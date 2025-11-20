@@ -45,14 +45,11 @@ namespace GDGame
         private Material _matBasicUnlit, _matBasicLit, _matAlphaCutout, _matBasicUnlitGround;
         #endregion
 
-        #region Demo Fields (remove in the game)
-        private AnimationCurve3D _animationPositionCurve, _animationRotationCurve;
-        private AnimationCurve _animationCurve;
+        #region Game Fields
         private GameObject _cameraGO;
         private UIStatsRenderer _uiStatsRenderer;
-        private int _dummyHealth;
         private KeyboardState _newKBState, _oldKBState;
-        private int _damageAmount;
+        private AudioSystem _audioSystem;
         #endregion
 
         #region Core Methods (Common to all games)     
@@ -112,9 +109,6 @@ namespace GDGame
             DemoCollidablePrimitiveObject(new Vector3(0, 50, 15), Vector3.One * 1);
             DemoCollidablePrimitiveObject(new Vector3(0, 40, 15), Vector3.One * 1);
             DemoCollidablePrimitiveObject(new Vector3(0, 30, 15), Vector3.One * 1);
-            DemoCollidableFBXModel(new Vector3(0, 50, 10), Vector3.Zero, new Vector3(2,1.25f,2));
-            DemoCollidableFBXModel(new Vector3(0, 40, 11), Vector3.Zero, new Vector3(2, 1.25f, 2));
-            DemoCollidableFBXModel(new Vector3(0, 25, 12), Vector3.Zero, new Vector3(2, 1.25f, 2));
 
             DemoAlphaCutoutFoliage(new Vector3(0, 10 /*note Y=heightscale/2*/, 0), 12, 20);
             DemoLoadFromJSON();
@@ -132,37 +126,6 @@ namespace GDGame
             base.Initialize();
         }
 
-        private void DemoCollidableFBXModel(Vector3 position, Vector3 eulerRotationDegrees, Vector3 scale)
-        {
-            var go = new GameObject("test");
-            go.Transform.TranslateTo(position);
-            go.Transform.RotateEulerBy(eulerRotationDegrees * MathHelper.Pi / 180f);
-            go.Transform.ScaleTo(scale);
-
-            var model = _modelDictionary.Get("monkey1");
-            var texture = _textureDictionary.Get("mona lisa");
-            var meshFilter = MeshFilterFactory.CreateFromModel(model, _graphics.GraphicsDevice, 0, 0);
-            go.AddComponent(meshFilter);
-
-            var meshRenderer = go.AddComponent<MeshRenderer>();
-
-            meshRenderer.Material = _matBasicLit;
-            meshRenderer.Overrides.MainTexture = texture;
-
-            _scene.Add(go);
-
-
-            // Add box collider (1x1x1 cube)
-            var collider = go.AddComponent<SphereCollider>();
-            collider.Diameter = scale.Length();
-
-            // Add rigidbody (Dynamic so it falls)
-            var rigidBody = go.AddComponent<RigidBody>();
-            rigidBody.BodyType = BodyType.Dynamic;
-            rigidBody.Mass = 1.0f;
-            rigidBody.UseGravity = true;
-        }
-
         private void InitializePlayer()
         {
             GameObject player = InitializeModel(new Vector3(0, 5, 10),
@@ -176,52 +139,9 @@ namespace GDGame
             player.AddComponent<DamageEventListener>();
         }
 
-        private void InitializePIPCamera(Vector3 position,
-      Viewport viewport, int depth, int index = 0)
-        {
-            var pipCameraGO = new GameObject("PIP camera");
-            pipCameraGO.Transform.TranslateTo(position);
-            pipCameraGO.Transform.RotateEulerBy(new Vector3(0, MathHelper.ToRadians(-90), 0));
-
-            //if (index == 0)
-            //{
-            //    pipCameraGO.AddComponent<KeyboardWASDController>();
-            //    pipCameraGO.AddComponent<MouseYawPitchController>();
-            //}
-
-            var camera = pipCameraGO.AddComponent<Camera>();
-            camera.StackRole = Camera.StackType.Overlay;
-            camera.ClearFlags = Camera.ClearFlagsType.DepthOnly;
-            camera.Depth = depth; //-100
-
-            camera.Viewport = viewport; // new Viewport(0, 0, 400, 300);
-
-            _scene.Add(pipCameraGO);
-        }
-
         private void InitializeAnimationCurves()
         {
-            //1D animation curve demo (e.g. scale, audio volume, lerp factor for color, etc)
-            _animationCurve = new AnimationCurve(CurveLoopType.Cycle);
-            _animationCurve.AddKey(0f, 10);
-            _animationCurve.AddKey(2f, 11); //up
-            _animationCurve.AddKey(0f, 12); //down
-            _animationCurve.AddKey(8f, 13); //up further
-            _animationCurve.AddKey(0f, 13.5f); //down
-
-            //3D animation curve demo
-            _animationPositionCurve = new AnimationCurve3D(CurveLoopType.Oscillate);
-            _animationPositionCurve.AddKey(new Vector3(0, 4, 0), 0);
-            _animationPositionCurve.AddKey(new Vector3(5, 8, 2), 1);
-            _animationPositionCurve.AddKey(new Vector3(10, 12, 4), 2);
-            _animationPositionCurve.AddKey(new Vector3(0, 4, 0), 3);
-
-            // Absolute yaw/pitch/roll angles (radians) over time
-            _animationRotationCurve = new AnimationCurve3D(CurveLoopType.Oscillate);
-            _animationRotationCurve.AddKey(new Vector3(0, 0, 0), 0);              // yaw, pitch, roll
-            _animationRotationCurve.AddKey(new Vector3(0, MathHelper.PiOver2, 0), 1);
-            _animationRotationCurve.AddKey(new Vector3(0, MathHelper.Pi, 0), 2);
-            _animationRotationCurve.AddKey(new Vector3(0, 0, 0), 3);
+            
         }
 
         private void InitializeGraphics(Integer2 resolution)
@@ -263,7 +183,7 @@ namespace GDGame
             _fontDictionary = new ContentDictionary<SpriteFont>();
             _soundFXDictionary = new ContentDictionary<SoundEffect>();
             _effectsDictionary = new ContentDictionary<Effect>();
-            //TODO - Add dictionary loading for other assets - song, other?
+         
 
             var manifests = JSONSerializationUtility.LoadData<AssetManifest>(Content, relativeFilePathAndName); // single or array
             if (manifests.Count > 0)
@@ -275,7 +195,6 @@ namespace GDGame
                     _fontDictionary.LoadFromManifest(m.Fonts, e => e.Name, e => e.ContentPath, overwrite: true);
                     _soundFXDictionary.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
                     _effectsDictionary.LoadFromManifest(m.Effects, e => e.Name, e => e.ContentPath, overwrite: true);
-                    //TODO - Add dictionary loading for other assets - song, other?
                 }
             }
         }
@@ -335,24 +254,20 @@ namespace GDGame
 
         private void InitializeScene()
         {
-            // Make a scene that will store all drawn objects and systems for that level
-            _scene = new Scene(EngineContext.Instance, "outdoors - level 1");
+            _scene = new Scene(EngineContext.Instance, "Main-Game");
         }
 
         private void InitializeSystems()
         {
             InitializePhysicsSystem();
             InitializePhysicsDebugSystem(true);
-            InitializeEventSystem();  //propagate events
-            InitializeInputSystem();  //input
-            InitializeCameraAndRenderSystems(); //update cameras, draw renderable game objects, draw ui and menu
+            InitializeCameraAndRenderSystems();
             InitializeAudioSystem();
         }
 
         private void InitializeAudioSystem()
         {
-            //throw new NotImplementedException();
-
+            _audioSystem = new AudioSystem();
         }
 
         private void InitializePhysicsDebugSystem(bool isEnabled)
@@ -418,19 +333,6 @@ namespace GDGame
         private void InitializeCameras()
         {
 
-            #region Third-person camera
-            _cameraGO = new GameObject(AppData.CAMERA_NAME_THIRD_PERSON);
-            _camera = _cameraGO.AddComponent<Camera>();
-
-            var thirdPersonController = new ThirdPersonController();
-            thirdPersonController.TargetName = AppData.PLAYER_NAME;
-            thirdPersonController.ShoulderOffset = 0;
-            thirdPersonController.FollowDistance = 50;
-            thirdPersonController.RotationDamping = 20;
-            _cameraGO.AddComponent(thirdPersonController);
-            _scene.Add(_cameraGO);
-            #endregion
-
             #region First-person camera
             var position = new Vector3(0, 5, 25);
 
@@ -450,10 +352,7 @@ namespace GDGame
             _scene.Add(_cameraGO);
             #endregion
 
-            // Set the active camera by finding and getting its camera component
-            //BUG - FIXED
             var theCamera = _scene.Find(go => go.Name.Equals(AppData.CAMERA_NAME_FIRST_PERSON)).GetComponent<Camera>();
-            ////Obviously, since we have _camera we could also just use the line below
             _scene.SetActiveCamera(theCamera);
         }
 
@@ -663,19 +562,6 @@ namespace GDGame
             var waypointObject = _scene.Find((go) => go.Name.Equals("test crate textured cube"));
             var cameraObject = _scene.Find(go => go.Name.Equals("First person camera"));
 
-            Func<IEnumerable<string>> linesProvider = () =>
-            {
-                var distToWaypoint = Vector3.Distance(
-                    cameraObject.Transform.Position,
-                    waypointObject.Transform.Position);
-                var hp = _dummyHealth;
-                return new[]
-                {
-                    $"Dist: {distToWaypoint:F2} m",
-                    $"Health:   {hp}"
-                };
-            };
-
             // Text anchored at mouse, slightly below the reticle
             var text = new UITextRenderer(uiFont);
             text.PositionProvider = () => Mouse.GetState().Position.ToVector2();
@@ -687,8 +573,6 @@ namespace GDGame
 
             // Place HUD text below the cursor in the same pass
             text.LayerDepth = UILayer.HUD;
-
-            text.TextProvider = () => string.Join("\n", linesProvider());
 
             uiGO.AddComponent(text);
             _scene.Add(uiGO);
@@ -728,7 +612,6 @@ namespace GDGame
         }
         protected override void Update(GameTime gameTime)
         {
-            //call time update
             #region Core
             Time.Update(gameTime);
 
@@ -740,9 +623,7 @@ namespace GDGame
           
             #endregion
 
-            #region Demo
-            _dummyHealth++;
-            DemoStuff();
+            #region Game
             #endregion
 
             base.Update(gameTime);
@@ -810,12 +691,6 @@ namespace GDGame
                 System.Diagnostics.Debug.WriteLine("Disposing EngineContext");
                 EngineContext.Instance?.Dispose();
 
-                // 6. Clear references to help GC
-                System.Diagnostics.Debug.WriteLine("Clearing References");
-                _animationCurve = null;
-                _animationPositionCurve = null;
-                _animationRotationCurve = null;
-
                 System.Diagnostics.Debug.WriteLine("Main disposal complete");
             }
 
@@ -827,97 +702,14 @@ namespace GDGame
 
         #endregion    }
 
-        #region Demo Methods (remove in the game)
+        #region Game Methods
 
-        private void DemoStuff()
-        {
-            _newKBState = Keyboard.GetState();
-            DemoStatsToggle();
-            DemoEventPublish();
-            DemoCameraSwitch();
-            DemoToggleFullscreen();
-            _oldKBState = _newKBState;
-        }
 
         private void DemoToggleFullscreen()
         {
             bool togglePressed = _newKBState.IsKeyDown(Keys.F5) && !_oldKBState.IsKeyDown(Keys.F5);
             if (togglePressed)
                 _graphics.ToggleFullScreen();
-        }
-
-        private void DemoCameraSwitch()
-        {
-            var cameraSystem = _scene.GetSystem<CameraSystem>();
-            if (cameraSystem == null)
-            {
-                return;
-            }
-
-            var cameras = cameraSystem.Cameras;
-            if (cameras == null || cameras.Count == 0)
-            {
-                return;
-            }
-
-            bool prevPressed = _newKBState.IsKeyDown(Keys.F2) && !_oldKBState.IsKeyDown(Keys.F2);
-            bool nextPressed = _newKBState.IsKeyDown(Keys.F3) && !_oldKBState.IsKeyDown(Keys.F3);
-
-            if (!prevPressed && !nextPressed)
-            {
-                return;
-            }
-
-            var active = _scene.ActiveCamera;
-            int index = 0;
-
-            if (active != null)
-            {
-                for (int i = 0; i < cameras.Count; i++)
-                {
-                    if (ReferenceEquals(cameras[i], active))
-                    {
-                        index = i;
-                        break;
-                    }
-                }
-            }
-
-            if (nextPressed)
-            {
-                index++;
-                if (index >= cameras.Count)
-                {
-                    index = 0;
-                }
-            }
-            else if (prevPressed)
-            {
-                index--;
-                if (index < 0)
-                {
-                    index = cameras.Count - 1;
-                }
-            }
-
-            _scene.ActiveCamera = cameras[index];
-        }
-
-        private void DemoEventPublish()
-        {
-            // F2: publish a test DamageEvent
-            if (_newKBState.IsKeyDown(Keys.F6) && !_oldKBState.IsKeyDown(Keys.F6))
-            {
-                // Simple “debug” damage example
-                var cameraPos = _cameraGO.Transform.Position;
-                var hitPos = cameraPos + _cameraGO.Transform.Forward * 5f;
-                _damageAmount++;
-
-                var damageEvent = new DamageEvent(_damageAmount, DamageEvent.DamageType.Strength,
-                    "DebugGun", AppData.PLAYER_NAME, hitPos, false);
-
-                EngineContext.Instance.Events.Post(damageEvent);
-            }
         }
 
         private void DemoStatsToggle()
