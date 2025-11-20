@@ -37,5 +37,10 @@ The goal is to develop a basic game using the 3D engine we made in class through
   - Maya
   - Reaper
 
-
 ---
+
+## 🗒️ Project Documents
+
+| Name | Use | Link |
+|------|-----|------|
+| Git Guide | Teach the team how to use Git to avoid Merge Conflicts and keep a clean project | [🔗](GIT_GUIDE.md) |
