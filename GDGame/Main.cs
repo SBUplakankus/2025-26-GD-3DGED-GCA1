@@ -65,10 +65,10 @@ namespace GDGame
             #region Core
 
             // Give the game a name
-            Window.Title = "My Amazing Game";
+            Window.Title = "Medieval Mayhem";
 
             // Set resolution and centering (by monitor index)
-            InitializeGraphics(ScreenResolution.R_HD_16_9_1280x720);
+            InitializeGraphics(ScreenResolution.R_FHD_16_9_1920x1080);
 
             // Center and hide the mouse!
             InitializeMouse();
@@ -101,25 +101,14 @@ namespace GDGame
             // Setup player
             InitializePlayer();
       
-            #region Demos
-            // Camera-demos
+            #region Game
             InitializeAnimationCurves();
-
-            // Collidable game object demos
-            DemoCollidablePrimitiveObject(new Vector3(0, 50, 15), Vector3.One * 1);
-            DemoCollidablePrimitiveObject(new Vector3(0, 40, 15), Vector3.One * 1);
-            DemoCollidablePrimitiveObject(new Vector3(0, 30, 15), Vector3.One * 1);
-
-            DemoAlphaCutoutFoliage(new Vector3(0, 10 /*note Y=heightscale/2*/, 0), 12, 20);
             DemoLoadFromJSON();
             DemoOrchestration();
             #endregion
 
             // Setup renderers after all game objects added since ui text may use a gameobject as target
             InitializeUI();
-
-            // Setup menu
-            //InitializeMenu();
 
             #endregion
 
@@ -130,7 +119,7 @@ namespace GDGame
         {
             GameObject player = InitializeModel(new Vector3(0, 5, 10),
                 new Vector3(0, 0, 0),
-                2 * Vector3.One, "crate1", "monkey1", AppData.PLAYER_NAME);
+                new Vector3(0.1f, 0.1f, 0.1f), "colormap", "ghost", AppData.PLAYER_NAME);
 
             var simpleDriveController = new SimpleDriveController();
             player.AddComponent(simpleDriveController);
@@ -267,7 +256,7 @@ namespace GDGame
 
         private void InitializeAudioSystem()
         {
-            _audioSystem = new AudioSystem();
+            // _audioSystem = new AudioSystem();
         }
 
         private void InitializePhysicsDebugSystem(bool isEnabled)
@@ -518,7 +507,7 @@ namespace GDGame
             // Set font 
             _uiStatsRenderer.Font = _fontDictionary.Get("perf_stats_font");
 
-            _uiStatsRenderer.ScreenCorner = ScreenCorner.TopRight;
+            //_uiStatsRenderer.ScreenCorner = ScreenCorner.TopRight;
             _uiStatsRenderer.Margin = new Vector2(20f, 20f);
 
             // Optional: add the own debug lines (same pattern you used before)
@@ -750,10 +739,6 @@ namespace GDGame
         {
             var relativeFilePathAndName = "assets/data/single_model_spawn.json";
             List<ModelSpawnData> mList = JSONSerializationUtility.LoadData<ModelSpawnData>(Content, relativeFilePathAndName);
-
-            //load a single model
-            foreach (var d in mList)
-                InitializeModel(d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName);
 
             relativeFilePathAndName = "assets/data/multi_model_spawn.json";
             //load multiple models

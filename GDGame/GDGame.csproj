@@ -33,6 +33,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Scripts\UI\" />
     <Folder Include="Scripts\Systems\" />
     <Folder Include="Scripts\Traps\" />
     <Folder Include="Scripts\Player\" />
