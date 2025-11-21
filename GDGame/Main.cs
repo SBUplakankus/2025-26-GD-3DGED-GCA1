@@ -35,20 +35,19 @@ namespace GDGame
     {
         #region Core Fields (Common to all games)     
         private GraphicsDeviceManager _graphics;
-        private ContentDictionary<Texture2D> _textureDictionary;
         private ContentDictionary<Model> _modelDictionary;
-        private ContentDictionary<SpriteFont> _fontDictionary;
         private ContentDictionary<Effect> _effectsDictionary;
         private Scene _scene;
         private Camera _camera;
         private bool _disposed = false;
         private OrchestrationSystem _orchestrationSystem;
-        private Material _matBasicUnlit, _matBasicLit, _matAlphaCutout, _matBasicUnlitGround;
         #endregion
 
-        #region Controllers
+        #region Systems
         AudioController _audioController;
         SceneController _sceneController;
+        UserInterfaceController _uiController;
+        SceneGenerator _sceneGenerator;
         #endregion
 
         #region Game Fields
@@ -82,8 +81,6 @@ namespace GDGame
 
             LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
 
-            // All effects used in game
-            InitializeEffects();
 
             // Scene to hold game objects
             InitializeScene();
@@ -106,7 +103,6 @@ namespace GDGame
             #region Game
             InitializeAnimationCurves();
             DemoLoadFromJSON();
-            DemoOrchestration();
             #endregion
 
             // Setup renderers after all game objects added since ui text may use a gameobject as target
@@ -125,11 +121,6 @@ namespace GDGame
 
             var simpleDriveController = new SimpleDriveController();
             player.AddComponent(simpleDriveController);
-        }
-
-        private void InitializeAnimationCurves()
-        {
-            
         }
 
         private void InitializeGraphics(Integer2 resolution)
@@ -159,9 +150,9 @@ namespace GDGame
         private void LoadAssetsFromJSON(string relativeFilePathAndName)
         {
             // Make dictionaries to store assets
-            _textureDictionary = new ContentDictionary<Texture2D>();
+            var textures = new ContentDictionary<Texture2D>();
             _modelDictionary = new ContentDictionary<Model>();
-            _fontDictionary = new ContentDictionary<SpriteFont>();
+            var fonts = new ContentDictionary<SpriteFont>();
             _effectsDictionary = new ContentDictionary<Effect>();
             var sounds = new ContentDictionary<SoundEffect>();
 
@@ -172,67 +163,16 @@ namespace GDGame
                 foreach (var m in manifests)
                 {
                     _modelDictionary.LoadFromManifest(m.Models, e => e.Name, e => e.ContentPath, overwrite: true);
-                    _textureDictionary.LoadFromManifest(m.Textures, e => e.Name, e => e.ContentPath, overwrite: true);
-                    _fontDictionary.LoadFromManifest(m.Fonts, e => e.Name, e => e.ContentPath, overwrite: true);
+                    textures.LoadFromManifest(m.Textures, e => e.Name, e => e.ContentPath, overwrite: true);
+                    fonts.LoadFromManifest(m.Fonts, e => e.Name, e => e.ContentPath, overwrite: true);
                     sounds.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
                     _effectsDictionary.LoadFromManifest(m.Effects, e => e.Name, e => e.ContentPath, overwrite: true);
                 }
             }
 
             _audioController = new AudioController(sounds);
-        }
-
-        private void InitializeEffects()
-        {
-            #region Unlit Textured BasicEffect 
-            var unlitBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = false,
-                VertexColorEnabled = false
-            };
-
-            _matBasicUnlit = new Material(unlitBasicEffect);
-            _matBasicUnlit.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlit.SamplerState = SamplerState.LinearClamp;   // helps avoid texture seams on sky
-
-            //ground texture where UVs above [0,0]-[1,1]
-            _matBasicUnlitGround = new Material(unlitBasicEffect.Clone());
-            _matBasicUnlitGround.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlitGround.SamplerState = SamplerState.AnisotropicWrap;   // wrap texture based on UV values
-
-            #endregion
-
-            #region Lit Textured BasicEffect 
-            var litBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = true,
-                PreferPerPixelLighting = true,
-                VertexColorEnabled = false
-            };
-            litBasicEffect.EnableDefaultLighting();
-            _matBasicLit = new Material(litBasicEffect);
-            _matBasicLit.StateBlock = RenderStates.Opaque3D();
-            #endregion
-
-            #region Alpha-test for foliage/billboards
-            var alphaFx = new AlphaTestEffect(GraphicsDevice)
-            {
-                VertexColorEnabled = false
-            };
-            _matAlphaCutout = new Material(alphaFx);
-
-            // Depth test/write on; no blending (cutout happens in the effect). 
-            // Make it two-sided so the quad is visible from both sides.
-            _matAlphaCutout.StateBlock = RenderStates.Cutout3D()
-                .WithRaster(new RasterizerState { CullMode = CullMode.None });
-
-            // Clamp avoids edge bleeding from transparent borders.
-            // (Use LinearWrap if the foliage textures tile.)
-            _matAlphaCutout.SamplerState = SamplerState.LinearClamp;
-
-            #endregion
+            _uiController = new UserInterfaceController(fonts, textures);
+            _sceneGenerator = new SceneGenerator(textures, _graphics);
         }
 
         private void InitializeScene()
@@ -255,6 +195,11 @@ namespace GDGame
         
             _audioController.PlayMusic();
            
+        }
+
+        private void GenerateBaseScene()
+        {
+
         }
 
         private void InitializePhysicsDebugSystem(bool isEnabled)
@@ -356,87 +301,7 @@ namespace GDGame
 
         private void InitializeSkyBox(int scale = 500)
         {
-            GameObject gameObject = null;
-            MeshFilter meshFilter = null;
-            MeshRenderer meshRenderer = null;
-
-            // Find the sky parent object to attach sky to so sky rotates
-            GameObject skyParent = _scene.Find((GameObject go) => go.Name.Equals("SkyParent"));
-
-            // back
-            gameObject = new GameObject("back");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.TranslateTo(new Vector3(0, 0, -scale / 2));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_back");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-            // left
-            gameObject = new GameObject("left");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(0, MathHelper.ToRadians(90), 0), true);
-            gameObject.Transform.TranslateTo(new Vector3(-scale / 2, 0, 0));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_left");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-
-            // right
-            gameObject = new GameObject("right");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(0, MathHelper.ToRadians(-90), 0), true);
-            gameObject.Transform.TranslateTo(new Vector3(scale / 2, 0, 0));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_right");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-            // front
-            gameObject = new GameObject("front");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(0, MathHelper.ToRadians(180), 0), true);
-            gameObject.Transform.TranslateTo(new Vector3(0, 0, scale / 2));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_front");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-            // sky (top)
-            gameObject = new GameObject("sky");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(MathHelper.ToRadians(90), 0, MathHelper.ToRadians(90)), true);
-            gameObject.Transform.TranslateTo(new Vector3(0, scale / 2, 0));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_sky");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
+            
 
         }
 
@@ -519,10 +384,8 @@ namespace GDGame
             #region Core
             Time.Update(gameTime);
 
-
             _scene.Update(Time.DeltaTimeSecs);
 
-          
             #endregion
 
             #region Game
@@ -605,31 +468,6 @@ namespace GDGame
 
         #region Game Methods
 
-
-        private void DemoOrchestration()
-        {
-            if (_orchestrationSystem == null)
-                return;
-
-            GameObject crate = _scene.Find((GameObject go) => go.Name.Equals("test crate textured cube"));
-            if (crate == null)
-                return;
-
-            Transform transform = crate.Transform;
-
-            Vector3 startPosition = transform.Position;
-            Vector3 peakPosition = startPosition + new Vector3(0, 5, 0);
-
-            Orchestrator orchestrator = _orchestrationSystem.Orchestrator;
-
-            orchestrator.Build("Demo_CrateBounce")
-                .WaitSeconds(1.0f)
-                .MoveTo(transform, peakPosition, 1.5f, Ease.EaseInOutSine)
-                .WaitSeconds(0.5f)
-                .MoveTo(transform, startPosition, 1.5f, Ease.EaseInOutSine)
-                .Register();
-        }
-
         private void DemoLoadFromJSON()
         {
             var relativeFilePathAndName = "assets/data/single_model_spawn.json";
@@ -639,37 +477,6 @@ namespace GDGame
             //load multiple models
             foreach (var d in JSONSerializationUtility.LoadData<ModelSpawnData>(Content, relativeFilePathAndName))
                 InitializeModel(d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName);
-        }
-
-        private void DemoCollidablePrimitiveObject(Vector3 position, Vector3 scale)
-        {
-            GameObject gameObject = null;
-            MeshFilter meshFilter = null;
-            MeshRenderer meshRenderer = null;
-
-            gameObject = new GameObject("test crate textured cube");
-            gameObject.Transform.TranslateTo(position);
-            gameObject.Transform.ScaleTo(scale);
-
-            meshFilter = MeshFilterFactory.CreateCubeTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicLit; //enable lighting for the crate
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("crate1");
-
-            _scene.Add(gameObject);
-
-            // Add box collider (1x1x1 cube)
-            var collider = gameObject.AddComponent<BoxCollider>();
-            collider.Size = scale;
-            collider.Center = new Vector3(0, 0, 0);
-
-            // Add rigidbody (Dynamic so it falls)
-            var rigidBody = gameObject.AddComponent<RigidBody>();
-            rigidBody.BodyType = BodyType.Dynamic;
-            rigidBody.Mass = 1.0f;
-            rigidBody.UseGravity = true;;
         }
         #endregion
 
