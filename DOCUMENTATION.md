@@ -81,6 +81,14 @@ Steps:
 - Stores the current scene and any new ones created
 - `_scene` in `Main` is gotten from `SceneController.CurrentScene`
 
+### 🏡 Scene Generator
+- Created in `Main`
+- Generates the Skybox and Ground
+
+### 🗽 Model Generator
+- Created in `Main`
+- Returns created Models
+
 ### 💻 User Interface Controller
 - Created in `Main`
 - Takes in the Fonts and 2D Textures on construction
