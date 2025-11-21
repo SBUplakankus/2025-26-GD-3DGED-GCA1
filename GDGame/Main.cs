@@ -36,7 +36,7 @@ namespace GDGame
         private ContentDictionary<Texture2D> _textureDictionary;
         private ContentDictionary<Model> _modelDictionary;
         private ContentDictionary<SpriteFont> _fontDictionary;
-        private ContentDictionary<SoundEffect> _soundFXDictionary;
+        private ContentDictionary<SoundEffect> _soundDictionary;
         private ContentDictionary<Effect> _effectsDictionary;
         private Scene _scene;
         private Camera _camera;
@@ -160,7 +160,7 @@ namespace GDGame
             _textureDictionary = new ContentDictionary<Texture2D>();
             _modelDictionary = new ContentDictionary<Model>();
             _fontDictionary = new ContentDictionary<SpriteFont>();
-            _soundFXDictionary = new ContentDictionary<SoundEffect>();
+            _soundDictionary = new ContentDictionary<SoundEffect>();
             _effectsDictionary = new ContentDictionary<Effect>();
          
 
@@ -172,7 +172,7 @@ namespace GDGame
                     _modelDictionary.LoadFromManifest(m.Models, e => e.Name, e => e.ContentPath, overwrite: true);
                     _textureDictionary.LoadFromManifest(m.Textures, e => e.Name, e => e.ContentPath, overwrite: true);
                     _fontDictionary.LoadFromManifest(m.Fonts, e => e.Name, e => e.ContentPath, overwrite: true);
-                    _soundFXDictionary.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
+                    _soundDictionary.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
                     _effectsDictionary.LoadFromManifest(m.Effects, e => e.Name, e => e.ContentPath, overwrite: true);
                 }
             }
@@ -246,7 +246,7 @@ namespace GDGame
 
         private void InitializeAudioSystem()
         {
-            // _audioSystem = new AudioSystem();
+            _scene.Add(new AudioSystem(_soundDictionary));
         }
 
         private void InitializePhysicsDebugSystem(bool isEnabled)
@@ -479,8 +479,7 @@ namespace GDGame
 
         private void InitializeUI()
         {
-            InitializeUIStatsRenderer();
-            InitializeUIReticleRenderer();
+            
         }
 
         private void InitializeUIStatsRenderer()
