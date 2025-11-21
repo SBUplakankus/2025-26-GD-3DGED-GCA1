@@ -1,4 +1,8 @@
-﻿using GDEngine.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Security.AccessControl;
+using GDEngine.Core;
 using GDEngine.Core.Collections;
 using GDEngine.Core.Components;
 using GDEngine.Core.Debug;
@@ -17,14 +21,12 @@ using GDEngine.Core.Systems;
 using GDEngine.Core.Timing;
 using GDEngine.Core.Utilities;
 using GDGame.Demos.Controllers;
+using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Security.AccessControl;
+using SharpDX.X3DAudio;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDGame
@@ -36,13 +38,16 @@ namespace GDGame
         private ContentDictionary<Texture2D> _textureDictionary;
         private ContentDictionary<Model> _modelDictionary;
         private ContentDictionary<SpriteFont> _fontDictionary;
-        private ContentDictionary<SoundEffect> _soundDictionary;
         private ContentDictionary<Effect> _effectsDictionary;
         private Scene _scene;
         private Camera _camera;
         private bool _disposed = false;
         private OrchestrationSystem _orchestrationSystem;
         private Material _matBasicUnlit, _matBasicLit, _matAlphaCutout, _matBasicUnlitGround;
+        #endregion
+
+        #region Controllers
+        AudioController _audioController;
         #endregion
 
         #region Game Fields
@@ -160,9 +165,9 @@ namespace GDGame
             _textureDictionary = new ContentDictionary<Texture2D>();
             _modelDictionary = new ContentDictionary<Model>();
             _fontDictionary = new ContentDictionary<SpriteFont>();
-            _soundDictionary = new ContentDictionary<SoundEffect>();
             _effectsDictionary = new ContentDictionary<Effect>();
-         
+            var sounds = new ContentDictionary<SoundEffect>();
+
 
             var manifests = JSONSerializationUtility.LoadData<AssetManifest>(Content, relativeFilePathAndName); // single or array
             if (manifests.Count > 0)
@@ -172,10 +177,12 @@ namespace GDGame
                     _modelDictionary.LoadFromManifest(m.Models, e => e.Name, e => e.ContentPath, overwrite: true);
                     _textureDictionary.LoadFromManifest(m.Textures, e => e.Name, e => e.ContentPath, overwrite: true);
                     _fontDictionary.LoadFromManifest(m.Fonts, e => e.Name, e => e.ContentPath, overwrite: true);
-                    _soundDictionary.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
+                    sounds.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
                     _effectsDictionary.LoadFromManifest(m.Effects, e => e.Name, e => e.ContentPath, overwrite: true);
                 }
             }
+
+            _audioController = new AudioController(sounds);
         }
 
         private void InitializeEffects()
@@ -246,7 +253,10 @@ namespace GDGame
 
         private void InitializeAudioSystem()
         {
-            _scene.Add(new AudioSystem(_soundDictionary));
+            if (_audioController == null) return;
+        
+            _audioController.PlayMusic();
+           
         }
 
         private void InitializePhysicsDebugSystem(bool isEnabled)

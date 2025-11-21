@@ -69,9 +69,14 @@
     ],
   "sounds": [
     {
-      "name": "explosion1",
-      "contentPath": "assets/sounds/Explosion 1"
+        "name": "explosion1",
+        "contentPath": "assets/sounds/Explosion 1"
+    },
+    {
+        "name": "test-music",
+        "contentPath": "assets/sounds/test-music"
     }
+
   ],
   "effects": [ {
     "name": "ui_test_effect",

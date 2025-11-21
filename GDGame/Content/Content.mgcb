@@ -266,6 +266,12 @@
 /processorParam:Quality=Best
 /build:Assets/Sounds/Secret door.wav
 
+#begin Assets/Sounds/test-music.mp3
+/importer:WmaImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Sounds/test-music.mp3
+
 #begin Assets/Textures/Architecture/Walls/backwall.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
