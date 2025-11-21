@@ -54,6 +54,7 @@ namespace GDEngine.Core.Systems
         #endregion
 
         #region Methods
+ 
         public void Add(Camera camera)
         {
             if (camera == null)
@@ -237,10 +238,7 @@ namespace GDEngine.Core.Systems
             if (camera == null)
                 return;
 
-            // If the camera is PiP (Viewport set), its projection derives aspect from that.
-            // Otherwise, keep the camera's default aspect equal to backbuffer aspect.
-            if (camera.Viewport.HasValue == false)
-                camera.AspectRatio = _backbufferWidth / MathF.Max(1, _backbufferHeight);
+            camera.AspectRatio = camera.GetAspectRatio();
         }
 
         private void EnsureFrustum(Camera? camera)

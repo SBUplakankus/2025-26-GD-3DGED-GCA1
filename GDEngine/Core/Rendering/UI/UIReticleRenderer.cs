@@ -1,26 +1,27 @@
 ﻿#nullable enable
 using GDEngine.Core.Components;
+using GDEngine.Core.Entities;
 using GDEngine.Core.Timing;
+using GDEngine.Core.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
-namespace GDEngine.Core.Rendering.UI
+namespace GDEngine.Core.Rendering
 {
     /// <summary>
-    /// Draws a rotating reticle sprite at the screen centre (with optional offset/scale).
+    /// Draws a rotating reticle sprite at the mouse cursor (with optional offset/scale).
     /// Uses centralized batching in <see cref="UIRenderer"/>.
+    /// Optimized to cache mouse state in Update rather than polling in Draw.
     /// </summary>
     public class UIReticleRenderer : UIRenderer
     {
         #region Fields
         private Texture2D _texture = null!;
-        private Rectangle? _sourceRect;
-        private Vector2 _origin;
-        private Vector2 _scale = Vector2.One;
         private Vector2 _offset = Vector2.Zero;
         private float _rotationSpeedDegPerSec = 90f;
-        private Color _tint = Color.White;
+
+        // Cached viewport center
+        private Vector2 _viewportCenter;
         #endregion
 
         #region Constructors
@@ -41,24 +42,8 @@ namespace GDEngine.Core.Rendering.UI
             }
         }
 
-        public Rectangle? SourceRectangle
-        {
-            get => _sourceRect;
-            set
-            {
-                _sourceRect = value;
-                RecenterOriginFromSource();
-            }
-        }
-
-        public Vector2 Scale
-        {
-            get => _scale;
-            set => _scale = value;
-        }
-
         /// <summary>
-        /// Optional 2D offset from the screen centre in pixels.
+        /// Optional 2D offset from the mouse position in pixels.
         /// </summary>
         public Vector2 Offset
         {
@@ -72,36 +57,52 @@ namespace GDEngine.Core.Rendering.UI
             set => _rotationSpeedDegPerSec = value;
         }
 
+        /// <summary>
+        /// Tint color for the reticle. Accesses base class Color property.
+        /// </summary>
         public Color Tint
         {
-            get => _tint;
-            set => _tint = value;
+            get => Color;
+            set => Color = value;
         }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Recalculates origin to center of texture/source rectangle.
+        /// Now uses base class helper method.
+        /// </summary>
         public void RecenterOriginFromSource()
         {
-            if (_texture == null)
-                return;
-
-            if (_sourceRect.HasValue)
-            {
-                var r = _sourceRect.Value;
-                _origin = new Vector2(r.Width * 0.5f, r.Height * 0.5f);
-            }
-            else
-            {
-                _origin = new Vector2(_texture.Width * 0.5f, _texture.Height * 0.5f);
-            }
+            CenterOriginFromTexture(_texture, _sourceRect);
         }
         #endregion
 
         #region Lifecycle Methods
+        protected override void Start()
+        {
+            if (GameObject == null)
+                throw new NullReferenceException(nameof(GameObject));
+
+            // Cache viewport center
+            var scene = GameObject.Scene;
+
+            if (scene == null)
+                throw new NullReferenceException(nameof(scene));
+
+            var activeCamera = scene.ActiveCamera;
+            var device = scene.Context.GraphicsDevice;
+
+            if (activeCamera == null)
+                throw new NullReferenceException(nameof(activeCamera));
+
+            _viewportCenter = activeCamera.GetViewport(device).GetCenter();
+        }
         protected override void Update(float deltaTime)
         {
-            // Advance base RotationRadians so we use the centralized rotation field.
-            RotationRadians += MathHelper.ToRadians(_rotationSpeedDegPerSec) * Time.DeltaTimeSecs;
+            if(_rotationSpeedDegPerSec != 0)
+                // Advance base RotationRadians so we use the centralized rotation field
+                RotationRadians += MathHelper.ToRadians(_rotationSpeedDegPerSec) * Time.DeltaTimeSecs;
         }
 
         public override void Draw(GraphicsDevice device, Camera? camera)
@@ -109,14 +110,14 @@ namespace GDEngine.Core.Rendering.UI
             if (_spriteBatch == null || _texture == null)
                 return;
 
-            var mouse = Mouse.GetState().Position.ToVector2();
-            var pos = mouse + _offset;
+            // Use cached mouse position from Update
+            var pos = _viewportCenter + _offset;  //Mouse.GetState().Position;
 
             _spriteBatch.Draw(
                 _texture,
                 pos,
                 _sourceRect,
-                _tint,
+                Color,
                 RotationRadians,
                 _origin,
                 _scale,
