@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GDEngine.Core.Collections;
+using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Factories;
 using GDEngine.Core.Rendering;
@@ -24,6 +25,7 @@ namespace GDGame.Scripts.Systems
         private Material _matBasicUnlit, _matBasicLit, _matBasicUnlitGround;
 
         private const int SKY_SCALE = 500;
+        private const int GROUND_SCALE = 500;
         private Vector3 _skyScaleVector = new(SKY_SCALE, SKY_SCALE, 1);
 
         private readonly Dictionary<string, Vector3> _skyPositions =
@@ -48,11 +50,14 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Constructors
-        public SceneGenerator(ContentDictionary<Texture2D> tex, GraphicsDeviceManager graphics)
+        public SceneGenerator(ContentDictionary<Texture2D> tex, Material matUnlit, Material matLit, Material matGround
+            , GraphicsDeviceManager graphics)
         {
             _textures = tex;
+            _matBasicLit = matLit;
+            _matBasicUnlit = matUnlit;
+            _matBasicUnlitGround = matGround;
             _graphics = graphics;
-            GenerateMaterials();
         }
         #endregion
 
@@ -61,6 +66,7 @@ namespace GDGame.Scripts.Systems
         public void GenerateScene(Scene currentScene)
         {
             GenerateSkyBox(currentScene);
+            GenerateGround(currentScene);
         }
 
         #endregion
@@ -109,40 +115,47 @@ namespace GDGame.Scripts.Systems
             return skySegment;
         }
 
-        private void GenerateMaterials()
+        private void GenerateGround(Scene currentScene)
         {
-            #region Unlit Textured BasicEffect 
-            var unlitBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = false,
-                VertexColorEnabled = false
-            };
+            GameObject gameObject = null;
+            MeshFilter meshFilter = null;
+            MeshRenderer meshRenderer = null;
 
-            _matBasicUnlit = new Material(unlitBasicEffect);
-            _matBasicUnlit.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlit.SamplerState = SamplerState.LinearClamp;   // helps avoid texture seams on sky
+            gameObject = new GameObject("ground");
+            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
 
-            //ground texture where UVs above [0,0]-[1,1]
-            _matBasicUnlitGround = new Material(unlitBasicEffect.Clone());
-            _matBasicUnlitGround.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlitGround.SamplerState = SamplerState.AnisotropicWrap;   // wrap texture based on UV values
+            meshFilter = MeshFilterFactory.CreateQuadGridTexturedUnlit(_graphics.GraphicsDevice,
+                 1,
+                 1,
+                 1,
+                 1,
+                 20,
+                 20);
 
-            #endregion
 
-            #region Lit Textured BasicEffect 
-            var litBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = true,
-                PreferPerPixelLighting = true,
-                VertexColorEnabled = false
-            };
-            litBasicEffect.EnableDefaultLighting();
-            _matBasicLit = new Material(litBasicEffect);
-            _matBasicLit.StateBlock = RenderStates.Opaque3D();
-            #endregion
+            gameObject.Transform.ScaleBy(new Vector3(GROUND_SCALE, GROUND_SCALE, 1));
+            gameObject.Transform.RotateEulerBy(new Vector3(MathHelper.ToRadians(-90), 0, 0), true);
+            gameObject.Transform.TranslateTo(new Vector3(0, -0.5f, 0));
+
+            gameObject.AddComponent(meshFilter);
+            meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            meshRenderer.Material = _matBasicUnlitGround;
+            meshRenderer.Overrides.MainTexture = _textures.Get("ground_grass");
+
+            // Add a box collider matching the ground size
+            var collider = gameObject.AddComponent<BoxCollider>();
+            collider.Size = new Vector3(GROUND_SCALE, GROUND_SCALE, 0.025f);
+            collider.Center = new Vector3(0, 0, -0.0125f);
+
+            // Add rigidbody as Static (immovable)
+            var rigidBody = gameObject.AddComponent<RigidBody>();
+            rigidBody.BodyType = BodyType.Static;
+            gameObject.IsStatic = true;
+
+            currentScene.Add(gameObject);
         }
+
+        
 
         #endregion
     }
