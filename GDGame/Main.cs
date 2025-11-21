@@ -123,9 +123,6 @@ namespace GDGame
 
             var simpleDriveController = new SimpleDriveController();
             player.AddComponent(simpleDriveController);
-
-            // Listen for damage events on the player
-            player.AddComponent<DamageEventListener>();
         }
 
         private void InitializeAnimationCurves()
@@ -135,21 +132,14 @@ namespace GDGame
 
         private void InitializeGraphics(Integer2 resolution)
         {
-            // Enable per-monitor DPI awareness so the window/UI scales crisply on multi-monitor setups with different DPIs (avoids blurriness when moving between screens).
             System.Windows.Forms.Application.SetHighDpiMode(System.Windows.Forms.HighDpiMode.PerMonitorV2);
-
-            // Set preferred resolution
             ScreenResolution.SetResolution(_graphics, resolution);
-
-            // Center on primary display (set to index of the preferred monitor)
             WindowUtility.CenterOnMonitor(this, 1);
         }
 
         private void InitializeMouse()
         {
             Mouse.SetPosition(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
-
-            // Set old state at start so its not null for comparison with new state in Update
             _oldKBState = Keyboard.GetState();
         }
 
@@ -243,7 +233,7 @@ namespace GDGame
 
         private void InitializeScene()
         {
-            _scene = new Scene(EngineContext.Instance, "Main-Game");
+            _scene = new Scene(EngineContext.Instance, AppData.MAIN_SCENE_NAME);
         }
 
         private void InitializeSystems()
@@ -326,7 +316,7 @@ namespace GDGame
             var position = new Vector3(0, 5, 25);
 
             //camera GO
-            _cameraGO = new GameObject(AppData.CAMERA_NAME_FIRST_PERSON);
+            _cameraGO = new GameObject(AppData.CAMERA_NAME);
             //set position 
             _cameraGO.Transform.TranslateTo(position);
             //add camera component to the GO
@@ -341,7 +331,7 @@ namespace GDGame
             _scene.Add(_cameraGO);
             #endregion
 
-            var theCamera = _scene.Find(go => go.Name.Equals(AppData.CAMERA_NAME_FIRST_PERSON)).GetComponent<Camera>();
+            var theCamera = _scene.Find(go => go.Name.Equals(AppData.CAMERA_NAME)).GetComponent<Camera>();
             _scene.SetActiveCamera(theCamera);
         }
 
@@ -495,40 +485,8 @@ namespace GDGame
 
         private void InitializeUIStatsRenderer()
         {
-            // Create a GO to host the UI
-            var uiGO = new GameObject("Stats Overlay");
+            var uiGO = new GameObject(AppData.USER_INTERFACE);
 
-            // Attach stats overlay (auto-registers with UIRenderSystem in Awake)
-            _uiStatsRenderer = uiGO.AddComponent<UIStatsRenderer>();
-
-            // Layering: HUD should sit behind a cursor but in front of menu backgrounds
-            _uiStatsRenderer.LayerDepth = UILayer.HUD;
-
-            // Set font 
-            _uiStatsRenderer.Font = _fontDictionary.Get("perf_stats_font");
-
-            //_uiStatsRenderer.ScreenCorner = ScreenCorner.TopRight;
-            _uiStatsRenderer.Margin = new Vector2(20f, 20f);
-
-            // Optional: add the own debug lines (same pattern you used before)
-            _uiStatsRenderer.LinesProvider = () =>
-            {
-                var camera = _scene.ActiveCamera;
-
-                return new[]
-                {
-                    "",
-                    $"Draw Stats:",
-                    $" - Renderer Count: {_scene.Renderers.Count}",
-                    "",
-                    $"Camera Stats:",
-                    $" - Camera [name]: {camera.GameObject.Name}",
-                    $" - Camera [Position]: {camera.Transform.Position.ToFixed()}",
-                    $" - Camera [Forward]: {camera.Transform.Forward.ToFixed()}"
-                };
-            };
-
-            // Add to scene so Awake runs and it registers itself
             _scene.Add(uiGO);
         }
 
@@ -604,9 +562,7 @@ namespace GDGame
             #region Core
             Time.Update(gameTime);
 
-            //Time.TimeScale = 0;
 
-            //update Scene
             _scene.Update(Time.DeltaTimeSecs);
 
           
@@ -689,27 +645,10 @@ namespace GDGame
             base.Dispose(disposing);
         }
 
-        #endregion    }
+        #endregion    
 
         #region Game Methods
 
-
-        private void DemoToggleFullscreen()
-        {
-            bool togglePressed = _newKBState.IsKeyDown(Keys.F5) && !_oldKBState.IsKeyDown(Keys.F5);
-            if (togglePressed)
-                _graphics.ToggleFullScreen();
-        }
-
-        private void DemoStatsToggle()
-        {
-            // F1: toggle stats overlay
-            if (_uiStatsRenderer != null)
-            {
-                if (_newKBState.IsKeyDown(Keys.F1) && !_oldKBState.IsKeyDown(Keys.F1))
-                    _uiStatsRenderer.Enabled = !_uiStatsRenderer.Enabled;
-            }
-        }
 
         private void DemoOrchestration()
         {
@@ -790,33 +729,6 @@ namespace GDGame
             //#endregion
 
             //  testCrateGO.Layer = LayerMask.World;
-        }
-
-        private void DemoAlphaCutoutFoliage(Vector3 position, float width, float height)
-        {
-            var go = new GameObject("tree");
-
-            // A unit quad facing +Z (the factory already supplies lit quad with UVs)
-            var mf = MeshFilterFactory.CreateQuadTexturedLit(GraphicsDevice);
-            go.AddComponent(mf);
-
-            var treeRenderer = go.AddComponent<MeshRenderer>();
-            treeRenderer.Material = _matAlphaCutout;
-
-            // Per-object properties via the overrides block
-            treeRenderer.Overrides.MainTexture = _textureDictionary.Get("tree4");
-
-            // AlphaTest: pixels with alpha below ReferenceAlpha are discarded (0–255).
-            // 128–160 is a good starting range for foliage; tweak to taste.
-            treeRenderer.Overrides.SetInt("ReferenceAlpha", 128);
-            treeRenderer.Overrides.Alpha = 1f; // overall alpha multiplier (kept at 1 for cutout)
-
-            // Scale the quad so it looks like a tree (aspect from the PNG)
-            go.Transform.ScaleTo(new Vector3(width, height, 1f));
-
-            go.Transform.TranslateTo(position);
-
-            _scene.Add(go);
         }
         #endregion
 
