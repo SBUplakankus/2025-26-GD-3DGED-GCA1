@@ -32,6 +32,7 @@ The goal is to develop a basic game using the 3D engine we made in class through
 | [Development Plan](DEVELOPMENT_PLAN.md) | Track the features of our game and layout what we want to achieve each week | 
 | [Engine Documentation](DOCUMENTATION.md) | Contains tips, how-to's and fixes for common problems we find in the engine throughout development |
 | [User Testing](USER_TESTING.md) | Contains takeaways and notes from our user testing sessions |
+| [References](REFERENCES.md) | Contains references for materials used in our project |
 
 ---
 
