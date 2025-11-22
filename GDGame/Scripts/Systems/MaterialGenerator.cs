@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using GDEngine.Core.Rendering;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace GDGame.Scripts.Systems
+{
+    public class MaterialGenerator
+    {
+        #region Fields
+        private Material _matBasicUnlit, _matBasicLit, _matBasicUnlitGround;
+        #endregion
+
+        #region Constructors
+        public MaterialGenerator(GraphicsDeviceManager graphics) 
+        {
+            #region Unlit Textured BasicEffect 
+            var unlitBasicEffect = new BasicEffect(graphics.GraphicsDevice)
+            {
+                TextureEnabled = true,
+                LightingEnabled = false,
+                VertexColorEnabled = false
+            };
+
+            _matBasicUnlit = new Material(unlitBasicEffect);
+            _matBasicUnlit.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
+            _matBasicUnlit.SamplerState = SamplerState.LinearClamp;   // helps avoid texture seams on sky
+
+            //ground texture where UVs above [0,0]-[1,1]
+            _matBasicUnlitGround = new Material(unlitBasicEffect.Clone());
+            _matBasicUnlitGround.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
+            _matBasicUnlitGround.SamplerState = SamplerState.AnisotropicWrap;   // wrap texture based on UV values
+
+            #endregion
+
+            #region Lit Textured BasicEffect 
+            var litBasicEffect = new BasicEffect(graphics.GraphicsDevice)
+            {
+                TextureEnabled = true,
+                LightingEnabled = true,
+                PreferPerPixelLighting = true,
+                VertexColorEnabled = false
+            };
+
+            litBasicEffect.EnableDefaultLighting();
+            _matBasicLit = new Material(litBasicEffect);
+            _matBasicLit.StateBlock = RenderStates.Opaque3D();
+            #endregion
+        }
+        #endregion
+
+        #region Accessors
+        public Material MatBasicLit => _matBasicLit;
+        public Material MatBasicUnlit => _matBasicUnlit;
+        public Material MatBasicUnlitGround => _matBasicUnlitGround;
+        #endregion
+    }
+}

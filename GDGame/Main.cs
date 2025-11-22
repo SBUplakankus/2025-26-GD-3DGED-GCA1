@@ -39,7 +39,6 @@ namespace GDGame
         private Camera _camera;
         private bool _disposed = false;
         private OrchestrationSystem _orchestrationSystem;
-        private Material _matBasicUnlit, _matBasicLit, _matBasicUnlitGround;
         #endregion
 
         #region Systems
@@ -48,6 +47,7 @@ namespace GDGame
         private UserInterfaceController _uiController;
         private SceneGenerator _sceneGenerator;
         private ModelGenerator _modelGenerator;
+        private MaterialGenerator _materialGenerator;
         private InputManager _inputManager;
         #endregion
 
@@ -75,11 +75,7 @@ namespace GDGame
             InitializeScene();
             LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
             InitializeSystems();
-            GenerateBaseScene();
-            InitializeCameras();
-            InitializePlayer();
             DemoLoadFromJSON();
-            InitializeUI();
 
             base.Initialize();
         }
@@ -143,8 +139,9 @@ namespace GDGame
 
             _audioController = new AudioController(sounds);
             _uiController = new UserInterfaceController(fonts, textures);
-            _sceneGenerator = new SceneGenerator(textures, _matBasicLit, _matBasicUnlit, _matBasicUnlitGround, _graphics);
-            _modelGenerator = new ModelGenerator(textures, models, _scene, _matBasicUnlit, _graphics);
+            _sceneGenerator = new SceneGenerator(textures, _materialGenerator.MatBasicLit, 
+                _materialGenerator.MatBasicUnlit, _materialGenerator.MatBasicUnlitGround, _graphics);
+            _modelGenerator = new ModelGenerator(textures, models, _scene, _materialGenerator.MatBasicUnlit, _graphics);
         }
 
         private void InitializeScene()
@@ -160,6 +157,10 @@ namespace GDGame
             InitializeCameraAndRenderSystems();
             InitializeAudioSystem();
             InitializeInputSystem();
+            GenerateBaseScene();
+            InitializeCameras();
+            InitializePlayer();
+            InitializeUI();
         }
 
         private void InitializeAudioSystem()
@@ -243,37 +244,7 @@ namespace GDGame
 
         private void GenerateMaterials()
         {
-            #region Unlit Textured BasicEffect 
-            var unlitBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = false,
-                VertexColorEnabled = false
-            };
-
-            _matBasicUnlit = new Material(unlitBasicEffect);
-            _matBasicUnlit.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlit.SamplerState = SamplerState.LinearClamp;   // helps avoid texture seams on sky
-
-            //ground texture where UVs above [0,0]-[1,1]
-            _matBasicUnlitGround = new Material(unlitBasicEffect.Clone());
-            _matBasicUnlitGround.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlitGround.SamplerState = SamplerState.AnisotropicWrap;   // wrap texture based on UV values
-
-            #endregion
-
-            #region Lit Textured BasicEffect 
-            var litBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = true,
-                PreferPerPixelLighting = true,
-                VertexColorEnabled = false
-            };
-            litBasicEffect.EnableDefaultLighting();
-            _matBasicLit = new Material(litBasicEffect);
-            _matBasicLit.StateBlock = RenderStates.Opaque3D();
-            #endregion
+            _materialGenerator = new MaterialGenerator(_graphics);
         }
         private void InitializeUI()
         {
