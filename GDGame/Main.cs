@@ -20,6 +20,7 @@ using GDEngine.Core.Services;
 using GDEngine.Core.Systems;
 using GDEngine.Core.Timing;
 using GDEngine.Core.Utilities;
+using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -51,6 +52,10 @@ namespace GDGame
         private InputManager _inputManager;
         #endregion
 
+        #region Player
+        private PlayerController _playerController;
+        #endregion
+
         #region Game Fields
         private GameObject _cameraGO;
         private KeyboardState _newKBState, _oldKBState;
@@ -76,18 +81,26 @@ namespace GDGame
             LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
             InitializeSystems();
             DemoLoadFromJSON();
+            TestObjectLoad();
 
             base.Initialize();
         }
 
         private void InitializePlayer()
         {
+            _playerController = new PlayerController(
+                (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight);
+
+            _scene.Add(_playerController.PlayerCamGO);
+            _scene.Add(_playerController.PlayerGO);
+            _scene.SetActiveCamera(_playerController.PlayerCam);
+        }
+
+        private void TestObjectLoad()
+        {
             GameObject player = _modelGenerator.GenerateModel(new Vector3(0, 5, 10),
                 new Vector3(0, 0, 0),
-                new Vector3(0.1f, 0.1f, 0.1f), "colormap", "ghost", AppData.PLAYER_NAME);
-
-            var simpleDriveController = new SimpleDriveController();
-            player.AddComponent(simpleDriveController);
+                new Vector3(0.1f, 0.1f, 0.1f), "colormap", "ghost", "test");
         }
 
         private void InitializeGraphics(Integer2 resolution)
@@ -158,7 +171,6 @@ namespace GDGame
             InitializeAudioSystem();
             InitializeInputSystem();
             GenerateBaseScene();
-            InitializeCameras();
             InitializePlayer();
             InitializeUI();
         }
@@ -214,32 +226,6 @@ namespace GDGame
             _inputManager = new InputManager();
 
             _scene.Add(_inputManager.Input);
-        }
-
-        private void InitializeCameras()
-        {
-
-            #region First-person camera
-            var position = new Vector3(0, 5, 25);
-
-            //camera GO
-            _cameraGO = new GameObject(AppData.CAMERA_NAME);
-            //set position 
-            _cameraGO.Transform.TranslateTo(position);
-            //add camera component to the GO
-            _camera = _cameraGO.AddComponent<Camera>();
-            _camera.FarPlane = 1000;
-            ////feed off whatever screen dimensions you set InitializeGraphics
-            _camera.AspectRatio = (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight;
-            _cameraGO.AddComponent<KeyboardWASDController>();
-            _cameraGO.AddComponent<MouseYawPitchController>();
-
-            // Add it to the scene
-            _scene.Add(_cameraGO);
-            #endregion
-
-            var theCamera = _scene.Find(go => go.Name.Equals(AppData.CAMERA_NAME)).GetComponent<Camera>();
-            _scene.SetActiveCamera(theCamera);
         }
 
         private void GenerateMaterials()
