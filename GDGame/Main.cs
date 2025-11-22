@@ -1,4 +1,8 @@
-﻿using GDEngine.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Security.AccessControl;
+using GDEngine.Core;
 using GDEngine.Core.Collections;
 using GDEngine.Core.Components;
 using GDEngine.Core.Debug;
@@ -17,14 +21,12 @@ using GDEngine.Core.Systems;
 using GDEngine.Core.Timing;
 using GDEngine.Core.Utilities;
 using GDGame.Demos.Controllers;
+using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Security.AccessControl;
+using SharpDX.X3DAudio;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDGame
@@ -33,26 +35,29 @@ namespace GDGame
     {
         #region Core Fields (Common to all games)     
         private GraphicsDeviceManager _graphics;
-        private ContentDictionary<Texture2D> _textureDictionary;
         private ContentDictionary<Model> _modelDictionary;
-        private ContentDictionary<SpriteFont> _fontDictionary;
-        private ContentDictionary<SoundEffect> _soundFXDictionary;
         private ContentDictionary<Effect> _effectsDictionary;
         private Scene _scene;
         private Camera _camera;
         private bool _disposed = false;
         private OrchestrationSystem _orchestrationSystem;
-        private Material _matBasicUnlit, _matBasicLit, _matAlphaCutout, _matBasicUnlitGround;
+        private Material _matBasicUnlit, _matBasicLit, _matBasicUnlitGround;
+        #endregion
+
+        #region Systems
+        private AudioController _audioController;
+        private SceneController _sceneController;
+        private UserInterfaceController _uiController;
+        private SceneGenerator _sceneGenerator;
+        private ModelGenerator _modelGenerator;
         #endregion
 
         #region Game Fields
         private GameObject _cameraGO;
-        private UIStatsRenderer _uiStatsRenderer;
         private KeyboardState _newKBState, _oldKBState;
-        private AudioSystem _audioSystem;
         #endregion
 
-        #region Core Methods (Common to all games)     
+        #region Core Methods    
         public Main()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -62,105 +67,44 @@ namespace GDGame
 
         protected override void Initialize()
         {
-            #region Core
+            Window.Title = AppData.GAME_WINDOW_TITLE;
 
-            // Give the game a name
-            Window.Title = "My Amazing Game";
-
-            // Set resolution and centering (by monitor index)
-            InitializeGraphics(ScreenResolution.R_HD_16_9_1280x720);
-
-            // Center and hide the mouse!
+            InitializeGraphics(ScreenResolution.R_FHD_16_9_1920x1080);
             InitializeMouse();
-
-            // Shared data across entities
             InitializeContext();
-
-            // Assets from string names in JSON
-            var relativeFilePathAndName = "assets/data/asset_manifest.json";
-            LoadAssetsFromJSON(relativeFilePathAndName);
-
-            // All effects used in game
-            InitializeEffects();
-
-            // Scene to hold game objects
+            GenerateMaterials();
             InitializeScene();
-
-            // Camera, UI, Menu, Physics, Rendering etc.
+            LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
             InitializeSystems();
-
-            // All cameras we want in the game are loaded now and one set as active
+            GenerateBaseScene();
             InitializeCameras();
-
-            // Setup world
-            int scale = 100;
-            InitializeSkyParent();
-            InitializeSkyBox(scale);
-            InitializeCollidableGround(scale);
-
-            // Setup player
             InitializePlayer();
-      
-            #region Demos
-            // Camera-demos
-            InitializeAnimationCurves();
-
-            // Collidable game object demos
-            DemoCollidablePrimitiveObject(new Vector3(0, 50, 15), Vector3.One * 1);
-            DemoCollidablePrimitiveObject(new Vector3(0, 40, 15), Vector3.One * 1);
-            DemoCollidablePrimitiveObject(new Vector3(0, 30, 15), Vector3.One * 1);
-
-            DemoAlphaCutoutFoliage(new Vector3(0, 10 /*note Y=heightscale/2*/, 0), 12, 20);
             DemoLoadFromJSON();
-            DemoOrchestration();
-            #endregion
-
-            // Setup renderers after all game objects added since ui text may use a gameobject as target
             InitializeUI();
-
-            // Setup menu
-            //InitializeMenu();
-
-            #endregion
 
             base.Initialize();
         }
 
         private void InitializePlayer()
         {
-            GameObject player = InitializeModel(new Vector3(0, 5, 10),
+            GameObject player = _modelGenerator.GenerateModel(new Vector3(0, 5, 10),
                 new Vector3(0, 0, 0),
-                2 * Vector3.One, "crate1", "monkey1", AppData.PLAYER_NAME);
+                new Vector3(0.1f, 0.1f, 0.1f), "colormap", "ghost", AppData.PLAYER_NAME);
 
             var simpleDriveController = new SimpleDriveController();
             player.AddComponent(simpleDriveController);
-
-            // Listen for damage events on the player
-            player.AddComponent<DamageEventListener>();
-        }
-
-        private void InitializeAnimationCurves()
-        {
-            
         }
 
         private void InitializeGraphics(Integer2 resolution)
         {
-            // Enable per-monitor DPI awareness so the window/UI scales crisply on multi-monitor setups with different DPIs (avoids blurriness when moving between screens).
             System.Windows.Forms.Application.SetHighDpiMode(System.Windows.Forms.HighDpiMode.PerMonitorV2);
-
-            // Set preferred resolution
             ScreenResolution.SetResolution(_graphics, resolution);
-
-            // Center on primary display (set to index of the preferred monitor)
             WindowUtility.CenterOnMonitor(this, 1);
         }
 
         private void InitializeMouse()
         {
             Mouse.SetPosition(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
-
-            // Set old state at start so its not null for comparison with new state in Update
             _oldKBState = Keyboard.GetState();
         }
 
@@ -178,83 +122,36 @@ namespace GDGame
         private void LoadAssetsFromJSON(string relativeFilePathAndName)
         {
             // Make dictionaries to store assets
-            _textureDictionary = new ContentDictionary<Texture2D>();
-            _modelDictionary = new ContentDictionary<Model>();
-            _fontDictionary = new ContentDictionary<SpriteFont>();
-            _soundFXDictionary = new ContentDictionary<SoundEffect>();
+            var textures = new ContentDictionary<Texture2D>();
+            var models = new ContentDictionary<Model>();
+            var fonts = new ContentDictionary<SpriteFont>();
             _effectsDictionary = new ContentDictionary<Effect>();
-         
+            var sounds = new ContentDictionary<SoundEffect>();
+
 
             var manifests = JSONSerializationUtility.LoadData<AssetManifest>(Content, relativeFilePathAndName); // single or array
             if (manifests.Count > 0)
             {
                 foreach (var m in manifests)
                 {
-                    _modelDictionary.LoadFromManifest(m.Models, e => e.Name, e => e.ContentPath, overwrite: true);
-                    _textureDictionary.LoadFromManifest(m.Textures, e => e.Name, e => e.ContentPath, overwrite: true);
-                    _fontDictionary.LoadFromManifest(m.Fonts, e => e.Name, e => e.ContentPath, overwrite: true);
-                    _soundFXDictionary.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
+                    models.LoadFromManifest(m.Models, e => e.Name, e => e.ContentPath, overwrite: true);
+                    textures.LoadFromManifest(m.Textures, e => e.Name, e => e.ContentPath, overwrite: true);
+                    fonts.LoadFromManifest(m.Fonts, e => e.Name, e => e.ContentPath, overwrite: true);
+                    sounds.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
                     _effectsDictionary.LoadFromManifest(m.Effects, e => e.Name, e => e.ContentPath, overwrite: true);
                 }
             }
-        }
 
-        private void InitializeEffects()
-        {
-            #region Unlit Textured BasicEffect 
-            var unlitBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = false,
-                VertexColorEnabled = false
-            };
-
-            _matBasicUnlit = new Material(unlitBasicEffect);
-            _matBasicUnlit.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlit.SamplerState = SamplerState.LinearClamp;   // helps avoid texture seams on sky
-
-            //ground texture where UVs above [0,0]-[1,1]
-            _matBasicUnlitGround = new Material(unlitBasicEffect.Clone());
-            _matBasicUnlitGround.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlitGround.SamplerState = SamplerState.AnisotropicWrap;   // wrap texture based on UV values
-
-            #endregion
-
-            #region Lit Textured BasicEffect 
-            var litBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = true,
-                PreferPerPixelLighting = true,
-                VertexColorEnabled = false
-            };
-            litBasicEffect.EnableDefaultLighting();
-            _matBasicLit = new Material(litBasicEffect);
-            _matBasicLit.StateBlock = RenderStates.Opaque3D();
-            #endregion
-
-            #region Alpha-test for foliage/billboards
-            var alphaFx = new AlphaTestEffect(GraphicsDevice)
-            {
-                VertexColorEnabled = false
-            };
-            _matAlphaCutout = new Material(alphaFx);
-
-            // Depth test/write on; no blending (cutout happens in the effect). 
-            // Make it two-sided so the quad is visible from both sides.
-            _matAlphaCutout.StateBlock = RenderStates.Cutout3D()
-                .WithRaster(new RasterizerState { CullMode = CullMode.None });
-
-            // Clamp avoids edge bleeding from transparent borders.
-            // (Use LinearWrap if the foliage textures tile.)
-            _matAlphaCutout.SamplerState = SamplerState.LinearClamp;
-
-            #endregion
+            _audioController = new AudioController(sounds);
+            _uiController = new UserInterfaceController(fonts, textures);
+            _sceneGenerator = new SceneGenerator(textures, _matBasicLit, _matBasicUnlit, _matBasicUnlitGround, _graphics);
+            _modelGenerator = new ModelGenerator(textures, models, _scene, _matBasicUnlit, _graphics);
         }
 
         private void InitializeScene()
         {
-            _scene = new Scene(EngineContext.Instance, "Main-Game");
+            _sceneController = new SceneController();
+            _scene = _sceneController.CurrentScene;
         }
 
         private void InitializeSystems()
@@ -267,7 +164,14 @@ namespace GDGame
 
         private void InitializeAudioSystem()
         {
-            _audioSystem = new AudioSystem();
+            if (_audioController == null) return;
+        
+            _audioController.PlayMusic();
+        }
+
+        private void GenerateBaseScene()
+        {
+            _sceneGenerator.GenerateScene(_scene);
         }
 
         private void InitializePhysicsDebugSystem(bool isEnabled)
@@ -290,11 +194,6 @@ namespace GDGame
             // 1. add physics
             var physicsSystem = _scene.AddSystem(new PhysicsSystem());
             physicsSystem.Gravity = AppData.GRAVITY;
-        }
-
-        private void InitializeEventSystem()
-        {
-            _scene.Add(new EventSystem(EngineContext.Instance.Events));
         }
 
         private void InitializeCameraAndRenderSystems()
@@ -337,7 +236,7 @@ namespace GDGame
             var position = new Vector3(0, 5, 25);
 
             //camera GO
-            _cameraGO = new GameObject(AppData.CAMERA_NAME_FIRST_PERSON);
+            _cameraGO = new GameObject(AppData.CAMERA_NAME);
             //set position 
             _cameraGO.Transform.TranslateTo(position);
             //add camera component to the GO
@@ -352,279 +251,54 @@ namespace GDGame
             _scene.Add(_cameraGO);
             #endregion
 
-            var theCamera = _scene.Find(go => go.Name.Equals(AppData.CAMERA_NAME_FIRST_PERSON)).GetComponent<Camera>();
+            var theCamera = _scene.Find(go => go.Name.Equals(AppData.CAMERA_NAME)).GetComponent<Camera>();
             _scene.SetActiveCamera(theCamera);
         }
 
-        /// <summary>
-        /// Add parent root at origin to rotate the sky
-        /// </summary>
-        private void InitializeSkyParent()
+        private void GenerateMaterials()
         {
-            var _skyParent = new GameObject("SkyParent");
-            var rot = _skyParent.AddComponent<RotationController>();
-
-            // Turntable spin around local +Y
-            rot._rotationAxisNormalized = Vector3.Up;
-
-            // Dramatised fast drift at 2 deg/sec. 
-            rot._rotationSpeedInRadiansPerSecond = MathHelper.ToRadians(2f);
-            _scene.Add(_skyParent);
-        }
-
-        private void InitializeSkyBox(int scale = 500)
-        {
-            GameObject gameObject = null;
-            MeshFilter meshFilter = null;
-            MeshRenderer meshRenderer = null;
-
-            // Find the sky parent object to attach sky to so sky rotates
-            GameObject skyParent = _scene.Find((GameObject go) => go.Name.Equals("SkyParent"));
-
-            // back
-            gameObject = new GameObject("back");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.TranslateTo(new Vector3(0, 0, -scale / 2));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_back");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-            // left
-            gameObject = new GameObject("left");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(0, MathHelper.ToRadians(90), 0), true);
-            gameObject.Transform.TranslateTo(new Vector3(-scale / 2, 0, 0));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_left");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-
-            // right
-            gameObject = new GameObject("right");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(0, MathHelper.ToRadians(-90), 0), true);
-            gameObject.Transform.TranslateTo(new Vector3(scale / 2, 0, 0));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_right");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-            // front
-            gameObject = new GameObject("front");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(0, MathHelper.ToRadians(180), 0), true);
-            gameObject.Transform.TranslateTo(new Vector3(0, 0, scale / 2));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_front");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-            // sky (top)
-            gameObject = new GameObject("sky");
-            gameObject.Transform.ScaleTo(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(MathHelper.ToRadians(90), 0, MathHelper.ToRadians(90)), true);
-            gameObject.Transform.TranslateTo(new Vector3(0, scale / 2, 0));
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlit;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("skybox_sky");
-            _scene.Add(gameObject);
-
-            //set parent to allow rotation
-            gameObject.Transform.SetParent(skyParent.Transform);
-
-        }
-
-        private void InitializeCollidableGround(int scale = 500)
-        {
-            GameObject gameObject = null;
-            MeshFilter meshFilter = null;
-            MeshRenderer meshRenderer = null;
-
-            gameObject = new GameObject("ground");
-            meshFilter = MeshFilterFactory.CreateQuadTexturedLit(_graphics.GraphicsDevice);
-
-            meshFilter = MeshFilterFactory.CreateQuadGridTexturedUnlit(_graphics.GraphicsDevice,
-                 1,
-                 1,
-                 1,
-                 1,
-                 20,
-                 20);
-
-
-            gameObject.Transform.ScaleBy(new Vector3(scale, scale, 1));
-            gameObject.Transform.RotateEulerBy(new Vector3(MathHelper.ToRadians(-90), 0, 0), true);
-            gameObject.Transform.TranslateTo(new Vector3(0, -0.5f, 0));
-
-            gameObject.AddComponent(meshFilter);
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicUnlitGround;
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("ground_grass");
-
-            // Add a box collider matching the ground size
-            var collider = gameObject.AddComponent<BoxCollider>();
-            collider.Size = new Vector3(scale, scale, 0.025f);
-            collider.Center = new Vector3(0, 0, -0.0125f);
-
-            // Add rigidbody as Static (immovable)
-            var rigidBody = gameObject.AddComponent<RigidBody>();
-            rigidBody.BodyType = BodyType.Static;
-            gameObject.IsStatic = true; 
-
-            _scene.Add(gameObject);
-        }
-
-        private void InitializeUI()
-        {
-            InitializeUIStatsRenderer();
-            InitializeUIReticleRenderer();
-        }
-
-        private void InitializeUIStatsRenderer()
-        {
-            // Create a GO to host the UI
-            var uiGO = new GameObject("Stats Overlay");
-
-            // Attach stats overlay (auto-registers with UIRenderSystem in Awake)
-            _uiStatsRenderer = uiGO.AddComponent<UIStatsRenderer>();
-
-            // Layering: HUD should sit behind a cursor but in front of menu backgrounds
-            _uiStatsRenderer.LayerDepth = UILayer.HUD;
-
-            // Set font 
-            _uiStatsRenderer.Font = _fontDictionary.Get("perf_stats_font");
-
-            _uiStatsRenderer.ScreenCorner = ScreenCorner.TopRight;
-            _uiStatsRenderer.Margin = new Vector2(20f, 20f);
-
-            // Optional: add the own debug lines (same pattern you used before)
-            _uiStatsRenderer.LinesProvider = () =>
+            #region Unlit Textured BasicEffect 
+            var unlitBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
             {
-                var camera = _scene.ActiveCamera;
-
-                return new[]
-                {
-                    "",
-                    $"Draw Stats:",
-                    $" - Renderer Count: {_scene.Renderers.Count}",
-                    "",
-                    $"Camera Stats:",
-                    $" - Camera [name]: {camera.GameObject.Name}",
-                    $" - Camera [Position]: {camera.Transform.Position.ToFixed()}",
-                    $" - Camera [Forward]: {camera.Transform.Forward.ToFixed()}"
-                };
+                TextureEnabled = true,
+                LightingEnabled = false,
+                VertexColorEnabled = false
             };
 
-            // Add to scene so Awake runs and it registers itself
-            _scene.Add(uiGO);
-        }
+            _matBasicUnlit = new Material(unlitBasicEffect);
+            _matBasicUnlit.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
+            _matBasicUnlit.SamplerState = SamplerState.LinearClamp;   // helps avoid texture seams on sky
 
-        private void InitializeUIReticleRenderer()
+            //ground texture where UVs above [0,0]-[1,1]
+            _matBasicUnlitGround = new Material(unlitBasicEffect.Clone());
+            _matBasicUnlitGround.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
+            _matBasicUnlitGround.SamplerState = SamplerState.AnisotropicWrap;   // wrap texture based on UV values
+
+            #endregion
+
+            #region Lit Textured BasicEffect 
+            var litBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
+            {
+                TextureEnabled = true,
+                LightingEnabled = true,
+                PreferPerPixelLighting = true,
+                VertexColorEnabled = false
+            };
+            litBasicEffect.EnableDefaultLighting();
+            _matBasicLit = new Material(litBasicEffect);
+            _matBasicLit.StateBlock = RenderStates.Opaque3D();
+            #endregion
+        }
+        private void InitializeUI()
         {
-            var uiGO = new GameObject("HUD");
-
-            var reticleAtlas = _textureDictionary.Get("Crosshair_21");
-            var uiFont = _fontDictionary.Get("mouse_reticle_font");
-
-            // Reticle (cursor): always on top
-            var reticle = new UIReticleRenderer(reticleAtlas);
-            reticle.SourceRectangle = null;
-            reticle.Scale = new Vector2(0.1f, 0.1f);
-            reticle.RotationSpeedDegPerSec = 45;
-            reticle.LayerDepth = UILayer.Cursor;
-            uiGO.AddComponent(reticle);
-
-            // Distance/health lines under the cursor
-            var waypointObject = _scene.Find((go) => go.Name.Equals("test crate textured cube"));
-            var cameraObject = _scene.Find(go => go.Name.Equals("First person camera"));
-
-            // Text anchored at mouse, slightly below the reticle
-            var text = new UITextRenderer(uiFont);
-            text.PositionProvider = () => Mouse.GetState().Position.ToVector2();
-            text.Anchor = TextAnchor.Center;
-            text.Offset = new Vector2(0, 50);
-            text.FallbackColor = Color.White;
-            text.DropShadow = true;
-            text.ShadowColor = Color.Black;
-
-            // Place HUD text below the cursor in the same pass
-            text.LayerDepth = UILayer.HUD;
-
-            uiGO.AddComponent(text);
-            _scene.Add(uiGO);
-
-            // Hide mouse since reticle will take its place
-            IsMouseVisible = false;
+            
         }
 
-
-        /// <summary>
-        /// Adds a single-part FBX model into the scene.
-        /// </summary>
-        private GameObject InitializeModel(Vector3 position,
-            Vector3 eulerRotationDegrees, Vector3 scale,
-            string textureName, string modelName, string objectName)
-        {
-            GameObject gameObject = null;
-
-            gameObject = new GameObject(objectName);
-            gameObject.Transform.TranslateTo(position);
-            gameObject.Transform.RotateEulerBy(eulerRotationDegrees * MathHelper.Pi / 180f);
-            gameObject.Transform.ScaleTo(scale);
-
-            var model = _modelDictionary.Get(modelName);
-            var texture = _textureDictionary.Get(textureName);
-            var meshFilter = MeshFilterFactory.CreateFromModel(model, _graphics.GraphicsDevice, 0, 0);
-            gameObject.AddComponent(meshFilter);
-
-            var meshRenderer = gameObject.AddComponent<MeshRenderer>();
-
-            meshRenderer.Material = _matBasicLit;
-            meshRenderer.Overrides.MainTexture = texture;
-
-            _scene.Add(gameObject);
-
-            return gameObject;
-        }
         protected override void Update(GameTime gameTime)
         {
-            #region Core
             Time.Update(gameTime);
 
-            //Time.TimeScale = 0;
-
-            //update Scene
             _scene.Update(Time.DeltaTimeSecs);
-
-          
-            #endregion
-
-            #region Game
-            #endregion
 
             base.Update(gameTime);
         }
@@ -633,7 +307,6 @@ namespace GDGame
         {
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-            //just as called update, we now have to call draw to call the draw in the renderingsystem
             _scene.Draw(Time.DeltaTimeSecs);
 
             base.Draw(gameTime);
@@ -646,6 +319,7 @@ namespace GDGame
         /// <param name="disposing">True if called from Dispose(), false if called from finalizer.</param>
         protected override void Dispose(bool disposing)
         {
+            // TODO: Need to add disposing to created systems
             if (_disposed)
             {
                 base.Dispose(disposing);
@@ -656,38 +330,16 @@ namespace GDGame
             {
                 System.Diagnostics.Debug.WriteLine("Disposing Main...");
 
-                // 1. Dispose Scene (which will cascade to GameObjects and Components)
                 System.Diagnostics.Debug.WriteLine("Disposing Scene");
                 _scene?.Dispose();
                 _scene = null;
 
-                // 2. Dispose Materials (which may own Effects)
-                System.Diagnostics.Debug.WriteLine("Disposing Materials");
-                _matBasicUnlit?.Dispose();
-                _matBasicUnlit = null;
-
-                _matBasicLit?.Dispose();
-                _matBasicLit = null;
-
-                _matAlphaCutout?.Dispose();
-                _matAlphaCutout = null;
-
-                // 3. Clear cached MeshFilters in factory registry
                 System.Diagnostics.Debug.WriteLine("Clearing MeshFilter Registry");
                 MeshFilterFactory.ClearRegistry();
-
-                // 4. Dispose content dictionaries (now they implement IDisposable!)
-                System.Diagnostics.Debug.WriteLine("Disposing Content Dictionaries");
-                _textureDictionary?.Dispose();
-                _textureDictionary = null;
 
                 _modelDictionary?.Dispose();
                 _modelDictionary = null;
 
-                _fontDictionary?.Dispose();
-                _fontDictionary = null;
-
-                // 5. Dispose EngineContext (which owns SpriteBatch and Content)
                 System.Diagnostics.Debug.WriteLine("Disposing EngineContext");
                 EngineContext.Instance?.Dispose();
 
@@ -700,138 +352,20 @@ namespace GDGame
             base.Dispose(disposing);
         }
 
-        #endregion    }
+        #endregion    
 
         #region Game Methods
-
-
-        private void DemoToggleFullscreen()
-        {
-            bool togglePressed = _newKBState.IsKeyDown(Keys.F5) && !_oldKBState.IsKeyDown(Keys.F5);
-            if (togglePressed)
-                _graphics.ToggleFullScreen();
-        }
-
-        private void DemoStatsToggle()
-        {
-            // F1: toggle stats overlay
-            if (_uiStatsRenderer != null)
-            {
-                if (_newKBState.IsKeyDown(Keys.F1) && !_oldKBState.IsKeyDown(Keys.F1))
-                    _uiStatsRenderer.Enabled = !_uiStatsRenderer.Enabled;
-            }
-        }
-
-        private void DemoOrchestration()
-        {
-            if (_orchestrationSystem == null)
-                return;
-
-            GameObject crate = _scene.Find((GameObject go) => go.Name.Equals("test crate textured cube"));
-            if (crate == null)
-                return;
-
-            Transform transform = crate.Transform;
-
-            Vector3 startPosition = transform.Position;
-            Vector3 peakPosition = startPosition + new Vector3(0, 5, 0);
-
-            Orchestrator orchestrator = _orchestrationSystem.Orchestrator;
-
-            orchestrator.Build("Demo_CrateBounce")
-                .WaitSeconds(1.0f)
-                .MoveTo(transform, peakPosition, 1.5f, Ease.EaseInOutSine)
-                .WaitSeconds(0.5f)
-                .MoveTo(transform, startPosition, 1.5f, Ease.EaseInOutSine)
-                .Register();
-        }
 
         private void DemoLoadFromJSON()
         {
             var relativeFilePathAndName = "assets/data/single_model_spawn.json";
             List<ModelSpawnData> mList = JSONSerializationUtility.LoadData<ModelSpawnData>(Content, relativeFilePathAndName);
 
-            //load a single model
-            foreach (var d in mList)
-                InitializeModel(d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName);
-
             relativeFilePathAndName = "assets/data/multi_model_spawn.json";
             //load multiple models
             foreach (var d in JSONSerializationUtility.LoadData<ModelSpawnData>(Content, relativeFilePathAndName))
-                InitializeModel(d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName);
-        }
-
-        private void DemoCollidablePrimitiveObject(Vector3 position, Vector3 scale)
-        {
-            GameObject gameObject = null;
-            MeshFilter meshFilter = null;
-            MeshRenderer meshRenderer = null;
-
-            gameObject = new GameObject("test crate textured cube");
-            gameObject.Transform.TranslateTo(position);
-            gameObject.Transform.ScaleTo(scale);
-
-            meshFilter = MeshFilterFactory.CreateCubeTexturedLit(_graphics.GraphicsDevice);
-            gameObject.AddComponent(meshFilter);
-
-            meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.Material = _matBasicLit; //enable lighting for the crate
-            meshRenderer.Overrides.MainTexture = _textureDictionary.Get("crate1");
-
-            _scene.Add(gameObject);
-
-            // Add box collider (1x1x1 cube)
-            var collider = gameObject.AddComponent<BoxCollider>();
-            collider.Size = scale;
-            collider.Center = new Vector3(0, 0, 0);
-
-            // Add rigidbody (Dynamic so it falls)
-            var rigidBody = gameObject.AddComponent<RigidBody>();
-            rigidBody.BodyType = BodyType.Dynamic;
-            rigidBody.Mass = 1.0f;
-            rigidBody.UseGravity = true;
-
-            //#region Demo - Curve and Input
-            //var posRotController = new PositionRotationController
-            //{
-            //    RotationCurve = _animationRotationCurve,
-            //    PositionCurve = _animationPositionCurve
-            //};
-            //gameObject.AddComponent(posRotController);
-
-            ////demo the new input system support for keyboard, mouse and gamepad
-            //gameObject.AddComponent(new InputReceiverComponent());
-
-            //#endregion
-
-            //  testCrateGO.Layer = LayerMask.World;
-        }
-
-        private void DemoAlphaCutoutFoliage(Vector3 position, float width, float height)
-        {
-            var go = new GameObject("tree");
-
-            // A unit quad facing +Z (the factory already supplies lit quad with UVs)
-            var mf = MeshFilterFactory.CreateQuadTexturedLit(GraphicsDevice);
-            go.AddComponent(mf);
-
-            var treeRenderer = go.AddComponent<MeshRenderer>();
-            treeRenderer.Material = _matAlphaCutout;
-
-            // Per-object properties via the overrides block
-            treeRenderer.Overrides.MainTexture = _textureDictionary.Get("tree4");
-
-            // AlphaTest: pixels with alpha below ReferenceAlpha are discarded (0–255).
-            // 128–160 is a good starting range for foliage; tweak to taste.
-            treeRenderer.Overrides.SetInt("ReferenceAlpha", 128);
-            treeRenderer.Overrides.Alpha = 1f; // overall alpha multiplier (kept at 1 for cutout)
-
-            // Scale the quad so it looks like a tree (aspect from the PNG)
-            go.Transform.ScaleTo(new Vector3(width, height, 1f));
-
-            go.Transform.TranslateTo(position);
-
-            _scene.Add(go);
+                _modelGenerator.GenerateModel(
+                    d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName);
         }
         #endregion
 
