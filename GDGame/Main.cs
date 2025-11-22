@@ -20,13 +20,11 @@ using GDEngine.Core.Services;
 using GDEngine.Core.Systems;
 using GDEngine.Core.Timing;
 using GDEngine.Core.Utilities;
-using GDGame.Demos.Controllers;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SharpDX.X3DAudio;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDGame
@@ -50,6 +48,7 @@ namespace GDGame
         private UserInterfaceController _uiController;
         private SceneGenerator _sceneGenerator;
         private ModelGenerator _modelGenerator;
+        private InputManager _inputManager;
         #endregion
 
         #region Game Fields
@@ -160,6 +159,7 @@ namespace GDGame
             InitializePhysicsDebugSystem(true);
             InitializeCameraAndRenderSystems();
             InitializeAudioSystem();
+            InitializeInputSystem();
         }
 
         private void InitializeAudioSystem()
@@ -210,23 +210,9 @@ namespace GDGame
 
         private void InitializeInputSystem()
         {
-            //set mouse, keyboard binding keys (e.g. WASD)
-            var bindings = InputBindings.Default;
-            // optional tuning
-            bindings.MouseSensitivity = 0.12f;  // mouse look scale
-            bindings.DebounceMs = 60;           // key/mouse debounce in ms
-            bindings.EnableKeyRepeat = true;    // hold-to-repeat
-            bindings.KeyRepeatMs = 300;         // repeat rate in ms
+            _inputManager = new InputManager();
 
-            // Create the input system 
-            var inputSystem = new InputSystem();
-
-            //register all the devices, you dont have to, but its for the demo
-            inputSystem.Add(new GDKeyboardInput(bindings));
-            inputSystem.Add(new GDMouseInput(bindings));
-            inputSystem.Add(new GDGamepadInput(PlayerIndex.One, "Gamepad P1"));
-
-            _scene.Add(inputSystem);
+            _scene.Add(_inputManager.Input);
         }
 
         private void InitializeCameras()

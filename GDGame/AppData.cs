@@ -41,6 +41,7 @@ namespace GDGame
         public static readonly string PLAYER_NAME = "Player";
         public static readonly string CAMERA_NAME = "Cam";
         public static readonly string USER_INTERFACE = "ui";
+        public static readonly string INPUT_NAME = "user_input";
         #endregion
 
         #region Game
