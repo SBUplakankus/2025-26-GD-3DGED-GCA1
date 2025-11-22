@@ -93,6 +93,32 @@ Steps:
 - Created in `Main`
 - Takes in the Fonts and 2D Textures on construction
 
+### 🎮 Input Manager
+- Created in `Main`
+- Creates the Input System based off of the given settings
+
+### 🖌️ Material Generator
+- Created in `Main`
+- Generates the Lit, Unlit and UnlitGround Materials
+
+---
+
+## ⚙️ Player Systems
+
+### 🕹️ Player Controller
+- Created in `Main`
+- Stores the `PlayerMovement` and `PlayerCamera` logic
+
+### 🎥 Player Camera
+- Created in `PlayerController`
+- Handles the first person perspective logic
+
+### 🚶 Player Movement
+- Created in `PlayerController`
+- Handles the physics based player movement
+
+---
+
 ## 📁 Project Workflow Notes
 
 -  Engine is very basic, keep things simple.
