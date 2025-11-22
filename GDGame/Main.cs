@@ -45,11 +45,11 @@ namespace GDGame
         #endregion
 
         #region Systems
-        AudioController _audioController;
-        SceneController _sceneController;
-        UserInterfaceController _uiController;
-        SceneGenerator _sceneGenerator;
-        ModelGenerator _modelGenerator;
+        private AudioController _audioController;
+        private SceneController _sceneController;
+        private UserInterfaceController _uiController;
+        private SceneGenerator _sceneGenerator;
+        private ModelGenerator _modelGenerator;
         #endregion
 
         #region Game Fields
@@ -57,7 +57,7 @@ namespace GDGame
         private KeyboardState _newKBState, _oldKBState;
         #endregion
 
-        #region Core Methods (Common to all games)     
+        #region Core Methods    
         public Main()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -67,46 +67,20 @@ namespace GDGame
 
         protected override void Initialize()
         {
-            #region Core
-
-            // Give the game a name
             Window.Title = AppData.GAME_WINDOW_TITLE;
 
-            // Set resolution and centering (by monitor index)
             InitializeGraphics(ScreenResolution.R_FHD_16_9_1920x1080);
-
-            // Center and hide the mouse!
             InitializeMouse();
-
-            // Shared data across entities
             InitializeContext();
-
             GenerateMaterials();
-
             InitializeScene();
-
             LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
-
-            // Camera, UI, Menu, Physics, Rendering etc.
             InitializeSystems();
-
             GenerateBaseScene();
-
-            // All cameras we want in the game are loaded now and one set as active
             InitializeCameras();
-
-
-            // Setup player
             InitializePlayer();
-      
-            #region Game
             DemoLoadFromJSON();
-            #endregion
-
-            // Setup renderers after all game objects added since ui text may use a gameobject as target
             InitializeUI();
-
-            #endregion
 
             base.Initialize();
         }
@@ -149,7 +123,6 @@ namespace GDGame
         {
             // Make dictionaries to store assets
             var textures = new ContentDictionary<Texture2D>();
-
             var models = new ContentDictionary<Model>();
             var fonts = new ContentDictionary<SpriteFont>();
             _effectsDictionary = new ContentDictionary<Effect>();
@@ -194,7 +167,6 @@ namespace GDGame
             if (_audioController == null) return;
         
             _audioController.PlayMusic();
-           
         }
 
         private void GenerateBaseScene()
@@ -324,15 +296,9 @@ namespace GDGame
 
         protected override void Update(GameTime gameTime)
         {
-            #region Core
             Time.Update(gameTime);
 
             _scene.Update(Time.DeltaTimeSecs);
-
-            #endregion
-
-            #region Game
-            #endregion
 
             base.Update(gameTime);
         }
@@ -353,6 +319,7 @@ namespace GDGame
         /// <param name="disposing">True if called from Dispose(), false if called from finalizer.</param>
         protected override void Dispose(bool disposing)
         {
+            // TODO: Need to add disposing to created systems
             if (_disposed)
             {
                 base.Dispose(disposing);

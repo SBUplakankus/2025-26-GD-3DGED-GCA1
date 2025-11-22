@@ -26,6 +26,9 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Play the games default base music
+        /// </summary>
         public void PlayMusic()
         {
             _audioSystem.PlayMusic(AppData.MAIN_MUSIC, MUSIC_VOLUME);

@@ -24,6 +24,9 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Initialise the base scene of the game (Only 1 for now) 
+        /// </summary>
         public void InitBaseScene()
         {
             _scenes = [new Scene(EngineContext.Instance, AppData.MAIN_SCENE_NAME)];

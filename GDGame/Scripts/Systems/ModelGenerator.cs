@@ -36,6 +36,16 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Generate a model and add it to the scene
+        /// </summary>
+        /// <param name="position">Spawn Position</param>
+        /// <param name="eulerRotationDegrees">Spawn Rotation</param>
+        /// <param name="scale">Spawn Scale</param>
+        /// <param name="textureName">Name of the Texture</param>
+        /// <param name="modelName">Name of the Model</param>
+        /// <param name="objectName">Name of the Game Object</param>
+        /// <returns></returns>
         public GameObject GenerateModel( Vector3 position,
             Vector3 eulerRotationDegrees, Vector3 scale,
             string textureName, string modelName, string objectName)

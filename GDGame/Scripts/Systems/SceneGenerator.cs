@@ -62,7 +62,10 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Public Methods
-
+        /// <summary>
+        /// Generate the Base Scene, involves the skybox and ground plane with collisions
+        /// </summary>
+        /// <param name="currentScene"></param>
         public void GenerateScene(Scene currentScene)
         {
             GenerateSkyBox(currentScene);
@@ -72,6 +75,10 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Private Methods
+        /// <summary>
+        /// Generate a Sky Box inside of a Parent Object that Rotates
+        /// </summary>
+        /// <param name="currentScene">The scene the sky box is being added to</param>
         private void GenerateSkyBox(Scene currentScene)
         {
             _skyBoxParent = new GameObject("SkyParent");
@@ -154,9 +161,6 @@ namespace GDGame.Scripts.Systems
 
             currentScene.Add(gameObject);
         }
-
-        
-
         #endregion
     }
 }
