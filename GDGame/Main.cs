@@ -23,6 +23,7 @@ using GDEngine.Core.Utilities;
 using GDGame.Scripts.Events.Game;
 using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
+using GDGame.Scripts.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -55,6 +56,7 @@ namespace GDGame
 
         #region Player
         private PlayerController _playerController;
+        private CursorController _cursorController;
         #endregion
 
         #region Core Methods    
@@ -102,6 +104,7 @@ namespace GDGame
         private void InitializeMouse()
         {
             Mouse.SetPosition(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
+            IsMouseVisible = false;
         }
 
         private void InitializeContext()
@@ -143,6 +146,7 @@ namespace GDGame
             _sceneGenerator = new SceneGenerator(textures, _materialGenerator.MatBasicLit, 
                 _materialGenerator.MatBasicUnlit, _materialGenerator.MatBasicUnlitGround, _graphics);
             _modelGenerator = new ModelGenerator(textures, models, _scene, _materialGenerator.MatBasicUnlit, _graphics);
+            _cursorController = new CursorController(textures.Get(AppData.RETICLE_NAME));
         }
 
         private void InitializeScene()
@@ -215,7 +219,7 @@ namespace GDGame
 
         private void InitializeUI()
         {
-            
+            _scene.Add(_cursorController.Reticle);
         }
         private void InitializeSystems()
         {

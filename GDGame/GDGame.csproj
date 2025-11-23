@@ -33,7 +33,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Scripts\UI\" />
     <Folder Include="Scripts\Traps\" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="CollectPackageReferences">
