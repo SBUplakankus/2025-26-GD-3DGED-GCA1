@@ -20,41 +20,45 @@ using GDEngine.Core.Services;
 using GDEngine.Core.Systems;
 using GDEngine.Core.Timing;
 using GDEngine.Core.Utilities;
-using GDGame.Demos.Controllers;
+using GDGame.Scripts.Events.Game;
+using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
+using GDGame.Scripts.Traps;
+using GDGame.Scripts.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SharpDX.X3DAudio;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDGame
 {
     public class Main : Game
     {
-        #region Core Fields (Common to all games)     
+        #region Core Fields    
         private GraphicsDeviceManager _graphics;
         private ContentDictionary<Model> _modelDictionary;
         private ContentDictionary<Effect> _effectsDictionary;
         private Scene _scene;
-        private Camera _camera;
         private bool _disposed = false;
         private OrchestrationSystem _orchestrationSystem;
-        private Material _matBasicUnlit, _matBasicLit, _matBasicUnlitGround;
+        private EventBus _eventBus;
         #endregion
 
-        #region Systems
+        #region Game Systems
         private AudioController _audioController;
         private SceneController _sceneController;
         private UserInterfaceController _uiController;
         private SceneGenerator _sceneGenerator;
         private ModelGenerator _modelGenerator;
+        private MaterialGenerator _materialGenerator;
+        private InputManager _inputManager;
+        private TrapManager _trapManager;
         #endregion
 
-        #region Game Fields
-        private GameObject _cameraGO;
-        private KeyboardState _newKBState, _oldKBState;
+        #region Player
+        private PlayerController _playerController;
+        private CursorController _cursorController;
         #endregion
 
         #region Core Methods    
@@ -76,24 +80,11 @@ namespace GDGame
             InitializeScene();
             LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
             InitializeSystems();
-            GenerateBaseScene();
-            InitializeCameras();
-            InitializePlayer();
-            DemoLoadFromJSON();
-            InitializeUI();
+            InitGameSystems();
 
             base.Initialize();
         }
 
-        private void InitializePlayer()
-        {
-            GameObject player = _modelGenerator.GenerateModel(new Vector3(0, 5, 10),
-                new Vector3(0, 0, 0),
-                new Vector3(0.1f, 0.1f, 0.1f), "colormap", "ghost", AppData.PLAYER_NAME);
-
-            var simpleDriveController = new SimpleDriveController();
-            player.AddComponent(simpleDriveController);
-        }
 
         private void InitializeGraphics(Integer2 resolution)
         {
@@ -105,7 +96,7 @@ namespace GDGame
         private void InitializeMouse()
         {
             Mouse.SetPosition(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
-            _oldKBState = Keyboard.GetState();
+            IsMouseVisible = false;
         }
 
         private void InitializeContext()
@@ -144,8 +135,10 @@ namespace GDGame
 
             _audioController = new AudioController(sounds);
             _uiController = new UserInterfaceController(fonts, textures);
-            _sceneGenerator = new SceneGenerator(textures, _matBasicLit, _matBasicUnlit, _matBasicUnlitGround, _graphics);
-            _modelGenerator = new ModelGenerator(textures, models, _scene, _matBasicUnlit, _graphics);
+            _sceneGenerator = new SceneGenerator(textures, _materialGenerator.MatBasicLit, 
+                _materialGenerator.MatBasicUnlit, _materialGenerator.MatBasicUnlitGround, _graphics);
+            _modelGenerator = new ModelGenerator(textures, models, _scene, _materialGenerator.MatBasicUnlit, _graphics);
+            _cursorController = new CursorController(textures.Get(AppData.RETICLE_NAME));
         }
 
         private void InitializeScene()
@@ -154,12 +147,9 @@ namespace GDGame
             _scene = _sceneController.CurrentScene;
         }
 
-        private void InitializeSystems()
+        private void SetEventBus()
         {
-            InitializePhysicsSystem();
-            InitializePhysicsDebugSystem(true);
-            InitializeCameraAndRenderSystems();
-            InitializeAudioSystem();
+            _eventBus = EngineContext.Instance.Events;
         }
 
         private void InitializeAudioSystem()
@@ -191,108 +181,103 @@ namespace GDGame
 
         private void InitializePhysicsSystem()
         {
-            // 1. add physics
             var physicsSystem = _scene.AddSystem(new PhysicsSystem());
             physicsSystem.Gravity = AppData.GRAVITY;
         }
 
         private void InitializeCameraAndRenderSystems()
         {
-            var cameraSystem = new CameraSystem(_graphics.GraphicsDevice, -100);
+            var cameraSystem = new CameraSystem(_graphics.GraphicsDevice, -AppData.RENDER_ORDER);
             _scene.Add(cameraSystem);
 
-            var renderSystem = new RenderSystem(-100);
+            var renderSystem = new RenderSystem(-AppData.RENDER_ORDER);
             _scene.Add(renderSystem);
 
-            var uiRenderSystem = new UIRenderSystem(100);
-            _scene.Add(uiRenderSystem); // draws in PostRender after RenderingSystem (order = -100)
+            var uiRenderSystem = new UIRenderSystem(AppData.RENDER_ORDER);
+            _scene.Add(uiRenderSystem);
         }
 
         private void InitializeInputSystem()
         {
-            //set mouse, keyboard binding keys (e.g. WASD)
-            var bindings = InputBindings.Default;
-            // optional tuning
-            bindings.MouseSensitivity = 0.12f;  // mouse look scale
-            bindings.DebounceMs = 60;           // key/mouse debounce in ms
-            bindings.EnableKeyRepeat = true;    // hold-to-repeat
-            bindings.KeyRepeatMs = 300;         // repeat rate in ms
+            _inputManager = new InputManager();
 
-            // Create the input system 
-            var inputSystem = new InputSystem();
-
-            //register all the devices, you dont have to, but its for the demo
-            inputSystem.Add(new GDKeyboardInput(bindings));
-            inputSystem.Add(new GDMouseInput(bindings));
-            inputSystem.Add(new GDGamepadInput(PlayerIndex.One, "Gamepad P1"));
-
-            _scene.Add(inputSystem);
-        }
-
-        private void InitializeCameras()
-        {
-
-            #region First-person camera
-            var position = new Vector3(0, 5, 25);
-
-            //camera GO
-            _cameraGO = new GameObject(AppData.CAMERA_NAME);
-            //set position 
-            _cameraGO.Transform.TranslateTo(position);
-            //add camera component to the GO
-            _camera = _cameraGO.AddComponent<Camera>();
-            _camera.FarPlane = 1000;
-            ////feed off whatever screen dimensions you set InitializeGraphics
-            _camera.AspectRatio = (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight;
-            _cameraGO.AddComponent<KeyboardWASDController>();
-            _cameraGO.AddComponent<MouseYawPitchController>();
-
-            // Add it to the scene
-            _scene.Add(_cameraGO);
-            #endregion
-
-            var theCamera = _scene.Find(go => go.Name.Equals(AppData.CAMERA_NAME)).GetComponent<Camera>();
-            _scene.SetActiveCamera(theCamera);
+            _scene.Add(_inputManager.Input);
         }
 
         private void GenerateMaterials()
         {
-            #region Unlit Textured BasicEffect 
-            var unlitBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = false,
-                VertexColorEnabled = false
-            };
-
-            _matBasicUnlit = new Material(unlitBasicEffect);
-            _matBasicUnlit.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlit.SamplerState = SamplerState.LinearClamp;   // helps avoid texture seams on sky
-
-            //ground texture where UVs above [0,0]-[1,1]
-            _matBasicUnlitGround = new Material(unlitBasicEffect.Clone());
-            _matBasicUnlitGround.StateBlock = RenderStates.Opaque3D();      // depth on, cull CCW
-            _matBasicUnlitGround.SamplerState = SamplerState.AnisotropicWrap;   // wrap texture based on UV values
-
-            #endregion
-
-            #region Lit Textured BasicEffect 
-            var litBasicEffect = new BasicEffect(_graphics.GraphicsDevice)
-            {
-                TextureEnabled = true,
-                LightingEnabled = true,
-                PreferPerPixelLighting = true,
-                VertexColorEnabled = false
-            };
-            litBasicEffect.EnableDefaultLighting();
-            _matBasicLit = new Material(litBasicEffect);
-            _matBasicLit.StateBlock = RenderStates.Opaque3D();
-            #endregion
+            _materialGenerator = new MaterialGenerator(_graphics);
         }
+
         private void InitializeUI()
         {
-            
+            _scene.Add(_cursorController.Reticle);
         }
+        private void InitializeSystems()
+        {
+            SetEventBus();
+            InitializePhysicsSystem();
+            InitializePhysicsDebugSystem(true);
+            InitializeCameraAndRenderSystems();
+            InitializeAudioSystem();
+            InitializeInputSystem();
+            GenerateBaseScene();
+            InitializeUI();
+        }
+
+        #endregion
+
+        #region Game Methods
+        private void DemoLoadFromJSON()
+        {
+            var relativeFilePathAndName = "assets/data/single_model_spawn.json";
+            List<ModelSpawnData> mList = JSONSerializationUtility.LoadData<ModelSpawnData>(Content, relativeFilePathAndName);
+
+            relativeFilePathAndName = "assets/data/multi_model_spawn.json";
+            foreach (var d in JSONSerializationUtility.LoadData<ModelSpawnData>(Content, relativeFilePathAndName))
+                _modelGenerator.GenerateModel(
+                    d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName);
+        }
+
+        private void TestObjectLoad()
+        {
+            GameObject player = _modelGenerator.GenerateModel(new Vector3(0, 5, 10),
+                new Vector3(0, 0, 0),
+                new Vector3(0.1f, 0.1f, 0.1f), "colormap", "ghost", "test");
+        }
+
+        private void HandleFullscreenToggle()
+        {
+            _graphics.ToggleFullScreen();
+        }
+
+        private void InitPlayer()
+        {
+            _playerController = new PlayerController(
+                (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight);
+
+            _scene.Add(_playerController.PlayerCamGO);
+            _scene.Add(_playerController.PlayerGO);
+            _scene.SetActiveCamera(_playerController.PlayerCam);
+        }
+
+        private void InitTraps()
+        {
+            _trapManager = new TrapManager();
+            foreach(var trap in _trapManager.TrapList)
+                _scene.Add(trap.TrapGO);
+        }
+
+        private void InitGameSystems()
+        {
+            InitPlayer();
+            InitTraps();
+            DemoLoadFromJSON();
+            TestObjectLoad();
+        }
+        #endregion
+
+        #region Engine Methods
 
         protected override void Update(GameTime gameTime)
         {
@@ -353,21 +338,6 @@ namespace GDGame
         }
 
         #endregion    
-
-        #region Game Methods
-
-        private void DemoLoadFromJSON()
-        {
-            var relativeFilePathAndName = "assets/data/single_model_spawn.json";
-            List<ModelSpawnData> mList = JSONSerializationUtility.LoadData<ModelSpawnData>(Content, relativeFilePathAndName);
-
-            relativeFilePathAndName = "assets/data/multi_model_spawn.json";
-            //load multiple models
-            foreach (var d in JSONSerializationUtility.LoadData<ModelSpawnData>(Content, relativeFilePathAndName))
-                _modelGenerator.GenerateModel(
-                    d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName);
-        }
-        #endregion
 
     }
 }
