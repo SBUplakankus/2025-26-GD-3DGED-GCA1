@@ -128,6 +128,24 @@ Steps:
 
 ---
 
+## 🎮 Game Systems
+
+### ⚙️ Trap Manager
+- Created in `Main`
+- Creates a list of `TrapBase` to add to the scene
+- Initialises all of the traps
+- Updates the list of traps each frame
+
+### 🏹 Trap Base
+- Base abstract class all traps inherit from
+- Holds the trap `GameObject` and core abstract functions all traps need
+
+### 🪓Moving Trap
+- Inherits from `TrapBase`
+- Holds the logic for a moving trap such as platforms or axes
+
+---
+
 ## 📁 Project Workflow Notes
 
 -  Engine is very basic, keep things simple.
