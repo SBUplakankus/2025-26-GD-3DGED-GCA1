@@ -57,10 +57,10 @@
 ## **📅 Week 3 — Feature Implementation**
 ### Goals
 - [ ] Player Movement
-- [ ] Player Camera
+- [x] Player Camera
 - [ ] Game Win System
 - [ ] Game Over System
-- [ ] Audio System
+- [x] Audio System
 
 ---
 
