@@ -168,13 +168,13 @@
 
 #begin Assets/Sounds/cats-how-56624.mp3
 /importer:Mp3Importer
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Sounds/cats-how-56624.mp3;Assets/Sounds/cats-how-56624
 
 #begin Assets/Sounds/dungeon-air-6983.mp3
 /importer:Mp3Importer
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Sounds/dungeon-air-6983.mp3;Assets/Sounds/dungeon-air-6983
 
@@ -186,7 +186,7 @@
 
 #begin Assets/Sounds/fire-sound-334130.mp3
 /importer:Mp3Importer
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Sounds/fire-sound-334130.mp3;Assets/Sounds/fire-sound-334130
 

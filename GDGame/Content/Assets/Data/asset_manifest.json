@@ -67,17 +67,29 @@
             "contentPath": "assets/models/corridor-intersection"
         }
     ],
-  "sounds": [
-    {
-        "name": "explosion1",
-        "contentPath": "assets/sounds/Explosion 1"
-    },
-    {
-        "name": "test-music",
-        "contentPath": "assets/sounds/test-music"
-    }
+    "sounds": [
+        {
+            "name": "explosion1",
+            "contentPath": "assets/sounds/Explosion 1"
+        },
+        {
+            "name": "test-music",
+            "contentPath": "assets/sounds/test-music"
+        },
+        {
+            "name": "fire_audio",
+            "contentPath": "assets/sounds/fire-sound-334130"
+        },
+        {
+            "name": "cat_audio",
+            "contentPath": "assets/sounds/cats-how-56624"
+        },
+        {
+            "name": "dungeon_audio",
+            "contentPath": "assets/sounds/dungeon-air-6983"
+        }
 
-  ],
+    ],
   "effects": [ {
     "name": "ui_test_effect",
     "contentPath": "assets/effects/ui/ui_test_effect"

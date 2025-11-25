@@ -150,6 +150,12 @@ namespace GDGame
             if (_audioController == null) return;
         
             _audioController.PlayMusic();
+            _audioController.Generate3DAudio();
+
+            foreach(var sound in _audioController.SoundsList)
+            {
+                _scene.Add(sound);
+            }
         }
 
         private void GenerateBaseScene()

@@ -44,6 +44,9 @@ namespace GDGame
         public static readonly string INPUT_NAME = "user_input";
         public static readonly string RETICLE_NAME = "reticle";
         public static readonly string TRAP_NAME = "trap";
+        public static readonly string FIRE_AUDIO_NAME = "fire_audio";
+        public static readonly string CAT_AUDIO_NAME = "cat_audio";
+        public static readonly string DUNGEON_AUDIO_NAME = "dungeon_audio";
         #endregion
 
         #region Game

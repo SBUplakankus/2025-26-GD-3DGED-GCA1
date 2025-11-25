@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GDEngine.Core.Components;
+﻿using GDEngine.Core.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using SharpDX.X3DAudio;
 
 namespace GDGame.Scripts.Audio
 {
-    public class _3DAudioController
+    public class _3DAudioController : Component
     {
         #region Fields
         private AudioEmitter _emitter;
@@ -29,6 +23,7 @@ namespace GDGame.Scripts.Audio
         {
             _soundInstance = sound.CreateInstance();
             _soundTransform = soundTransform;
+            _emitter = new AudioEmitter();
             _listener = listener;
             _looped = looped;
             _volume = volume;
@@ -45,6 +40,7 @@ namespace GDGame.Scripts.Audio
             _emitter.Forward = _soundTransform.Forward;
             _emitter.Up = _soundTransform.Up;
             _emitter.Velocity = Vector3.Zero;
+            _emitter.DopplerScale = 0.02f;
 
             _soundInstance.IsLooped = _looped;
             _soundInstance.Volume = _volume;

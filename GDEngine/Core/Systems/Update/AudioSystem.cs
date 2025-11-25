@@ -303,6 +303,8 @@ namespace GDEngine.Core.Systems
         }
         #endregion
 
+        public AudioListener Listener => _listener;
+
         #region Constructors
         public AudioSystem(ContentDictionary<SoundEffect> sounds)
           : this(sounds, 0)
