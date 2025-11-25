@@ -197,14 +197,12 @@ namespace GDGame
         private void InitTime()
         {
             _timeController = new TimeController();
-            _inputEventChannel.SubscribeToPauseToggle(_timeController.TogglePause);
+            _inputEventChannel.PauseToggle.Subscribe(_timeController.TogglePause);
         }
 
         private void UnscubscribeFromEvents()
         {
-            _inputEventChannel.UnsubscribeToFullscreenToggle(HandleFullscreenToggle);
-            _inputEventChannel.UnsubscribeToExitRequest(HandleGameExit);
-            _inputEventChannel.UnsubscribeToPauseToggle(_timeController.TogglePause);
+            _inputEventChannel.ClearEventChannel();
         }
 
         private void InitializeInputSystem()
@@ -221,8 +219,8 @@ namespace GDGame
 
         private void InitInputEvents()
         {
-            _inputEventChannel.SubscribeToFullscreenToggle(HandleFullscreenToggle);
-            _inputEventChannel.SubscribeToExitRequest(HandleGameExit);
+            _inputEventChannel.FullscreenToggle.Subscribe(HandleFullscreenToggle);
+            _inputEventChannel.ApplicationExit.Subscribe(HandleGameExit);
         }
 
         private void GenerateMaterials()

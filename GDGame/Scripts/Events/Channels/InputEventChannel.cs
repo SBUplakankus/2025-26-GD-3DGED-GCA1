@@ -8,25 +8,15 @@ namespace GDGame.Scripts.Events.Channels
 {
     public class InputEventChannel
     {
-        public InputEventChannel() { }
+        public EventBase FullscreenToggle = new();
+        public EventBase PauseToggle = new();
+        public EventBase ApplicationExit = new();
 
-        private event Action OnFullscreenToggleRequested;
-        private event Action OnPauseToggleRequested;
-        private event Action OnApplicationExitRequested;
-
-        #region Requests
-        public void RaiseFullscreenToggleRequest() => OnFullscreenToggleRequested?.Invoke();
-        public void RaisePauseToggleRequest() => OnPauseToggleRequested?.Invoke();
-        public void RaiseApplicationExitRequest() => OnApplicationExitRequested?.Invoke();
-        #endregion
-
-        #region Subsribers
-        public void SubscribeToFullscreenToggle(Action action) => OnFullscreenToggleRequested += action;
-        public void UnsubscribeToFullscreenToggle(Action action) => OnFullscreenToggleRequested -= action;
-        public void SubscribeToPauseToggle(Action action) => OnPauseToggleRequested += action;
-        public void UnsubscribeToPauseToggle(Action action) => OnPauseToggleRequested -= action;
-        public void SubscribeToExitRequest(Action action) => OnApplicationExitRequested += action;
-        public void UnsubscribeToExitRequest(Action action) => OnApplicationExitRequested -= action;
-        #endregion
+        public void ClearEventChannel()
+        {
+            FullscreenToggle.UnsubscribeAll();
+            PauseToggle.UnsubscribeAll();
+            ApplicationExit.UnsubscribeAll();
+        }
     }
 }
