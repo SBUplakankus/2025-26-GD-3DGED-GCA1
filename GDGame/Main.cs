@@ -253,6 +253,8 @@ namespace GDGame
             _playerController = new PlayerController(
                 (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight);
 
+            _playerController.PlayerCamGO.AddComponent(_audioController);
+
             _scene.Add(_playerController.PlayerCamGO);
             _scene.Add(_playerController.PlayerGO);
             _scene.SetActiveCamera(_playerController.PlayerCam);

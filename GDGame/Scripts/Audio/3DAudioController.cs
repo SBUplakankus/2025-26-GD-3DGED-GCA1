@@ -11,15 +11,16 @@ namespace GDGame.Scripts.Audio
         private AudioListener _listener;
         private SoundEffectInstance _soundInstance;
         private Transform _soundTransform;
+        private float _soundRadius;
+        private float _volume;
         private bool _looped;
         private bool _active;
-        private float _volume;
         #endregion
 
 
         #region Constructors
         public _3DAudioController(AudioListener listener, Transform soundTransform, 
-            SoundEffect sound, bool looped = true, float volume = 1f) 
+            SoundEffect sound, float volume = 1f, float radius = 0.25f, bool looped = true) 
         {
             _soundInstance = sound.CreateInstance();
             _soundTransform = soundTransform;
@@ -27,6 +28,7 @@ namespace GDGame.Scripts.Audio
             _listener = listener;
             _looped = looped;
             _volume = volume;
+            _soundRadius = radius;
             _active = true;
 
             Init3DSound();
@@ -40,7 +42,7 @@ namespace GDGame.Scripts.Audio
             _emitter.Forward = _soundTransform.Forward;
             _emitter.Up = _soundTransform.Up;
             _emitter.Velocity = Vector3.Zero;
-            _emitter.DopplerScale = 0.02f;
+            _emitter.DopplerScale = _soundRadius;
 
             _soundInstance.IsLooped = _looped;
             _soundInstance.Volume = _volume;

@@ -33,7 +33,7 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Accessors
-        public List<GameObject> SoundsList => _3DsoundsList; 
+        public List<GameObject> SoundsList => _3DsoundsList;
         #endregion
 
         #region Methods
@@ -42,13 +42,19 @@ namespace GDGame.Scripts.Systems
         /// </summary>
         public void PlayMusic()
         {
-            // _audioSystem.PlayMusic(AppData.MAIN_MUSIC, MUSIC_VOLUME);
+            _audioSystem.PlayMusic(AppData.MAIN_MUSIC, MUSIC_VOLUME);
         }
 
         public void Generate3DAudio()
         {
-            var obj1 = Generate3DAudioObject(AppData.FIRE_AUDIO_NAME, new Vector3(10, 10, 1));
+            var obj1 = Generate3DAudioObject(AppData.FIRE_AUDIO_NAME, new Vector3(1000, 1, 1));
             _3DsoundsList.Add(obj1);
+
+            var obj2 = Generate3DAudioObject(AppData.CAT_AUDIO_NAME, new Vector3(1, 1, 1));
+            _3DsoundsList.Add(obj2);
+
+            var obj3 = Generate3DAudioObject(AppData.DUNGEON_AUDIO_NAME, new Vector3(1, 1, 1));
+            _3DsoundsList.Add(obj3);
         }
 
         private GameObject Generate3DAudioObject(string name, Vector3 position)
