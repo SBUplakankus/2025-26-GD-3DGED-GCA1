@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GDEngine.Core.Collections;
 using GDEngine.Core.Components;
+using GDEngine.Core.Entities;
 using GDEngine.Core.Systems;
 using Microsoft.Xna.Framework.Audio;
 
@@ -32,6 +33,14 @@ namespace GDGame.Scripts.Systems
         public void PlayMusic()
         {
             _audioSystem.PlayMusic(AppData.MAIN_MUSIC, MUSIC_VOLUME);
+        }
+
+        private GameObject Generate3DAudioObject(SoundEffect sound, string name)
+        {
+            var soundGO = new GameObject(name);
+
+
+            return soundGO;
         }
         #endregion
 
