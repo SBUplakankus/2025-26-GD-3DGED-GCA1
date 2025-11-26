@@ -47,6 +47,7 @@ namespace GDGame
         private InputManager _inputManager;
         private TrapManager _trapManager;
         private TimeController _timeController;
+        private LocalisationController _localisationController;
 
         // Player
         private PlayerController _playerController;
@@ -102,6 +103,11 @@ namespace GDGame
         private void InitializeContext()
         {
             EngineContext.Initialize(GraphicsDevice, Content);
+        }
+
+        private void InitLocalisation()
+        {
+            _localisationController = new LocalisationController();
         }
 
         private void GenerateMaterials()
@@ -165,6 +171,7 @@ namespace GDGame
             InitCameraAndRenderSystems();
             InitAudioSystem();
             InitInputSystem();
+            InitLocalisation();
             GenerateBaseScene();
             InitializeUI();
         }

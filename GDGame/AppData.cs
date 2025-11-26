@@ -27,6 +27,9 @@ namespace GDGame
         public static readonly string SKYBOX_RIGHT_TEXTURE_KEY = "skybox_right";
         public static readonly string SKYBOX_FRONT_TEXTURE_KEY = "skybox_front";
         public static readonly string SKYBOX_SKY_TEXTURE_KEY = "skybox_sky";
+        public static readonly string ENGLISH_CSV_PATH = "../../../Localisation/english.csv";
+        public static readonly string CZECH_CSV_PATH = "../../../Localisation/czech.csv";
+        public static readonly string UKRANIAN_CSV_PATH = "../../../Localisation/ukranian.csv";
         #endregion
 
         #region GameObject Names
@@ -54,7 +57,12 @@ namespace GDGame
         public static readonly string START_SCENE_NAME = "Start";
         public static readonly string MAIN_SCENE_NAME = "Main Game";
         public static readonly string GAMEPAD_P1_NAME = "Gamepad P1";
+        public static readonly string LOCALISATION_KEY_ERROR = "Key Not Found";
         public static readonly int RENDER_ORDER = 100;
+        public static readonly int FORWARD_MOVE_NUM = 0;
+        public static readonly int BACKWARD_MOVE_NUM = 1;
+        public static readonly int RIGHT_MOVE_NUM = 2;
+        public static readonly int LEFT_MOVE_NUM = 3;
         #endregion
 
         #region Content

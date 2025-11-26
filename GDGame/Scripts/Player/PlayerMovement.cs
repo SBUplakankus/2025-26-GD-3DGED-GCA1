@@ -8,7 +8,7 @@ namespace GDGame.Scripts.Player
     public class PlayerMovement
     {
         #region Fields
-        private float _moveSpeed = 20f;
+        private float _moveSpeed = 40f;
         private RigidBody _rb;
         private SphereCollider _collider;
         private GameObject _playerParent;
@@ -51,16 +51,16 @@ namespace GDGame.Scripts.Player
 
             var moveDir = Vector3.Zero;
 
-            if (dir == 0)
+            if (dir == AppData.FORWARD_MOVE_NUM)
                 moveDir += forward;
 
-            if(dir == 1)
+            if(dir == AppData.BACKWARD_MOVE_NUM)
                 moveDir -= forward;
 
-            if (dir == 2)
+            if (dir == AppData.LEFT_MOVE_NUM)
                 moveDir -= right;
 
-            if(dir == 3)
+            if(dir == AppData.RIGHT_MOVE_NUM)
                 moveDir += right;
 
             if(moveDir.LengthSquared() == 0) return;

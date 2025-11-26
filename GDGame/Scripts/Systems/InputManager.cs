@@ -84,16 +84,16 @@ namespace GDGame.Scripts.Systems
         private void CheckForMovement()
         {
             if (_newKBState.IsKeyDown(_forwardKey))
-                _inputEventChannel.MovementInput.Raise(0);
+                _inputEventChannel.MovementInput.Raise(AppData.FORWARD_MOVE_NUM);
 
             if (_newKBState.IsKeyDown(_backwardKey))
-                _inputEventChannel.MovementInput.Raise(1);
+                _inputEventChannel.MovementInput.Raise(AppData.BACKWARD_MOVE_NUM);
 
             if (_newKBState.IsKeyDown(_leftKey))
-                _inputEventChannel.MovementInput.Raise(2);
+                _inputEventChannel.MovementInput.Raise(AppData.LEFT_MOVE_NUM);
 
             if (_newKBState.IsKeyDown(_rightKey))
-                _inputEventChannel.MovementInput.Raise(3);
+                _inputEventChannel.MovementInput.Raise(AppData.RIGHT_MOVE_NUM);
         }
         
         private void CheckForInputs()

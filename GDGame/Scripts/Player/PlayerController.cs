@@ -16,7 +16,6 @@ namespace GDGame.Scripts.Player
         private GameObject _playerGO;
         private PlayerMovement _playerMovement;
         private PlayerCamera _playerCamera;
-        private InputEventChannel _inputEventChannel;
         private Vector3 _startPos = new (0, 0, 0);
         private Vector3 _startRot = new (0, 0, 0);
         #endregion
