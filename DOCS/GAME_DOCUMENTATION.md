@@ -100,23 +100,23 @@ A place for nots on any classes created for our game in the engine.
 
 ## 🛥️ Event Systems
 
-### ⛵ [Event Base](../GDGame/Scripts/Events/EventBase.cs)
+### ⛵ [Event Base](../GDGame/Scripts/Events/Channels/EventBase.cs)
 - Uses C# `event Action` as a base
 - Uses `Subscribe` to add a listener to the event
 - Uses `Unsubscribe` to remove a listener from the event
 - Uses `Raise` to call the event
 
-### 🕹️ [Input Event Channel](../GDGame/Scripts/Events/InputEventChannel.cs)
+### 🕹️ [Input Event Channel](../GDGame/Scripts/Events/Channels/InputEventChannel.cs)
 - Created in `EventChannelManager`
 - Events created from `EventBase`
 - Controls Fullscreen Toggle, Pause Toggle, Movement and Exit Events
 
-### 🧔 [Player Event Channel](../GDGame/Scripts/Events/PlayerEvent.cs)
+### 🧔 [Player Event Channel](../GDGame/Scripts/Events/Channels/PlayerEvent.cs)
 - Created in `EventChannelManager`
 - Events created from `EventBase`
 - Controls Game Over and Game Won events
 
-### 🧰 [Event Channel Manager](../GDGame/Scripts/Events/EventChannelManager.cs)
+### 🧰 [Event Channel Manager](../GDGame/Scripts/Events/Channels/EventChannelManager.cs)
 - Static Class that can be accessed anywhere
 - Initialised in `Main`
 - Creates a `PlayerEventChannel` and `InputEventChannel`
