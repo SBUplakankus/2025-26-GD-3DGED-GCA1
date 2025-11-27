@@ -106,7 +106,7 @@ namespace GDGame
 
         private void InitLocalisation()
         {
-            _localisationController = new LocalisationController();
+            LocalisationController.Initialise();
         }
 
         private void GenerateMaterials()
@@ -155,7 +155,7 @@ namespace GDGame
             }
 
             _audioController = new AudioController(sounds);
-            _uiController = new UserInterfaceController(fonts, textures);
+            _uiController = new UserInterfaceController(EngineContext.Instance.SpriteBatch ,fonts, textures);
             _sceneGenerator = new SceneGenerator(textures, _materialGenerator.MatBasicLit, _materialGenerator.MatBasicUnlit,
                 _materialGenerator.MatBasicUnlitGround, _graphics);
             _modelGenerator = new ModelGenerator(textures, models, _materialGenerator.MatBasicUnlit, _graphics);
