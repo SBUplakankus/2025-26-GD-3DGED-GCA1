@@ -11,7 +11,7 @@ A place for nots on any classes created for our game in the engine.
 - Encapsulates functions for playing audio to clear up main
 - Takes in the Sounds Dictionary when constructed
 
-### 🔊 [3D Audio Controller](../GDGame/Scripts/Systems/3DAudioController.cs)
+### 🔊 [3D Audio Controller](../GDGame/Scripts/Audio/3DAudioController.cs)
 - Created in `AudioController` and attached to a `GameObject`
 - Takes in a sound effect, spawn position, volume and radius
 - Plays 3D Audio in the Game Scene
