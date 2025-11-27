@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GDGame.Scripts.Events.Channels;
 using Microsoft.VisualBasic.FileIO;
 
 namespace GDGame.Scripts.Systems
@@ -12,6 +13,7 @@ namespace GDGame.Scripts.Systems
     public class LocalisationController
     {
         #region Fields
+        private static LocalisationController _instance;
         private LanguageOption _currentLanguage;
         private readonly Dictionary<string, string> _englishDict;
         private readonly Dictionary<string, string> _ukranianDict;
@@ -28,7 +30,27 @@ namespace GDGame.Scripts.Systems
         }
         #endregion
 
+        #region Accessors
+        public static LocalisationController Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    throw new InvalidOperationException("Ensure you call Initialise() first");
+
+                return _instance;
+            }
+        }
+        #endregion
+
         #region Methods
+        public static void Initialise()
+        {
+            if (_instance != null) return;
+
+            _instance = new LocalisationController();
+        }
+
         private static Dictionary<string, string> LoadCSV(string filePath)
         {
             var dict = new Dictionary<string, string>();

@@ -51,7 +51,6 @@ namespace GDGame
 
         // Player
         private PlayerController _playerController;
-        private CursorController _cursorController;
 
         // Events
         private InputEventChannel _inputEventChannel;
@@ -107,7 +106,7 @@ namespace GDGame
 
         private void InitLocalisation()
         {
-            _localisationController = new LocalisationController();
+            LocalisationController.Initialise();
         }
 
         private void GenerateMaterials()
@@ -156,11 +155,10 @@ namespace GDGame
             }
 
             _audioController = new AudioController(sounds);
-            _uiController = new UserInterfaceController(fonts, textures);
+            _uiController = new UserInterfaceController(EngineContext.Instance.SpriteBatch ,fonts, textures);
             _sceneGenerator = new SceneGenerator(textures, _materialGenerator.MatBasicLit, _materialGenerator.MatBasicUnlit,
                 _materialGenerator.MatBasicUnlitGround, _graphics);
             _modelGenerator = new ModelGenerator(textures, models, _materialGenerator.MatBasicUnlit, _graphics);
-            _cursorController = new CursorController(textures.Get(AppData.RETICLE_NAME));
         }
 
         private void InitializeSystems()
@@ -251,7 +249,9 @@ namespace GDGame
 
         private void InitializeUI()
         {
-            _scene.Add(_cursorController.Reticle);
+            _uiController.InitUserInterface();
+            foreach (var obj in _uiController.UIObjects)
+                _scene.Add(obj);
         }
 
         #endregion
