@@ -60,6 +60,23 @@ Steps:
 11. Insert the path to the sound 
 12. When playing audio in the `AudioSystem`, pass through the name you gave it
 
+### 🖋️ Importing Fonts
+Steps:
+
+1. Open content.mcgb in Visual Studio
+2. Click into Assets -> Fonts
+3. With Fonts selected, click on `New Item` at the top *(Grey Box with Black Border and Yellow + Sign)*
+4. Select SpriteFont and give it a name
+5. Once created, open up the SpriteFont file in Notepad or Visual Studio
+6. Change the font name to your desired font
+7. If the font is not native to the PC, you will need to download and install it
+8. We use Inter since it supports English, Czech and Ukranian which means we had to download it from Google Fonts *(Fully Free)*
+9. Go to Content -> Assets -> Data and open `asset_manifest.json`
+10. Create a new entry in the fonts section
+11. Give it a name to be referenced by in the fonts dictionary
+12. Insert path to font
+13. When setting fonts in the `UserInterfaceController`, pass through the name you gave it
+
 ### 👂 The Event Channel System
 Steps:
 
