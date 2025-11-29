@@ -5,6 +5,7 @@ using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Systems;
 using GDGame.Scripts.Audio;
+using GDGame.Scripts.Events.Channels;
 using Microsoft.Xna.Framework.Audio;
 
 namespace GDGame.Scripts.Systems
@@ -16,7 +17,9 @@ namespace GDGame.Scripts.Systems
         private AudioSystem _audioSystem;
         private ContentDictionary<SoundEffect> _sounds;
         private List<GameObject> _3DsoundsList;
-        private const float MUSIC_VOLUME = 0.5f;
+        private AudioEventChannel _audioEventChannel;
+        private const float MUSIC_VOLUME = 0.25f;
+        private const float SFX_VOLUME = 0.8f;
         #endregion
 
         #region Constructors
@@ -25,6 +28,7 @@ namespace GDGame.Scripts.Systems
             _sounds = sounds;
             _3DsoundsList = new();
             _audioSystem = new AudioSystem(_sounds);
+            _audioEventChannel = EventChannelManager.Instance.AudioEvents;
         }
         #endregion
 
@@ -33,18 +37,17 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Methods
-        public void Initialise()
-        {
-            PlayMusic();
-            Generate3DAudio();
-            Add3DAudioToScene();
-        }
         /// <summary>
         /// Play the games default base music
         /// </summary>
-        public void PlayMusic()
+        private void PlayMusic(string key)
         {
-            _audioSystem.PlayMusic(AppData.MAIN_MUSIC, MUSIC_VOLUME);
+            _audioSystem.PlayMusic(key, MUSIC_VOLUME);
+        }
+
+        private void PlaySFX(string key)
+        {
+            _audioSystem.PlayOneShot(key, SFX_VOLUME);
         }
 
         /// <summary>
@@ -75,6 +78,19 @@ namespace GDGame.Scripts.Systems
             var audio = new _3DAudioController(_audioSystem.Listener, soundGO.Transform, _sounds.Get(name));
             soundGO.AddComponent(audio);
             return soundGO;
+        }
+
+        private void InitEventHandlers()
+        {
+            _audioEventChannel.PlayMusic.Subscribe(PlayMusic);
+            _audioEventChannel.PlaySFX.Subscribe(PlaySFX);
+        }
+        public void Initialise()
+        {
+            PlayMusic(AppData.MAIN_MUSIC);
+            Generate3DAudio();
+            Add3DAudioToScene();
+            InitEventHandlers();
         }
         #endregion
 

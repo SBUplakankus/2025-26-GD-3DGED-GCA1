@@ -10,6 +10,7 @@ namespace GDGame.Scripts.Events.Channels
         // Channels
         private readonly InputEventChannel _inputEvents;
         private readonly PlayerEventChannel _playerEvents;
+        private readonly AudioEventChannel _audioEvents;
 
         public EventChannelManager() 
         {
@@ -30,6 +31,7 @@ namespace GDGame.Scripts.Events.Channels
         }
         public InputEventChannel InputEvents => _inputEvents;
         public PlayerEventChannel PlayerEvents => _playerEvents;
+        public AudioEventChannel AudioEvents => _audioEvents;
         #endregion
 
         #region Methods

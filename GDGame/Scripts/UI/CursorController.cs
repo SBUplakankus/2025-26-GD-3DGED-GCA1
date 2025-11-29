@@ -26,7 +26,6 @@ namespace GDGame.Scripts.UI
             _reticleRenderer.LayerDepth = UILayer.Cursor;
 
             _reticleGO.AddComponent(_reticleRenderer);
-
         }
         #endregion
 
