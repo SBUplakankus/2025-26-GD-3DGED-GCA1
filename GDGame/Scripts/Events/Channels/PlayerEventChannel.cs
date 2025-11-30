@@ -11,6 +11,8 @@ namespace GDGame.Scripts.Events.Channels
         public EventBase PlayerLose = new();
         public EventBase PlayerWin = new();
         public EventBase<GameState> GameStateChange = new();
+        public EventBase<int> PlayerDamaged = new();
+        public EventBase OrbCollected = new();
 
         /// <summary>
         /// Unsubscribe from all events in the Channel
@@ -20,6 +22,8 @@ namespace GDGame.Scripts.Events.Channels
             PlayerLose.UnsubscribeAll();
             PlayerWin.UnsubscribeAll();
             GameStateChange.UnsubscribeAll();
+            OrbCollected.UnsubscribeAll();
+            PlayerDamaged.UnsubscribeAll();
         }
     }
 }

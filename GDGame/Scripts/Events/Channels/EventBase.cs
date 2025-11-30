@@ -33,6 +33,11 @@ namespace GDGame.Scripts.Events.Channels
         public void UnsubscribeAll() => Handlers = null;
     }
 
+    /// <summary>
+    /// Used in <see cref="EventChannelManager"/> channels to store subscribers and raise events.
+    /// Contains Raise, Subscribe and Unsubscribe functions with an <see cref="Action"/> as the event. 
+    /// </summary>
+    /// <typeparam name="T">Generic Type to pass through event</typeparam>
     public class EventBase<T>
     {
         private event Action<T> Handlers;

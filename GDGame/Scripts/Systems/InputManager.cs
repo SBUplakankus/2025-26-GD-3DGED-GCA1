@@ -17,6 +17,7 @@ namespace GDGame.Scripts.Systems
     {
         #region Fields
         private InputEventChannel _inputEventChannel;
+        private PlayerEventChannel _playerEventChannel;
         private InputSystem _inputSystem;
         private GameObject _inputGO;
         private KeyboardState _newKBState, _oldKBState;
@@ -35,6 +36,8 @@ namespace GDGame.Scripts.Systems
         private readonly Keys _leftKey = Keys.A;
         private readonly Keys _rightKey = Keys.D;
         private readonly Keys _languageSwitchKey = Keys.L;
+        private readonly Keys _orbTestKey = Keys.O;
+        private readonly Keys _damageTestKey = Keys.P;
         #endregion
 
         #region Constructors
@@ -56,6 +59,7 @@ namespace GDGame.Scripts.Systems
             _inputSystem.Add(new GDGamepadInput(PlayerIndex.One, AppData.GAMEPAD_P1_NAME));
 
             _inputEventChannel = EventChannelManager.Instance.InputEvents;
+            _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
         }
         #endregion
 
@@ -121,6 +125,22 @@ namespace GDGame.Scripts.Systems
 
             _inputEventChannel.LanguageSwap.Raise();
         }
+
+        private void CheckForOrbTest()
+        {
+            bool isPressed = _newKBState.IsKeyDown(_orbTestKey) && !_oldKBState.IsKeyDown(_orbTestKey);
+            if (!isPressed) return;
+
+            _playerEventChannel.OrbCollected.Raise();
+        }
+
+        private void CheckForDamageTest()
+        {
+            bool isPressed = _newKBState.IsKeyDown(_damageTestKey) && !_oldKBState.IsKeyDown(_damageTestKey);
+            if (!isPressed) return;
+
+            _playerEventChannel.PlayerDamaged.Raise(5);
+        }
         
         private void CheckForInputs()
         {
@@ -129,6 +149,8 @@ namespace GDGame.Scripts.Systems
             CheckForExit();
             CheckForMovement();
             CheckForLanguageSwap();
+            CheckForOrbTest();
+            CheckForDamageTest();
         }
         #endregion
 
