@@ -4,6 +4,9 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace GDGame.Scripts.Audio
 {
+    /// <summary>
+    /// Creates a 3D Audio Object in the game environment
+    /// </summary>
     public class _3DAudioController : Component
     {
         #region Fields

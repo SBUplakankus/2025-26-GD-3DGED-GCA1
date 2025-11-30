@@ -23,9 +23,6 @@ namespace GDEngine.Core.Rendering.UI
             base.Awake();
             // Get ref to draw textures and strings
             _spriteBatch = GameObject?.Scene?.Context.SpriteBatch;
-
-            
-
         }
         public override void Draw(GraphicsDevice device, Camera? camera)
         {

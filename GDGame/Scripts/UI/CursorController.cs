@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 using GDEngine.Core.Entities;
-using GDEngine.Core.Rendering;
+using GDEngine.Core.Rendering.UI;
 using GDEngine.Core.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GDGame.Scripts.UI
 {
+    /// <summary>
+    /// Controls the cursor reticle in the centre of the screen.
+    /// Created in <see cref="UserInterfaceController"/>.
+    /// </summary>
     public class CursorController
     {
         #region Fields
         private GameObject _reticleGO;
-        private UIReticleRenderer _reticleRenderer;
+        private UIReticle _reticleRenderer;
         private Vector2 _reticleScale = new (0.1f, 0.1f);
         #endregion
 
@@ -24,14 +23,13 @@ namespace GDGame.Scripts.UI
         {
             _reticleGO = new GameObject(AppData.RETICLE_NAME);
 
-            _reticleRenderer = new UIReticleRenderer(reticleTexture);
+            _reticleRenderer = new UIReticle(reticleTexture);
             _reticleRenderer.Origin = reticleTexture.GetCenter();
             _reticleRenderer.SourceRectangle = null;
             _reticleRenderer.Scale = _reticleScale;
             _reticleRenderer.LayerDepth = UILayer.Cursor;
 
             _reticleGO.AddComponent(_reticleRenderer);
-
         }
         #endregion
 

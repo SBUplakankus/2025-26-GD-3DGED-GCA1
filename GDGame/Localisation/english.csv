@@ -4,3 +4,6 @@ Pause,Pause
 GameOver,Game Over
 Victory,Victory
 Score,Score
+Time,Time Remaining:
+Health,Current Health:
+Orbs,Orbs Collected:

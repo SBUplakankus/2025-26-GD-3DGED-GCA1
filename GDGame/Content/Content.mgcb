@@ -19,6 +19,13 @@
 /processorParam:DebugMode=Auto
 /build:Assets/Effects/UI/ui_test_effect.fx
 
+#begin Assets/Fonts/gamefont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Assets/Fonts/gamefont.spritefont
+
 #begin Assets/Fonts/menufont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -190,6 +197,24 @@
 /processorParam:Quality=Best
 /build:Assets/Sounds/fire-sound-334130.mp3;Assets/Sounds/fire-sound-334130
 
+#begin Assets/Sounds/hit_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Sounds/hit_2.wav;Assets/Sounds/hit_2
+
+#begin Assets/Sounds/intro_extended_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Sounds/intro_extended_3.wav;Assets/Sounds/intro_extended_3
+
+#begin Assets/Sounds/rattle_loop_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Sounds/rattle_loop_1.wav;Assets/Sounds/rattle_loop_1
+
 #begin Assets/Sounds/test-music.mp3
 /importer:WmaImporter
 /processor:SoundEffectProcessor
@@ -267,6 +292,66 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Assets/Textures/Skybox/right.bmp;Assets/Textures/Skybox/right
+
+#begin Assets/Textures/Skybox/sky_back.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Textures/Skybox/sky_back.png
+
+#begin Assets/Textures/Skybox/sky_front.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Textures/Skybox/sky_front.png
+
+#begin Assets/Textures/Skybox/sky_left.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Textures/Skybox/sky_left.png
+
+#begin Assets/Textures/Skybox/sky_right.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Textures/Skybox/sky_right.png
+
+#begin Assets/Textures/Skybox/sky_top.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Textures/Skybox/sky_top.png
 
 #begin Assets/Textures/Skybox/sky.bmp
 /importer:TextureImporter

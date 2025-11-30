@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GDEngine.Core.Collections;
-using GDEngine.Core.Components;
+﻿using GDEngine.Core.Collections;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Enums;
+using GDEngine.Core.Rendering.UI;
 using GDEngine.Core.Systems.Base;
+using GDGame.Scripts.Player;
+using GDGame.Scripts.Systems;
 using GDGame.Scripts.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace GDGame.Scripts.Systems
+namespace GDGame.Scripts.UI
 {
     public class UserInterfaceController : SystemBase
     {
@@ -21,8 +18,7 @@ namespace GDGame.Scripts.Systems
         private ContentDictionary<SpriteFont> _fonts;
         private ContentDictionary<Texture2D> _interfaceTextures;
         private CursorController _cursorController;
-        private List<GameObject> _uiObjects;
-        private List<TextDisplay> _textDisplays;
+        private PlayerHUD _playerHUD;
         #endregion
 
         #region Constructors
@@ -33,45 +29,31 @@ namespace GDGame.Scripts.Systems
             _spriteBatch = batch;
             _fonts = fonts;
             _interfaceTextures = textures;
-            _textDisplays = new List<TextDisplay>();
         }
-        #endregion
-
-        #region Accessors
-        public List<GameObject> UIObjects => _uiObjects;
         #endregion
 
         #region Methods
         private void InitCursor()
         {
             _cursorController = new CursorController(_interfaceTextures.Get(AppData.RETICLE_NAME));
-            _uiObjects = [_cursorController.Reticle];
+            SceneController.AddToCurrentScene(_cursorController.Reticle);
         }
 
-        private void InitText()
+        private void InitHUD(PlayerStats stats)
         {
-            var text1 = new TextDisplay(
-                LocalisationController.Instance.Get("Play"), Color.Black, _fonts.Get("menufont"));
-
-            _textDisplays.Add(text1);
+            _playerHUD = new PlayerHUD(_fonts.Get("gamefont"), stats);
+            _playerHUD.Initialise();
         }
 
-        private void DisplayText()
-        {
-            foreach (var text in _textDisplays)
-                _spriteBatch.DrawString(text.Font, text.Text, text.Position, text.TextColour);
-        }
-
-        public void InitUserInterface()
+        public void Initialise(PlayerStats stats)
         {
             InitCursor();
-            InitText();
+            InitHUD(stats);
         }
 
         public override void Draw(float deltaTime)
         {
             _spriteBatch.Begin();
-            DisplayText();
             _spriteBatch.End();
         }
         #endregion

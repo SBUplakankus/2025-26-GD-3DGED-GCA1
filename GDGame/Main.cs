@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using GDEngine.Core;
 using GDEngine.Core.Collections;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Factories;
-using GDEngine.Core.Input.Data;
-using GDEngine.Core.Orchestration;
-using GDEngine.Core.Rendering.UI;
+using GDEngine.Core.Screen;
 using GDEngine.Core.Serialization;
 using GDEngine.Core.Services;
 using GDEngine.Core.Systems;
 using GDEngine.Core.Timing;
 using GDEngine.Core.Utilities;
+using GDGame.Scripts.Audio;
 using GDGame.Scripts.Events.Channels;
 using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
@@ -35,7 +35,6 @@ namespace GDGame
         private ContentDictionary<Effect> _effectsDictionary;
         private Scene _scene;
         private bool _disposed = false;
-        private OrchestrationSystem _orchestrationSystem;
 
         // Game Systems
         private AudioController _audioController;
@@ -47,7 +46,8 @@ namespace GDGame
         private InputManager _inputManager;
         private TrapManager _trapManager;
         private TimeController _timeController;
-        private LocalisationController _localisationController;
+        private CinematicCamController _cineCamController;
+        private GameStateManager _gameStateManager;
 
         // Player
         private PlayerController _playerController;
@@ -74,14 +74,14 @@ namespace GDGame
         {
             Window.Title = AppData.GAME_WINDOW_TITLE;
 
+
             InitializeGraphics(ScreenResolution.R_FHD_16_9_1920x1080);
-            InitializeMouse();
             InitializeContext();
-            GenerateMaterials();
-            InitializeScene();
-            LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
+            InitEvents();
             InitializeSystems();
+            LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
             InitGameSystems();
+
 
             base.Initialize();
         }
@@ -114,10 +114,12 @@ namespace GDGame
             _materialGenerator = new MaterialGenerator(_graphics);
         }
 
-        private void InitializeScene()
+        private void InitScene()
         {
-            _sceneController = new SceneController();
+            _sceneController = new SceneController(this);
+            _sceneController.Initialise();
             _scene = _sceneController.CurrentScene;
+            Components.Add(_sceneController);
         }
 
         private void InitEvents()
@@ -161,28 +163,6 @@ namespace GDGame
             _modelGenerator = new ModelGenerator(textures, models, _materialGenerator.MatBasicUnlit, _graphics);
         }
 
-        private void InitializeSystems()
-        {
-            InitEvents();
-            InitPhysicsSystem();
-            InitPhysicsDebugSystem(true);
-            InitCameraAndRenderSystems();
-            InitAudioSystem();
-            InitInputSystem();
-            InitLocalisation();
-            GenerateBaseScene();
-            InitializeUI();
-        }
-
-        private void InitGameSystems()
-        {
-            InitPlayer();
-            InitTraps();
-            InitTime();
-            DemoLoadFromJSON();
-            TestObjectLoad();
-        }
-
         private void InitPhysicsSystem()
         {
             var physicsSystem = _scene.AddSystem(new PhysicsSystem());
@@ -212,32 +192,27 @@ namespace GDGame
             _scene.Add(uiRenderSystem);
         }
 
-        private void InitAudioSystem()
+        private void InitializeSystems()
         {
-            if (_audioController == null) return;
-
-            _audioController.PlayMusic();
-            _audioController.Generate3DAudio();
-
-            foreach (var sound in _audioController.SoundsList)
-                _scene.Add(sound);
+            InitializeMouse();
+            GenerateMaterials();
+            InitScene();
+            InitPhysicsSystem();
+            InitPhysicsDebugSystem(true);
+            InitCameraAndRenderSystems();
         }
 
+        #endregion
+
+        #region Game Systems
+        private void InitAudioSystem()
+        {
+            _audioController.Initialise();
+        }
         private void InitInputSystem()
         {
             _inputManager = new InputManager();
-
-            InitInputEvents();
-
-            var inputGO = new GameObject(AppData.INPUT_NAME);
-            inputGO.AddComponent(_inputManager);
-
-            _scene.Add(inputGO);
-            _scene.Add(_inputManager.Input);
-        }
-
-        private void InitInputEvents()
-        {
+            _inputManager.Initialise();
             _inputEventChannel.FullscreenToggle.Subscribe(HandleFullscreenToggle);
             _inputEventChannel.ApplicationExit.Subscribe(HandleGameExit);
         }
@@ -249,55 +224,63 @@ namespace GDGame
 
         private void InitializeUI()
         {
-            _uiController.InitUserInterface();
-            foreach (var obj in _uiController.UIObjects)
-                _scene.Add(obj);
+            _uiController.Initialise(_playerController.Stats);
         }
-
-        #endregion
-
-        #region Game Systems
-
         private void InitPlayer()
         {
-            _playerController = new PlayerController(
-                (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight);
-
-            _playerController.PlayerCamGO.AddComponent(_audioController);
-
-            _scene.Add(_playerController.PlayerCamGO);
-            _scene.Add(_playerController.PlayerGO);
-            _scene.SetActiveCamera(_playerController.PlayerCam);
+            var aspectRatio = (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight;
+            _playerController = new PlayerController(aspectRatio, _audioController);
         }
 
         private void InitTraps()
         {
             _trapManager = new TrapManager();
-            foreach (var trap in _trapManager.TrapList)
-                _scene.Add(trap.TrapGO);
         }
 
         private void InitTime()
         {
             _timeController = new TimeController();
-            _inputEventChannel.PauseToggle.Subscribe(_timeController.TogglePause);
+        }
+
+        private void InitCineCam()
+        {
+            var aspectRatio = (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight;
+            _cineCamController = new CinematicCamController(aspectRatio);
+            _cineCamController.Initialise();
+        }
+
+        private void InitGameStateManager()
+        {
+            _gameStateManager = new GameStateManager();
+        }
+        private void InitGameSystems()
+        {
+            GenerateBaseScene();
+            InitInputSystem();
+            InitLocalisation();
+            InitPlayer();
+            InitializeUI();
+            InitAudioSystem();
+            InitCineCam();
+            InitTraps();
+            InitTime();
+            InitGameStateManager();
+            DemoLoadFromJSON();
+            TestObjectLoad();
         }
 
         #endregion
 
         #region Game Loop
-
         protected override void Update(GameTime gameTime)
         {
             Time.Update(gameTime);
-            _scene.Update(Time.DeltaTimeSecs);
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            _scene.Draw(Time.DeltaTimeSecs);
             base.Draw(gameTime);
         }
 
@@ -342,7 +325,7 @@ namespace GDGame
         /// </summary>
         private void UnscubscribeFromEvents()
         {
-            _inputEventChannel.ClearEventChannel();
+            EventChannelManager.Instance.ClearEventChannels();
         }
 
         protected override void Dispose(bool disposing)

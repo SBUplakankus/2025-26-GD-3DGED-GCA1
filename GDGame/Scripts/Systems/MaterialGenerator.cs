@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GDEngine.Core.Rendering;
+﻿using GDEngine.Core.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GDGame.Scripts.Systems
 {
+    /// <summary>
+    /// Creates the game materials
+    /// </summary>
     public class MaterialGenerator
     {
         #region Fields

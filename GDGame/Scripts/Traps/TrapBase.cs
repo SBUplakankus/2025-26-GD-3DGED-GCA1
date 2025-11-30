@@ -1,12 +1,11 @@
-﻿    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using GDEngine.Core.Entities;
+﻿using GDEngine.Core.Entities;
+using GDGame.Scripts.Systems;
 
-    namespace GDGame.Scripts.Traps
+namespace GDGame.Scripts.Traps
     {
+    /// <summary>
+    /// Base Abstract class all traps derive from.
+    /// </summary>
         public abstract class TrapBase
         {
             #region Fields
@@ -19,6 +18,7 @@
             {
                 _trapID = id;
                 _trapGO = new GameObject(AppData.TRAP_NAME + _trapID);
+                SceneController.AddToCurrentScene(_trapGO);
             }
             #endregion
 

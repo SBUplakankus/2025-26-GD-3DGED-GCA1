@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GDEngine.Core.Components;
-using GDGame.Demos.Controllers;
 
 namespace GDGame.Scripts.Traps
 {
+    /// <summary>
+    /// Moving Obstacle Trap which inherits from <see cref="TrapBase"/>.
+    /// </summary>
     public class MovingTrap : TrapBase
     {
         #region Fields

@@ -65,8 +65,25 @@ namespace GDGame
         public static readonly int LEFT_MOVE_NUM = 3;
         #endregion
 
+        #region Audio
+        public static readonly string GAME_INTRO_KEY = "game_intro";
+        public static readonly string OOF_KEY = "oof";
+        public static readonly string RATTLE_KEY = "rattle";
+        #endregion
+
         #region Content
         public static readonly string MAIN_MUSIC = "test-music";
+        #endregion
+
+        #region Localisation Keys
+        public static readonly string LANG_PLAY_KEY = "Play";
+        public static readonly string LANG_PAUSE_KEY = "Pause";
+        public static readonly string LANG_SCORE_KEY = "Score";
+        public static readonly string LANG_GAME_OVER_KEY = "GameOver";
+        public static readonly string LANG_VICTORY_KEY = "Victory";
+        public static readonly string LANG_TIME_KEY = "Time";
+        public static readonly string LANG_ORB_KEY = "Orbs";
+        public static readonly string LANG_HEALTH_KEY = "Health";
         #endregion
 
     }

@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Events;
-using GDEngine.Core.Events.Types.Camera;
 using Microsoft.Xna.Framework;
 
 namespace GDGame.Scripts.Events.Game
