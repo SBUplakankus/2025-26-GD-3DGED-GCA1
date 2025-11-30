@@ -28,7 +28,7 @@ Tables for tracking models, audio, textures, and other resources used in the pro
 
 | Texture Name | Source | Link |
 |--------------|--------|------|
-| ... | ... | [🔗](#) |
+| Kloppenheim 02 (Pure Sky) | Greg Zaal | [🔗](https://polyhaven.com/a/kloppenheim_02_puresky) |
 
 ---
 
