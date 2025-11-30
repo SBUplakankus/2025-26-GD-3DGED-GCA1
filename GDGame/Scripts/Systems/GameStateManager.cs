@@ -30,7 +30,7 @@ namespace GDGame.Scripts.Systems
             _gameStateManagerGO = new GameObject("GSM");
             _gameStateManagerGO.AddComponent(this);
             SceneController.AddToCurrentScene(_gameStateManagerGO);
-            EventChannelManager.Instance.PlayerEvents.GameStateChange.Subscribe(HandleGameStateChange);
+            EventChannelManager.Instance.PlayerEvents.OnGameStateChange.Subscribe(HandleGameStateChange);
         }
         #endregion
 

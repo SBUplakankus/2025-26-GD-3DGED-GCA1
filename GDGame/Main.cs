@@ -213,8 +213,8 @@ namespace GDGame
         {
             _inputManager = new InputManager();
             _inputManager.Initialise();
-            _inputEventChannel.FullscreenToggle.Subscribe(HandleFullscreenToggle);
-            _inputEventChannel.ApplicationExit.Subscribe(HandleGameExit);
+            _inputEventChannel.OnFullscreenToggle.Subscribe(HandleFullscreenToggle);
+            _inputEventChannel.OnApplicationExit.Subscribe(HandleGameExit);
         }
 
         private void GenerateBaseScene()

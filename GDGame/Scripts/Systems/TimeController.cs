@@ -17,7 +17,7 @@ namespace GDGame.Scripts.Systems
         {
             _isPlaying = true;
             Time.TimeScale = 1.0f;
-            EventChannelManager.Instance.InputEvents.PauseToggle.Subscribe(TogglePause);
+            EventChannelManager.Instance.InputEvents.OnPauseToggle.Subscribe(TogglePause);
         }
         #endregion
 

@@ -57,8 +57,8 @@ namespace GDGame.Scripts.Player
         private void InitPlayerEvents()
         {
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
-            _playerEventChannel.OrbCollected.Subscribe(_playerStats.HandleOrbCollection);
-            _playerEventChannel.PlayerDamaged.Subscribe(_playerStats.TakeDamage);    
+            _playerEventChannel.OnOrbCollected.Subscribe(_playerStats.HandleOrbCollection);
+            _playerEventChannel.OnPlayerDamaged.Subscribe(_playerStats.TakeDamage);    
             // EventChannelManager.Instance.InputEvents.MovementInput.Subscribe(_playerMovement.HandleMovement);
         }
         #endregion

@@ -56,7 +56,7 @@ namespace GDGame.Scripts.Systems
         {
             _cineCamGO.Transform.TranslateTo(_startPos);
             _isActive = true;
-            _audioEventChannel.PlaySFX.Raise(AppData.GAME_INTRO_KEY);
+            _audioEventChannel.OnSFXRequested.Raise(AppData.GAME_INTRO_KEY);
         }
 
         private void HandleCameraMovement()
@@ -69,7 +69,7 @@ namespace GDGame.Scripts.Systems
         {
             _isActive = false;
             SceneController.SetActiveCamera(AppData.PLAYER_NAME);
-            _playerEventChannel.GameStateChange.Raise(GameState.GameActive);
+            _playerEventChannel.OnGameStateChange.Raise(GameState.GameActive);
         }
 
         protected override void Update(float deltaTime)

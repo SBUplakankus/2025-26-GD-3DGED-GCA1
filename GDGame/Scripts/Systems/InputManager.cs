@@ -84,7 +84,7 @@ namespace GDGame.Scripts.Systems
             bool isPressed = _newKBState.IsKeyDown(_pauseKey) && !_oldKBState.IsKeyDown(_pauseKey);
             if (!isPressed) return;
 
-            _inputEventChannel.PauseToggle.Raise();    
+            _inputEventChannel.OnPauseToggle.Raise();    
         }
 
         private void CheckForFullscreen()
@@ -92,7 +92,7 @@ namespace GDGame.Scripts.Systems
             bool isPressed = _newKBState.IsKeyDown(_fullscreenKey) && !_oldKBState.IsKeyDown(_fullscreenKey);
             if (!isPressed) return;
 
-            _inputEventChannel.FullscreenToggle.Raise();
+            _inputEventChannel.OnFullscreenToggle.Raise();
         }
 
         private void CheckForExit()
@@ -100,22 +100,22 @@ namespace GDGame.Scripts.Systems
             bool isPressed = _newKBState.IsKeyDown(_exitKey) && !_oldKBState.IsKeyDown(_exitKey);
             if (!isPressed) return;
 
-            _inputEventChannel.ApplicationExit.Raise();
+            _inputEventChannel.OnApplicationExit.Raise();
         }
 
         private void CheckForMovement()
         {
             if (_newKBState.IsKeyDown(_forwardKey))
-                _inputEventChannel.MovementInput.Raise(AppData.FORWARD_MOVE_NUM);
+                _inputEventChannel.OnMovementInput.Raise(AppData.FORWARD_MOVE_NUM);
 
             if (_newKBState.IsKeyDown(_backwardKey))
-                _inputEventChannel.MovementInput.Raise(AppData.BACKWARD_MOVE_NUM);
+                _inputEventChannel.OnMovementInput.Raise(AppData.BACKWARD_MOVE_NUM);
 
             if (_newKBState.IsKeyDown(_leftKey))
-                _inputEventChannel.MovementInput.Raise(AppData.LEFT_MOVE_NUM);
+                _inputEventChannel.OnMovementInput.Raise(AppData.LEFT_MOVE_NUM);
 
             if (_newKBState.IsKeyDown(_rightKey))
-                _inputEventChannel.MovementInput.Raise(AppData.RIGHT_MOVE_NUM);
+                _inputEventChannel.OnMovementInput.Raise(AppData.RIGHT_MOVE_NUM);
         }
 
         private void CheckForLanguageSwap()
@@ -123,7 +123,7 @@ namespace GDGame.Scripts.Systems
             bool isPressed = _newKBState.IsKeyDown(_languageSwitchKey) && !_oldKBState.IsKeyDown(_languageSwitchKey);
             if (!isPressed) return;
 
-            _inputEventChannel.LanguageSwap.Raise();
+            _inputEventChannel.OnLanguageSwap.Raise();
         }
 
         private void CheckForOrbTest()
@@ -131,7 +131,7 @@ namespace GDGame.Scripts.Systems
             bool isPressed = _newKBState.IsKeyDown(_orbTestKey) && !_oldKBState.IsKeyDown(_orbTestKey);
             if (!isPressed) return;
 
-            _playerEventChannel.OrbCollected.Raise();
+            _playerEventChannel.OnOrbCollected.Raise();
         }
 
         private void CheckForDamageTest()
@@ -139,7 +139,7 @@ namespace GDGame.Scripts.Systems
             bool isPressed = _newKBState.IsKeyDown(_damageTestKey) && !_oldKBState.IsKeyDown(_damageTestKey);
             if (!isPressed) return;
 
-            _playerEventChannel.PlayerDamaged.Raise(5);
+            _playerEventChannel.OnPlayerDamaged.Raise(5);
         }
         
         private void CheckForInputs()
