@@ -51,6 +51,10 @@
         {
             "name": "colormap",
             "contentPath": "assets/models/textures/colormap"
+        },
+        {
+            "name": "button",
+            "contentPath": "assets/textures/ui/button_rectangle_12"
         }
     ],
     "models": [

@@ -77,14 +77,11 @@ namespace GDGame
         {
             Window.Title = AppData.GAME_WINDOW_TITLE;
 
-
             InitializeGraphics(ScreenResolution.R_FHD_16_9_1920x1080);
             InitializeContext();
-            InitEvents();
             InitializeSystems();
             LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
             InitGameSystems();
-
 
             base.Initialize();
         }
@@ -130,6 +127,8 @@ namespace GDGame
             EventChannelManager.Initialise();
             _inputEventChannel = EventChannelManager.Instance.InputEvents;
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
+
+            SceneController.AddToCurrentScene(new EventSystem(EngineContext.Instance.Events));
         }
 
         /// <summary>
@@ -264,6 +263,7 @@ namespace GDGame
         }
         private void InitGameSystems()
         {
+            InitEvents();
             GenerateBaseScene();
             InitInputSystem();
             InitLocalisation();

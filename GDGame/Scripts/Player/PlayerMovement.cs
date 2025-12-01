@@ -3,6 +3,7 @@ using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Events;
 using GDEngine.Core.Rendering.Base;
+using GDEngine.Core.Timing;
 using Microsoft.Xna.Framework;
 
 namespace GDGame.Scripts.Player
@@ -14,7 +15,7 @@ namespace GDGame.Scripts.Player
     public class PlayerMovement
     {
         #region Fields
-        private float _moveSpeed = 2f;
+        private float _moveSpeed = 200f;
         private RigidBody _rb;
         private SphereCollider _collider;
         private GameObject _playerParent;
@@ -30,7 +31,7 @@ namespace GDGame.Scripts.Player
         {
             _playerParent = parent;
 
-            // InitRB();
+            InitRB();
 
             parent.AddComponent<KeyboardWASDController>();
         }
@@ -45,8 +46,9 @@ namespace GDGame.Scripts.Player
 
             _rb = new RigidBody();
             _rb.BodyType = BodyType.Dynamic;
-            _rb.Mass = 0f;
-            _rb.UseGravity = false;
+            _rb.Mass = 0.01f;
+            _rb.AngularDamping = 1;
+            _rb.LinearDamping = 1;
             _playerParent.AddComponent(_rb);
         }
 
@@ -77,11 +79,16 @@ namespace GDGame.Scripts.Player
                     break;
             }
         }
-        private void Move(Vector3 dir)
+        private void Move(Vector3 direction, float speed)
         {
-            dir.Normalize();
-            Vector3 delta = dir * _moveSpeed;
-            _playerParent.Transform.TranslateBy(delta, true);
+            if (_rb.Transform == null)
+                return;
+
+            direction.Normalize();
+
+            Vector3 delta = direction * (speed * Time.DeltaTimeSecs);
+            // Debug.WriteLine($"{delta.ToString()}");
+
             _rb.AddForce(delta);
         }
         public void HandleMovement(int dir)
@@ -108,7 +115,9 @@ namespace GDGame.Scripts.Player
 
             if(moveDir.LengthSquared() == 0) return;
 
-            Move(moveDir);
+            //Debug.WriteLine($"{moveDir.ToString()}");
+
+            Move(moveDir, _moveSpeed);
         }
         #endregion
     }

@@ -19,6 +19,7 @@ namespace GDGame.Scripts.UI
         private ContentDictionary<Texture2D> _interfaceTextures;
         private CursorController _cursorController;
         private PlayerHUD _playerHUD;
+        private PauseMenu _pauseMenu;
         #endregion
 
         #region Constructors
@@ -45,10 +46,16 @@ namespace GDGame.Scripts.UI
             _playerHUD.Initialise();
         }
 
+        private void InitPauseMenu()
+        {
+            _pauseMenu = new PauseMenu(_interfaceTextures, _fonts.Get("gamefont"));
+        }
+
         public void Initialise(PlayerStats stats)
         {
             InitCursor();
             InitHUD(stats);
+            InitPauseMenu();
         }
 
         public override void Draw(float deltaTime)
