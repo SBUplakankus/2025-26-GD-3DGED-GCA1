@@ -3,6 +3,7 @@ using GDEngine.Core.Entities;
 using GDEngine.Core.Enums;
 using GDEngine.Core.Rendering.UI;
 using GDEngine.Core.Systems.Base;
+using GDGame.Scripts.Events.Channels;
 using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
 using GDGame.Scripts.UI;
@@ -19,16 +20,19 @@ namespace GDGame.Scripts.UI
         private ContentDictionary<Texture2D> _interfaceTextures;
         private CursorController _cursorController;
         private PlayerHUD _playerHUD;
+        private PauseMenu _pauseMenu;
+        private Vector2 _screenCentre;
         #endregion
 
         #region Constructors
         public UserInterfaceController(SpriteBatch batch, 
-            ContentDictionary<SpriteFont> fonts, ContentDictionary<Texture2D> textures) : 
+            ContentDictionary<SpriteFont> fonts, ContentDictionary<Texture2D> textures, Vector2 centre) : 
             base(FrameLifecycle.PostRender, order: 10)
         {
             _spriteBatch = batch;
             _fonts = fonts;
             _interfaceTextures = textures;
+            _screenCentre = centre;
         }
         #endregion
 
@@ -45,10 +49,16 @@ namespace GDGame.Scripts.UI
             _playerHUD.Initialise();
         }
 
+        private void InitPauseMenu()
+        {
+            _pauseMenu = new PauseMenu(_interfaceTextures, _fonts.Get("gamefont"), _screenCentre);
+        }
+
         public void Initialise(PlayerStats stats)
         {
             InitCursor();
             InitHUD(stats);
+            InitPauseMenu();
         }
 
         public override void Draw(float deltaTime)

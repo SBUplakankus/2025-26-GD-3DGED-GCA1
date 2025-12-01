@@ -6,16 +6,16 @@
     /// </summary>
     public class AudioEventChannel
     {
-        public EventBase<string> PlayMusic = new();
-        public EventBase<string> PlaySFX = new();
+        public EventBase<string> OnMusicRequested = new();
+        public EventBase<string> OnSFXRequested = new();
 
         /// <summary>
         /// Unsubscribe from all events in the Channel
         /// </summary>
         public void ClearEventChannel()
         {
-            PlayMusic.UnsubscribeAll();
-            PlaySFX.UnsubscribeAll();
+            OnMusicRequested.UnsubscribeAll();
+            OnSFXRequested.UnsubscribeAll();
         }
     }
 }

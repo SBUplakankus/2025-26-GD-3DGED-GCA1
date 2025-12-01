@@ -84,8 +84,8 @@ namespace GDGame.Scripts.Audio
 
         private void InitEventHandlers()
         {
-            _audioEventChannel.PlayMusic.Subscribe(PlayMusic);
-            _audioEventChannel.PlaySFX.Subscribe(PlaySFX);
+            _audioEventChannel.OnMusicRequested.Subscribe(PlayMusic);
+            _audioEventChannel.OnSFXRequested.Subscribe(PlaySFX);
         }
         public void Initialise()
         {

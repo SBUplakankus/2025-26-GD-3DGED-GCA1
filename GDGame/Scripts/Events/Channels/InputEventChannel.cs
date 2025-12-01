@@ -6,22 +6,22 @@
     /// </summary>
     public class InputEventChannel
     {
-        public EventBase FullscreenToggle = new();
-        public EventBase PauseToggle = new();
-        public EventBase ApplicationExit = new();
-        public EventBase<int> MovementInput = new();
-        public EventBase LanguageSwap = new();
+        public EventBase OnFullscreenToggle = new();
+        public EventBase OnPauseToggle = new();
+        public EventBase OnApplicationExit = new();
+        public EventBase<int> OnMovementInput = new();
+        public EventBase OnLanguageSwap = new();
 
         /// <summary>
         /// Unsubscribe from all events in the Channel
         /// </summary>
         public void ClearEventChannel()
         {
-            FullscreenToggle.UnsubscribeAll();
-            PauseToggle.UnsubscribeAll();
-            ApplicationExit.UnsubscribeAll();
-            MovementInput.UnsubscribeAll();
-            LanguageSwap.UnsubscribeAll();
+            OnFullscreenToggle.UnsubscribeAll();
+            OnPauseToggle.UnsubscribeAll();
+            OnApplicationExit.UnsubscribeAll();
+            OnMovementInput.UnsubscribeAll();
+            OnLanguageSwap.UnsubscribeAll();
         }
     }
 }

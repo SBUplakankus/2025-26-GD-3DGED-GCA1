@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Rendering.UI;
+using GDGame.Scripts.Events.Channels;
 using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
@@ -22,6 +23,7 @@ namespace GDGame.Scripts.UI
         private PlayerStats _playerStats;
         private SpriteFont _hudFont;
         private Color _hudTextColour = Color.White;
+        private List<UIText> _textObjects;
         private readonly Dictionary<string, Vector2> _hudPositions = new()
         {
             ["top_left"] = new Vector2(200, 100),
@@ -39,6 +41,8 @@ namespace GDGame.Scripts.UI
         {
             _hudFont = hudFont;
             _playerStats = stats;
+            _textObjects = new();
+
         }
         #endregion
 
@@ -56,6 +60,7 @@ namespace GDGame.Scripts.UI
             };
 
             textGO.AddComponent(uiText);
+            _textObjects.Add(uiText);
             SceneController.AddToCurrentScene(textGO);
         }
 
@@ -72,6 +77,7 @@ namespace GDGame.Scripts.UI
             };
 
             textGO.AddComponent(uiText);
+            _textObjects.Add(uiText);
             SceneController.AddToCurrentScene(textGO);
         }
 
@@ -88,6 +94,7 @@ namespace GDGame.Scripts.UI
             };
 
             textGO.AddComponent(uiText);
+            _textObjects.Add(uiText);
             SceneController.AddToCurrentScene(textGO);
         }
 
@@ -112,9 +119,15 @@ namespace GDGame.Scripts.UI
             CreateOrbStat(startPos + horIncrement);
         }
 
+        private void HandlePause()
+        {
+            foreach (var text in _textObjects)
+                text.Enabled = !text.Enabled;
+        }
         public void Initialise()
         {
             InitHUDText();
+            EventChannelManager.Instance.InputEvents.OnPauseToggle.Subscribe(HandlePause);
         }
         #endregion
     }

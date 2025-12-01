@@ -1,6 +1,9 @@
 ﻿using System.Numerics;
 using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
+using GDEngine.Core.Events;
+using GDEngine.Core.Rendering.Base;
+using GDEngine.Core.Services;
 using GDGame.Scripts.Audio;
 using GDGame.Scripts.Events.Channels;
 using GDGame.Scripts.Systems;
@@ -53,13 +56,16 @@ namespace GDGame.Scripts.Player
         public PlayerStats Stats => _playerStats;
         #endregion
 
-        #region Event Handlers
+        #region Events
+        
         private void InitPlayerEvents()
         {
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
-            _playerEventChannel.OrbCollected.Subscribe(_playerStats.HandleOrbCollection);
-            _playerEventChannel.PlayerDamaged.Subscribe(_playerStats.TakeDamage);    
-            // EventChannelManager.Instance.InputEvents.MovementInput.Subscribe(_playerMovement.HandleMovement);
+            _playerEventChannel.OnOrbCollected.Subscribe(_playerStats.HandleOrbCollection);
+            _playerEventChannel.OnPlayerDamaged.Subscribe(_playerStats.TakeDamage);
+            //_playerEventChannel.OnPlayerCollision.Subscribe(_playerMovement.HandlePlayerCollision);
+            EngineContext.Instance.Events.Subscribe<CollisionEvent>(_playerMovement.HandlePlayerCollision);
+            EventChannelManager.Instance.InputEvents.OnMovementInput.Subscribe(_playerMovement.HandleMovement);
         }
         #endregion
 

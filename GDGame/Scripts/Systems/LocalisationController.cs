@@ -30,7 +30,7 @@ namespace GDGame.Scripts.Systems
             _czechDict = LoadCSV(AppData.CZECH_CSV_PATH);
             _ukranianDict = LoadCSV(AppData.UKRANIAN_CSV_PATH);
             _currentLanguage = LanguageOption.English;
-            EventChannelManager.Instance.InputEvents.LanguageSwap.Subscribe(HandleLanguageSwap);
+            EventChannelManager.Instance.InputEvents.OnLanguageSwap.Subscribe(HandleLanguageSwap);
         }
         #endregion
 

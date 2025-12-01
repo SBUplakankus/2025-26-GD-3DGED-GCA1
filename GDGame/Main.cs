@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Forms;
 using GDEngine.Core;
 using GDEngine.Core.Collections;
@@ -13,6 +12,7 @@ using GDEngine.Core.Timing;
 using GDEngine.Core.Utilities;
 using GDGame.Scripts.Audio;
 using GDGame.Scripts.Events.Channels;
+using GDGame.Scripts.DemoGame;
 using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
 using GDGame.Scripts.Traps;
@@ -22,6 +22,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
+using GDGame.Scripts.Demo_Game;
 
 namespace GDGame
 {
@@ -35,6 +36,7 @@ namespace GDGame
         private ContentDictionary<Effect> _effectsDictionary;
         private Scene _scene;
         private bool _disposed = false;
+        private Vector2 _screenCentre;
 
         // Game Systems
         private AudioController _audioController;
@@ -48,6 +50,8 @@ namespace GDGame
         private TimeController _timeController;
         private CinematicCamController _cineCamController;
         private GameStateManager _gameStateManager;
+        private GameOverObject _gameOver;
+        private GameWonObject _gameWon;
 
         // Player
         private PlayerController _playerController;
@@ -74,14 +78,11 @@ namespace GDGame
         {
             Window.Title = AppData.GAME_WINDOW_TITLE;
 
-
             InitializeGraphics(ScreenResolution.R_FHD_16_9_1920x1080);
             InitializeContext();
-            InitEvents();
             InitializeSystems();
             LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
             InitGameSystems();
-
 
             base.Initialize();
         }
@@ -91,11 +92,12 @@ namespace GDGame
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             ScreenResolution.SetResolution(_graphics, resolution);
             WindowUtility.CenterOnMonitor(this, 1);
+            _screenCentre = new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
         }
 
         private void InitializeMouse()
         {
-            Mouse.SetPosition(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
+            Mouse.SetPosition((int)_screenCentre.X, (int) _screenCentre.Y);
             IsMouseVisible = false;
         }
 
@@ -127,6 +129,8 @@ namespace GDGame
             EventChannelManager.Initialise();
             _inputEventChannel = EventChannelManager.Instance.InputEvents;
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
+
+            SceneController.AddToCurrentScene(new EventSystem(EngineContext.Instance.Events));
         }
 
         /// <summary>
@@ -157,7 +161,7 @@ namespace GDGame
             }
 
             _audioController = new AudioController(sounds);
-            _uiController = new UserInterfaceController(EngineContext.Instance.SpriteBatch ,fonts, textures);
+            _uiController = new UserInterfaceController(EngineContext.Instance.SpriteBatch ,fonts, textures, _screenCentre);
             _sceneGenerator = new SceneGenerator(textures, _materialGenerator.MatBasicLit, _materialGenerator.MatBasicUnlit,
                 _materialGenerator.MatBasicUnlitGround, _graphics);
             _modelGenerator = new ModelGenerator(textures, models, _materialGenerator.MatBasicUnlit, _graphics);
@@ -213,8 +217,9 @@ namespace GDGame
         {
             _inputManager = new InputManager();
             _inputManager.Initialise();
-            _inputEventChannel.FullscreenToggle.Subscribe(HandleFullscreenToggle);
-            _inputEventChannel.ApplicationExit.Subscribe(HandleGameExit);
+            _inputEventChannel.OnFullscreenToggle.Subscribe(HandleFullscreenToggle);
+            _inputEventChannel.OnApplicationExit.Subscribe(HandleGameExit);
+            _inputEventChannel.OnPauseToggle.Subscribe(HandlePause);
         }
 
         private void GenerateBaseScene()
@@ -253,8 +258,15 @@ namespace GDGame
         {
             _gameStateManager = new GameStateManager();
         }
+
+        private void InitDemoGameEvents()
+        {
+            _gameOver = new GameOverObject();
+            _gameWon = new GameWonObject();
+        }
         private void InitGameSystems()
         {
+            InitEvents();
             GenerateBaseScene();
             InitInputSystem();
             InitLocalisation();
@@ -267,6 +279,7 @@ namespace GDGame
             InitGameStateManager();
             DemoLoadFromJSON();
             TestObjectLoad();
+            InitDemoGameEvents();
         }
 
         #endregion
@@ -290,6 +303,7 @@ namespace GDGame
 
         private void HandleFullscreenToggle() => _graphics.ToggleFullScreen();
         private void HandleGameExit() => Application.Exit();
+        private void HandlePause() => IsMouseVisible = !IsMouseVisible;
 
         #endregion
 

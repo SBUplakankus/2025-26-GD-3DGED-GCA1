@@ -1,5 +1,9 @@
-﻿using GDEngine.Core.Components;
+﻿using System.Diagnostics;
+using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
+using GDEngine.Core.Events;
+using GDEngine.Core.Rendering.Base;
+using GDEngine.Core.Timing;
 using Microsoft.Xna.Framework;
 
 namespace GDGame.Scripts.Player
@@ -11,10 +15,15 @@ namespace GDGame.Scripts.Player
     public class PlayerMovement
     {
         #region Fields
-        private float _moveSpeed = 2f;
+        private float _moveSpeed = 200f;
         private RigidBody _rb;
         private SphereCollider _collider;
         private GameObject _playerParent;
+        private LayerMask _playerLayerMask = LayerMask.All;
+        #endregion
+
+        #region Accessors
+        public RigidBody RB => _rb;
         #endregion
 
         #region Constructors
@@ -22,7 +31,7 @@ namespace GDGame.Scripts.Player
         {
             _playerParent = parent;
 
-            // InitRB();
+            InitRB();
 
             parent.AddComponent<KeyboardWASDController>();
         }
@@ -37,14 +46,49 @@ namespace GDGame.Scripts.Player
 
             _rb = new RigidBody();
             _rb.BodyType = BodyType.Dynamic;
-            _rb.Mass = 0.1f;
+            _rb.Mass = 0.01f;
+            _rb.AngularDamping = 1;
+            _rb.LinearDamping = 1;
             _playerParent.AddComponent(_rb);
         }
-        private void Move(Vector3 dir)
+
+        public void HandlePlayerCollision(CollisionEvent collision)
         {
-            dir.Normalize();
-            Vector3 delta = dir * _moveSpeed;
-            _playerParent.Transform.TranslateBy(delta, true);
+            // Early Exit if the Collsiion doesnt match the player layer mask
+            // Or if it doesn't involve the player
+            var a = collision.BodyA;
+            var b = collision.BodyB;
+
+            // Try keep A as player when calling events
+
+            if (!collision.Matches(_playerLayerMask)) return;
+            if (a != _rb && b != _rb) return;
+
+            var colName = b.GameObject.Name;
+
+            switch (colName)
+            {
+                case "Game_Over":
+                    Debug.WriteLine("Game Over");
+                    break;
+                case "Game_Won":
+                    Debug.WriteLine("Game Won");
+                    break;
+                default:
+                    Debug.WriteLine("Collison not Set Up");
+                    break;
+            }
+        }
+        private void Move(Vector3 direction, float speed)
+        {
+            if (_rb.Transform == null)
+                return;
+
+            direction.Normalize();
+
+            Vector3 delta = direction * (speed * Time.DeltaTimeSecs);
+            // Debug.WriteLine($"{delta.ToString()}");
+
             _rb.AddForce(delta);
         }
         public void HandleMovement(int dir)
@@ -71,7 +115,9 @@ namespace GDGame.Scripts.Player
 
             if(moveDir.LengthSquared() == 0) return;
 
-            Move(moveDir);
+            //Debug.WriteLine($"{moveDir.ToString()}");
+
+            Move(moveDir, _moveSpeed);
         }
         #endregion
     }

@@ -1,4 +1,6 @@
-﻿using GDGame.Scripts.Systems;
+﻿using BepuPhysics.CollisionDetection.CollisionTasks;
+using GDEngine.Core.Events;
+using GDGame.Scripts.Systems;
 
 namespace GDGame.Scripts.Events.Channels
 {
@@ -8,22 +10,24 @@ namespace GDGame.Scripts.Events.Channels
     /// </summary>
     public class PlayerEventChannel
     {
-        public EventBase PlayerLose = new();
-        public EventBase PlayerWin = new();
-        public EventBase<GameState> GameStateChange = new();
-        public EventBase<int> PlayerDamaged = new();
-        public EventBase OrbCollected = new();
+        public EventBase OnPlayerLose = new();
+        public EventBase OnPlayerWin = new();
+        public EventBase<GameState> OnGameStateChange = new();
+        public EventBase<int> OnPlayerDamaged = new();
+        public EventBase OnOrbCollected = new();
+        public EventBase<CollisionEvent> OnPlayerCollision = new();
 
         /// <summary>
         /// Unsubscribe from all events in the Channel
         /// </summary>
         public void ClearEventChannel()
         {
-            PlayerLose.UnsubscribeAll();
-            PlayerWin.UnsubscribeAll();
-            GameStateChange.UnsubscribeAll();
-            OrbCollected.UnsubscribeAll();
-            PlayerDamaged.UnsubscribeAll();
+            OnPlayerLose.UnsubscribeAll();
+            OnPlayerWin.UnsubscribeAll();
+            OnGameStateChange.UnsubscribeAll();
+            OnOrbCollected.UnsubscribeAll();
+            OnPlayerDamaged.UnsubscribeAll();
+            OnPlayerCollision.UnsubscribeAll();
         }
     }
 }
