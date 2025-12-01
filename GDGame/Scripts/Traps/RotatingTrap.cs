@@ -1,29 +1,28 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace GDGame.Scripts.Traps
 {
     /// <summary>
     /// Moving Obstacle Trap which inherits from <see cref="TrapBase"/>.
     /// </summary>
-    public class MovingTrap : TrapBase
+    public class RotatingTrap : TrapBase
     {
         #region Fields
-        private float _moveSpeed = 5f;
+        private float _rotSpeed = 5f;
         #endregion
 
         #region Constructors
-        public MovingTrap(int id, float moveSpeed) : base(id)
+        public RotatingTrap(int id, float rotSpeed) : base(id)
         {
-            _moveSpeed = moveSpeed;
+            _rotSpeed = rotSpeed;
         }
         #endregion
 
         #region Methods
         public override void UpdateTrap()
         {
-            TrapGO.Transform.TranslateBy(new Vector3(0,0,_moveSpeed));
-            if (TrapGO.Transform.Position.Z > 10f || TrapGO.Transform.Position.Z < -10f)
+            if (Quaternion.Dot(TrapGO.Transform.Rotation, Quaternion.CreateFromAxisAngle(Vector3.Up, MathHelper.Pi)) > 0.9f)
             {
                 flip();
             }
@@ -42,7 +41,7 @@ namespace GDGame.Scripts.Traps
 
         public void flip()
         {
-            _moveSpeed = -_moveSpeed;
+            _rotSpeed = -_rotSpeed;
         }
     }
 }
