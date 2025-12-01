@@ -9,7 +9,7 @@ namespace GDGame.Scripts.Traps
         public abstract class TrapBase
         {
             #region Fields
-            private GameObject _trapGO;
+            protected GameObject _trapGO;
             private int _trapID;
             #endregion
 
@@ -17,8 +17,7 @@ namespace GDGame.Scripts.Traps
             public TrapBase(int id)
             {
                 _trapID = id;
-                _trapGO = new GameObject(AppData.TRAP_NAME + _trapID);
-                SceneController.AddToCurrentScene(_trapGO);
+                
             }
             #endregion
 
