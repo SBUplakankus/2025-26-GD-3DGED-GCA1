@@ -88,6 +88,11 @@ A place for nots on any classes created for our game in the engine.
 - Creates the player HUD in the top left of the screen
 - Displays the data from `PlayerStats` and updates each frame
 
+### ⏸️ [Player HUD](../GDGame/Scripts/UI/PauseMenu.cs)
+- Created in `UserInterfaceController`
+- Creates the pause screen that toggles when called
+- Displays a resume and quit options
+
 ---
 
 ## 🎮 Game Systems
