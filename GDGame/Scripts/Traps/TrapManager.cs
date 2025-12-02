@@ -50,7 +50,7 @@ namespace GDGame.Scripts.Traps
         protected override void Start()
         {
             _trapList.Add(new MovingTrap(1, 1f));
-            _trapList.Add(new RotatingTrap(2, 3f));
+            _trapList.Add(new RotatingTrap(2, 1f));
 
             InitTraps();
         }
