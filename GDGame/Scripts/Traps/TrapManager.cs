@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using GDEngine.Core.Components;
+﻿using GDEngine.Core.Components;
+using System;
+using System.Collections.Generic;
 
 namespace GDGame.Scripts.Traps
 {
@@ -16,7 +17,8 @@ namespace GDGame.Scripts.Traps
         public TrapManager() 
         {
             _trapList = new List<TrapBase>();
-            _trapList.Add(new MovingTrap(1,5));
+            //_trapList.Add(new MovingTrap(1,5));
+            //_trapList.Add(new RotatingTrap(2,3));
         }
         #endregion
 
@@ -47,6 +49,9 @@ namespace GDGame.Scripts.Traps
         #region Engine Methods
         protected override void Start()
         {
+            _trapList.Add(new MovingTrap(1, 1f));
+            _trapList.Add(new RotatingTrap(2, 1f));
+
             InitTraps();
         }
         protected override void Update(float deltaTime)

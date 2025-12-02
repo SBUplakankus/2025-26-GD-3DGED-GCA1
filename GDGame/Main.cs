@@ -239,7 +239,10 @@ namespace GDGame
 
         private void InitTraps()
         {
-            _trapManager = new TrapManager();
+            //_trapManager = new TrapManager();
+            var trapManagerGO = new GameObject("TrapManagerGO");
+            var trapManager = trapManagerGO.AddComponent<TrapManager>();
+            SceneController.AddToCurrentScene(trapManagerGO);
         }
 
         private void InitTime()
