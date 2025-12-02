@@ -49,7 +49,7 @@ namespace GDGame.Scripts.Player
             _rb.Mass = 0.01f;
             _rb.AngularDamping = 1;
             _rb.LinearDamping = 1;
-            _playerParent.AddComponent(_rb);
+            // _playerParent.AddComponent(_rb);
         }
 
         public void HandlePlayerCollision(CollisionEvent collision)

@@ -21,10 +21,10 @@ namespace GDGame.Scripts.Systems
         private AudioEventChannel _audioEventChannel;
         private PlayerEventChannel _playerEventChannel;
         private Camera _camera;
-        private Vector3 _startPos = new (8,28,8);
-        private Vector3 _endPos = new (18, 25, 18);
+        private Vector3 _startPos = new (8,18,8);
+        private Vector3 _endPos = new (18, 15, 18);
         private bool _isActive;
-        private readonly float _duration = 2f;
+        private readonly float _duration = 5f;
         private float _counter = 0f;
         private float _cameraFOV = 0.9f;
         private const int FAR_PLANE_LIMIT = 1000;
