@@ -12,6 +12,7 @@ namespace GDGame.Scripts.Traps
     {
         #region Fields
         private float _moveSpeed = 5f;
+        private Vector3 _startPosition = new Vector3(0, 0, 0);
         #endregion
 
         #region Constructors
@@ -27,8 +28,8 @@ namespace GDGame.Scripts.Traps
         #region Methods
         public override void UpdateTrap()
         {
-            _trapGO.Transform.TranslateBy(new Vector3(0, 0, _moveSpeed));
-            if (_trapGO.Transform.Position.Z > 50f || _trapGO.Transform.Position.Z < -50f)
+            _trapGO.Transform.TranslateBy(new Vector3(0, _moveSpeed, 0));
+            if (_trapGO.Transform.Position.Y > _startPosition.Y+5f || _trapGO.Transform.Position.Y < _startPosition.Y -5f)
             {
                 flip();
             }
@@ -36,7 +37,7 @@ namespace GDGame.Scripts.Traps
 
         public override void InitTrap()
         {
-
+            _startPosition = _trapGO.Transform.Position;
         }
 
         public override void HandlePlayerHit()

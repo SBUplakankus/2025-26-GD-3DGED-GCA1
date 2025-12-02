@@ -49,12 +49,8 @@ namespace GDGame.Scripts.Traps
         #region Engine Methods
         protected override void Start()
         {
-            // Create traps now that the scene and engine are initialized
             _trapList.Add(new MovingTrap(1, 1f));
             _trapList.Add(new RotatingTrap(2, 3f));
-
-            // Optional: log so you can see this ran
-            Console.WriteLine("TrapManager.Start called - created traps: " + _trapList.Count);
 
             InitTraps();
         }
