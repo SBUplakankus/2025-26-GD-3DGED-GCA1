@@ -2,6 +2,7 @@
 using GDEngine.Core.Components;
 using GDEngine.Core.Events;
 using GDEngine.Core.Rendering.Base;
+using GDEngine.Core.Timing;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -19,7 +20,7 @@ namespace GDGame.Scripts.Player
     public class PlayerMovement : Component
     {
         #region Fields
-        private readonly float _moveSpeed = 5f;
+        private readonly float _moveSpeed = 15f;
         private RigidBody _rb;
         private BoxCollider _collider;
         private readonly LayerMask _playerLayerMask = LayerMask.All;
@@ -53,14 +54,13 @@ namespace GDGame.Scripts.Player
         {
             _collider = new BoxCollider
             {
-                Size = Vector3.One,
-               
+                Size = new Vector3(3,3,3),
             };
 
             _rb = new RigidBody
             {
                 BodyType = BodyType.Dynamic,
-                Mass = 5f,
+                Mass = 0.5f,
                 LinearDamping = 0f,
                 AngularDamping = 0f,
             };
@@ -121,8 +121,10 @@ namespace GDGame.Scripts.Player
             if (_keyboardState.IsKeyDown(_leftKey))
                 moveDir -= right;
 
+            var speed = _moveSpeed;
+
             // Move the players rigidbody
-            Move(moveDir, _moveSpeed);
+            Move(moveDir, speed);
         }
         #endregion
 

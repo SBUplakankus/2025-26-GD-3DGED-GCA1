@@ -34,8 +34,8 @@ namespace GDGame.Scripts.Player
             _playerCamera = new PlayerCamera(aspectRatio);
             _playerMovement = new PlayerMovement();
 
+            _playerGO.AddComponent(_playerCamera);
             _playerGO.AddComponent(_playerCamera.Cam);
-            _playerGO.AddComponent<MouseYawPitchController>();
             _playerGO.AddComponent(_playerMovement);
             _playerGO.AddComponent(_playerMovement.RB);
             _playerGO.AddComponent(_playerMovement.Collider);

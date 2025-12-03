@@ -34,6 +34,8 @@ namespace GDGame
         private readonly GraphicsDeviceManager _graphics;
         private ContentDictionary<Model> _modelDictionary;
         private ContentDictionary<Effect> _effectsDictionary;
+        private PhysicsSystem _physicsSystem;
+        private PhysicsDebugSystem _physicsDebugRenderer;
         private Scene _scene;
         private bool _disposed = false;
         private Vector2 _screenCentre;
@@ -100,7 +102,6 @@ namespace GDGame
             Mouse.SetPosition((int)_screenCentre.X, (int) _screenCentre.Y);
             IsMouseVisible = false;
         }
-
         private void InitializeContext()
         {
             EngineContext.Initialize(GraphicsDevice, Content);
@@ -115,7 +116,6 @@ namespace GDGame
         {
             _materialGenerator = new MaterialGenerator(_graphics);
         }
-
         private void InitScene()
         {
             _sceneController = new SceneController(this);
@@ -169,19 +169,27 @@ namespace GDGame
 
         private void InitPhysicsSystem()
         {
-            var physicsSystem = _scene.AddSystem(new PhysicsSystem());
-            physicsSystem.Gravity = AppData.GRAVITY;
+            _physicsSystem = new PhysicsSystem()
+            {
+                Gravity = AppData.GRAVITY
+            };
+
+            InitPhysicsDebugSystem(true);
+
+            _scene.AddSystem(_physicsDebugRenderer);
+            _scene.AddSystem(_physicsSystem);
         }
 
         private void InitPhysicsDebugSystem(bool isEnabled)
         {
-            var physicsDebugRenderer = _scene.AddSystem(new PhysicsDebugSystem());
-            physicsDebugRenderer.Enabled = isEnabled;
-
-            physicsDebugRenderer.StaticColor = Color.Green;
-            physicsDebugRenderer.KinematicColor = Color.Blue;
-            physicsDebugRenderer.DynamicColor = Color.Yellow;
-            physicsDebugRenderer.TriggerColor = Color.Red;
+            _physicsDebugRenderer = new PhysicsDebugSystem()
+            {
+                Enabled = isEnabled,
+                StaticColor = Color.Green,
+                KinematicColor = Color.Blue,
+                DynamicColor = Color.Yellow,
+                TriggerColor = Color.Red
+            };
         }
 
         private void InitCameraAndRenderSystems()
@@ -202,7 +210,6 @@ namespace GDGame
             GenerateMaterials();
             InitScene();
             InitPhysicsSystem();
-            InitPhysicsDebugSystem(true);
             InitCameraAndRenderSystems();
         }
 
@@ -247,7 +254,8 @@ namespace GDGame
 
         private void InitTime()
         {
-            _timeController = new TimeController();
+            // Pausing Breaks Movement Physics don't think we can fix that
+            _timeController = new TimeController(_physicsDebugRenderer, _physicsSystem);
         }
 
         private void InitCineCam()
@@ -261,7 +269,6 @@ namespace GDGame
         {
             _gameStateManager = new GameStateManager();
         }
-
         private void InitDemoGameEvents()
         {
             _gameOver = new GameOverObject();
@@ -281,7 +288,6 @@ namespace GDGame
             InitTime();
             InitGameStateManager();
             DemoLoadFromJSON();
-            TestObjectLoad();
             InitDemoGameEvents();
         }
 
@@ -323,16 +329,6 @@ namespace GDGame
                 _scene.Add(_modelGenerator.GenerateModel(
                     d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName));
         }
-
-        private void TestObjectLoad()
-        {
-            GameObject player = _modelGenerator.GenerateModel(
-                new Vector3(0, 5, 10),
-                new Vector3(0, 0, 0),
-                new Vector3(0.1f, 0.1f, 0.1f),
-                "colormap", "ghost", "test");
-        }
-
         #endregion
 
         #region Disposal

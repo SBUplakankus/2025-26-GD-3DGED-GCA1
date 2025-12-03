@@ -28,7 +28,7 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Input Keys
-        private readonly Keys _pauseKey = Keys.Escape;
+        private readonly Keys _pauseKey = Keys.Q;
         private readonly Keys _fullscreenKey = Keys.F11;
         private readonly Keys _exitKey = Keys.E;
         private readonly Keys _forwardKey = Keys.W;
@@ -139,12 +139,12 @@ namespace GDGame.Scripts.Systems
         
         private void CheckForInputs()
         {
-            CheckForPause();
             CheckForFullscreen();
             CheckForExit();
             CheckForLanguageSwap();
             CheckForOrbTest();
             CheckForDamageTest();
+            CheckForPause();
         }
         #endregion
 
