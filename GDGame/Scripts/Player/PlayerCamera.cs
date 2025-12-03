@@ -68,12 +68,6 @@ namespace GDGame.Scripts.Player
         {
             _newMouseState = Mouse.GetState();
 
-            if (TimeController.IsPaused)
-            {
-                _newMouseState = _oldMouseState;
-                return;
-            }
-
             float dX = _newMouseState.X - _oldMouseState.X;
             float dY = _newMouseState.Y - _oldMouseState.Y;
 

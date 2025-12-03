@@ -3,6 +3,7 @@ using GDEngine.Core.Entities;
 using GDEngine.Core.Rendering;
 using GDEngine.Core.Rendering.UI;
 using GDEngine.Core.Utilities;
+using GDGame.Scripts.Events.Channels;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GDGame.Scripts.UI
@@ -17,6 +18,7 @@ namespace GDGame.Scripts.UI
         private GameObject _reticleGO;
         private UIReticle _reticleRenderer;
         private Vector2 _reticleScale = new (0.1f, 0.1f);
+        private bool _reticleVisible = false;
         #endregion
 
         #region Constructors
@@ -28,7 +30,7 @@ namespace GDGame.Scripts.UI
             _reticleRenderer.Origin = reticleTexture.GetCenter();
             _reticleRenderer.SourceRectangle = null;
             _reticleRenderer.Scale = _reticleScale;
-            _reticleRenderer.LayerDepth = UILayer.Cursor;
+            _reticleRenderer.LayerDepth = UILayer.HUD;
 
             _reticleGO.AddComponent(_reticleRenderer);
         }

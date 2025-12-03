@@ -18,17 +18,17 @@ namespace GDGame.Scripts.Systems
         private static bool _isPaused;
         private PhysicsDebugSystem _physicsDebugSystem;
         private PhysicsSystem _physicsSystem;
+        private InputEventChannel _inputEventsChannel;
+        private GameEventChannel _gameEventsChannel;
         #endregion
 
         #region Constructors
         public TimeController(PhysicsDebugSystem pds, PhysicsSystem ps) 
         {
-            _isPaused = false;
-            Time.TimeScale = 1.0f;
             _physicsSystem = ps;
             _physicsDebugSystem = pds;
-            EventChannelManager.Instance.InputEvents.OnPauseToggle.Subscribe(TogglePause);
-            HandlePause(_isPaused);
+            _gameEventsChannel = EventChannelManager.Instance.GameEvents;
+            _inputEventsChannel = EventChannelManager.Instance.InputEvents;
         }
         #endregion
 
@@ -37,18 +37,6 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Methods
-        public void TogglePause()
-        {
-            _isPaused = !_isPaused;
-
-            HandlePause(_isPaused);
-        }
-
-        private void HandlePause(bool isPaused)
-        {
-            _physicsDebugSystem.SetPaused(isPaused);
-            _physicsSystem.SetPaused(isPaused);
-        }
         #endregion
     }
 }

@@ -100,8 +100,9 @@ namespace GDGame
         private void InitializeMouse()
         {
             Mouse.SetPosition((int)_screenCentre.X, (int) _screenCentre.Y);
-            IsMouseVisible = false;
+            IsMouseVisible = true;
         }
+
         private void InitializeContext()
         {
             EngineContext.Initialize(GraphicsDevice, Content);
@@ -129,6 +130,8 @@ namespace GDGame
             EventChannelManager.Initialise();
             _inputEventChannel = EventChannelManager.Instance.InputEvents;
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
+
+            // _inputEventChannel.OnPauseToggle.Subscribe(HandlePauseToggle);
 
             SceneController.AddToCurrentScene(new EventSystem(EngineContext.Instance.Events));
         }
@@ -161,7 +164,7 @@ namespace GDGame
             }
 
             _audioController = new AudioController(sounds);
-            _uiController = new UserInterfaceController(EngineContext.Instance.SpriteBatch ,fonts, textures, _screenCentre);
+            _uiController = new UserInterfaceController(EngineContext.Instance.SpriteBatch ,fonts, textures, _screenCentre, this);
             _sceneGenerator = new SceneGenerator(textures, _materialGenerator.MatBasicLit, _materialGenerator.MatBasicUnlit,
                 _materialGenerator.MatBasicUnlitGround, _graphics);
             _modelGenerator = new ModelGenerator(textures, models, _materialGenerator.MatBasicUnlit, _graphics);
@@ -209,6 +212,7 @@ namespace GDGame
             InitializeMouse();
             GenerateMaterials();
             InitScene();
+            InitEvents();
             InitPhysicsSystem();
             InitCameraAndRenderSystems();
         }
@@ -226,7 +230,6 @@ namespace GDGame
             _inputManager.Initialise();
             _inputEventChannel.OnFullscreenToggle.Subscribe(HandleFullscreenToggle);
             _inputEventChannel.OnApplicationExit.Subscribe(HandleGameExit);
-            _inputEventChannel.OnPauseToggle.Subscribe(HandlePause);
         }
 
         private void GenerateBaseScene()
@@ -236,6 +239,7 @@ namespace GDGame
 
         private void InitializeUI()
         {
+            SceneController.AddToCurrentScene(new UIEventSystem());
             _uiController.Initialise(_playerController.Stats);
         }
         private void InitPlayer()
@@ -254,7 +258,6 @@ namespace GDGame
 
         private void InitTime()
         {
-            // Pausing Breaks Movement Physics don't think we can fix that
             _timeController = new TimeController(_physicsDebugRenderer, _physicsSystem);
         }
 
@@ -274,9 +277,9 @@ namespace GDGame
             _gameOver = new GameOverObject();
             _gameWon = new GameWonObject();
         }
+
         private void InitGameSystems()
         {
-            InitEvents();
             GenerateBaseScene();
             InitInputSystem();
             InitLocalisation();
@@ -312,7 +315,7 @@ namespace GDGame
 
         private void HandleFullscreenToggle() => _graphics.ToggleFullScreen();
         private void HandleGameExit() => Application.Exit();
-        private void HandlePause() => IsMouseVisible = !IsMouseVisible;
+        private void HandlePauseToggle() => IsMouseVisible = !IsMouseVisible;
 
         #endregion
 
@@ -336,7 +339,7 @@ namespace GDGame
         /// <summary>
         /// Clear all of the event channels
         /// </summary>
-        private static void UnscubscribeFromEvents()
+        private static void UnsubscribeFromEvents()
         {
             EventChannelManager.Instance.ClearEventChannels();
         }
@@ -369,7 +372,7 @@ namespace GDGame
                 System.Diagnostics.Debug.WriteLine("Main disposal complete");
             }
 
-            UnscubscribeFromEvents();
+            UnsubscribeFromEvents();
             _disposed = true;
 
             base.Dispose(disposing);

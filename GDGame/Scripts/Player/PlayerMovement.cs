@@ -60,9 +60,6 @@ namespace GDGame.Scripts.Player
             _rb = new RigidBody
             {
                 BodyType = BodyType.Dynamic,
-                Mass = 0.5f,
-                LinearDamping = 0f,
-                AngularDamping = 0f,
             };
         }
         
@@ -81,8 +78,8 @@ namespace GDGame.Scripts.Player
             else
             {
                 // No movement input: stop horizontal motion, let damping & gravity handle the rest.
-                velocity.X = 0f;
-                velocity.Z = 0f;
+                velocity.X = 0.1f;
+                velocity.Z = 0.1f;
             }
 
             _rb.LinearVelocity = velocity;
@@ -123,7 +120,7 @@ namespace GDGame.Scripts.Player
 
             var speed = _moveSpeed;
 
-            // Move the players rigidbody
+            // Move the players rigid body
             Move(moveDir, speed);
         }
         #endregion

@@ -29,6 +29,7 @@ namespace GDGame.Scripts.Systems
 
         #region Accessors
         public Scene CurrentScene => _currentScene;
+        public static Scene GetCurrentScene=> _currentScene;
         #endregion
 
         #region Methods

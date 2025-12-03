@@ -25,6 +25,7 @@ namespace GDGame.Scripts.Systems
         private readonly int _debounceMs = 60;
         private readonly bool _enableKeyRepeat = true;
         private readonly int _keyRepeatMs = 300;
+        private bool _isPaused;
         #endregion
 
         #region Input Keys
