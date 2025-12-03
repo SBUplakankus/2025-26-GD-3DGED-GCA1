@@ -78,7 +78,7 @@ namespace GDGame.Scripts.Player
             else
             {
                 // No movement input: stop horizontal motion, let damping & gravity handle the rest.
-                velocity.X = 0.1f;
+                velocity.X = 0f;
                 velocity.Z = 0.1f;
             }
 
@@ -87,6 +87,7 @@ namespace GDGame.Scripts.Player
 
         private void HandleMovement()
         {
+
             // Set the Base Direction Vectors
             var forward = _rb.Transform.Forward;
             var right = _rb.Transform.Right;
