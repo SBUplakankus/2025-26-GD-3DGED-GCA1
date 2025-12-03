@@ -174,6 +174,11 @@ namespace GDGame.Scripts.UI
             TryBuildMenus();
         }
 
+        private void HandleLanguageSwap()
+        {
+            // System is too convoluted button text is stored in created buttons in menu panel
+        }
+
         /// <summary>
         /// Show the main menu and hide the other panels.
         /// This assumes the menu scene is currently active in the SceneManager.

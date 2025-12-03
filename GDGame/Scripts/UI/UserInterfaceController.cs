@@ -59,13 +59,13 @@ namespace GDGame.Scripts.UI
 
         private void InitHUD(PlayerStats stats)
         {
-            _playerHUD = new PlayerHUD(_fonts.Get("gamefont"), stats);
+            _playerHUD = new PlayerHUD(_fonts.Get(AppData.FONT_NAME), stats);
             _playerHUD.Initialise();
         }
 
         private void InitPauseMenu()
         {
-            _pauseMenu = new PauseMenu(_interfaceTextures, _fonts.Get("gamefont"), _screenCentre);
+            _pauseMenu = new PauseMenu(_interfaceTextures, _fonts.Get(AppData.FONT_NAME), _screenCentre);
         }
 
         private void InitMenuController()
