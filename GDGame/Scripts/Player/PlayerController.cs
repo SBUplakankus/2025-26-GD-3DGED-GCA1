@@ -11,18 +11,18 @@ using GDGame.Scripts.Systems;
 namespace GDGame.Scripts.Player
 {
     /// <summary>
-    /// Controls the player.
-    /// Uses <see cref="PlayerCamera"/> and <see cref="PlayerMovement"/>.
+    /// Central controller for the player.
+    /// Uses <see cref="PlayerCamera"/>, <see cref="PlayerStats"/> and <see cref="PlayerMovement"/>.
     /// </summary>
-    public class PlayerController : Component
+    public class PlayerController
     {
         #region Fields
-        private GameObject _playerGO;
-        private PlayerMovement _playerMovement;
-        private PlayerCamera _playerCamera;
-        private PlayerStats _playerStats;
+        private readonly GameObject _playerGO;
+        private readonly PlayerMovement _playerMovement;
+        private readonly PlayerCamera _playerCamera;
+        private readonly PlayerStats _playerStats;
         private PlayerEventChannel _playerEventChannel;
-        private Vector3 _startPos = new (0, 0, 0);
+        private Vector3 _startPos = new (0, 10, 0);
         private Vector3 _startRot = new (0, 0, 0);
         #endregion
 
@@ -31,10 +31,14 @@ namespace GDGame.Scripts.Player
         {
             _playerGO = new GameObject(AppData.PLAYER_NAME);
 
-            _playerCamera = new PlayerCamera(_playerGO, aspectRatio);
-            _playerMovement = new PlayerMovement(_playerGO);
+            _playerCamera = new PlayerCamera(aspectRatio);
+            _playerMovement = new PlayerMovement();
 
-            _playerGO.AddComponent(this);
+            _playerGO.AddComponent(_playerCamera);
+            _playerGO.AddComponent(_playerCamera.Cam);
+            _playerGO.AddComponent(_playerMovement);
+            _playerGO.AddComponent(_playerMovement.RB);
+            _playerGO.AddComponent(_playerMovement.Collider);
             _playerGO.AddComponent(audio);
 
             _playerGO.Transform.TranslateTo(_startPos);
@@ -63,13 +67,8 @@ namespace GDGame.Scripts.Player
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
             _playerEventChannel.OnOrbCollected.Subscribe(_playerStats.HandleOrbCollection);
             _playerEventChannel.OnPlayerDamaged.Subscribe(_playerStats.TakeDamage);
-            //_playerEventChannel.OnPlayerCollision.Subscribe(_playerMovement.HandlePlayerCollision);
             EngineContext.Instance.Events.Subscribe<CollisionEvent>(_playerMovement.HandlePlayerCollision);
-            EventChannelManager.Instance.InputEvents.OnMovementInput.Subscribe(_playerMovement.HandleMovement);
         }
-        #endregion
-
-        #region Methods
         #endregion
     }
 }

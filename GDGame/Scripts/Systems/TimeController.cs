@@ -1,36 +1,42 @@
-﻿using GDEngine.Core.Timing;
+﻿using System.Diagnostics;
+using GDEngine.Core.Components;
+using GDEngine.Core.Entities;
+using GDEngine.Core.Systems;
+using GDEngine.Core.Timing;
 using GDGame.Scripts.Events.Channels;
 
 namespace GDGame.Scripts.Systems
 {
     /// <summary>
     /// Controls the time of the game using <see cref="Time.TimeScale"/>.
+    /// Should pause the <see cref="PhysicsSystem"/> but its bugged so for now 
+    /// it is just a static bool we can check.
     /// </summary>
-    public class TimeController
+    public class TimeController : Component
     {
         #region Fields
-        private bool _isPlaying;
+        private static bool _isPaused;
+        private PhysicsDebugSystem _physicsDebugSystem;
+        private PhysicsSystem _physicsSystem;
+        private InputEventChannel _inputEventsChannel;
+        private GameEventChannel _gameEventsChannel;
         #endregion
 
         #region Constructors
-        public TimeController() 
+        public TimeController(PhysicsDebugSystem pds, PhysicsSystem ps) 
         {
-            _isPlaying = true;
-            Time.TimeScale = 1.0f;
-            EventChannelManager.Instance.InputEvents.OnPauseToggle.Subscribe(TogglePause);
+            _physicsSystem = ps;
+            _physicsDebugSystem = pds;
+            _gameEventsChannel = EventChannelManager.Instance.GameEvents;
+            _inputEventsChannel = EventChannelManager.Instance.InputEvents;
         }
         #endregion
 
-        #region Methods
-        public void TogglePause()
-        {
-            if (_isPlaying)
-                Time.TimeScale = 0;
-            else
-                Time.TimeScale = 1;
+        #region Accessors
+        public static bool IsPaused => _isPaused;
+        #endregion
 
-            _isPlaying = !_isPlaying;
-        }
+        #region Methods
         #endregion
     }
 }

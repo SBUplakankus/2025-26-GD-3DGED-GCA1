@@ -1,57 +1,143 @@
 ﻿using System.Diagnostics;
 using GDEngine.Core.Components;
-using GDEngine.Core.Entities;
 using GDEngine.Core.Events;
 using GDEngine.Core.Rendering.Base;
 using GDEngine.Core.Timing;
+using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct3D9;
 
 namespace GDGame.Scripts.Player
 {
+    
+
     /// <summary>
     /// Controls the player physics movement.
     /// Created in <see cref="PlayerController"/>.
+    /// Takes parts of code from <see cref="PhysicsWASDController"/>.
     /// </summary>
-    public class PlayerMovement
+    public class PlayerMovement : Component
     {
         #region Fields
-        private float _moveSpeed = 200f;
+        private readonly float _moveSpeed = 15f;
         private RigidBody _rb;
-        private SphereCollider _collider;
-        private GameObject _playerParent;
-        private LayerMask _playerLayerMask = LayerMask.All;
+        private BoxCollider _collider;
+        private readonly LayerMask _playerLayerMask = LayerMask.All;
+        private Keys _forwardKey, _rightKey, _backKey, _leftKey;
+        private KeyboardState _keyboardState;
         #endregion
 
         #region Accessors
         public RigidBody RB => _rb;
+        public BoxCollider Collider => _collider;
         #endregion
 
         #region Constructors
-        public PlayerMovement(GameObject parent)
+        public PlayerMovement()
         {
-            _playerParent = parent;
-
+            InitMovementKeys();
             InitRB();
-
-            parent.AddComponent<KeyboardWASDController>();
         }
         #endregion
 
         #region Methods
+        private void InitMovementKeys()
+        {
+            var keys = InputManager.MoveKeys;
+            _rightKey = keys.right;
+            _leftKey = keys.left;
+            _backKey = keys.back;
+            _forwardKey = keys.forward;
+        }
         private void InitRB()
         {
-            _collider = new SphereCollider();
-            _collider.Diameter = Vector3.One.Length();
-            _playerParent.AddComponent(_collider);
+            _collider = new BoxCollider
+            {
+                Size = new Vector3(3,3,3),
+            };
 
-            _rb = new RigidBody();
-            _rb.BodyType = BodyType.Dynamic;
-            _rb.Mass = 0.01f;
-            _rb.AngularDamping = 1;
-            _rb.LinearDamping = 1;
-            // _playerParent.AddComponent(_rb);
+            _rb = new RigidBody
+            {
+                BodyType = BodyType.Dynamic,
+            };
+        }
+        
+        private void Move(Vector3 moveDir, float speed)
+        {
+            var velocity = _rb.LinearVelocity;
+
+            if (moveDir.LengthSquared() > 0f && speed > 0f)
+            {
+                moveDir.Normalize();
+
+                // Set horizontal velocity; keep Y as-is.
+                velocity.X = moveDir.X * speed;
+                velocity.Z = moveDir.Z * speed;
+            }
+            else
+            {
+                // No movement input: stop horizontal motion, let damping & gravity handle the rest.
+                velocity.X = 0f;
+                velocity.Z = 0.1f;
+            }
+
+            _rb.LinearVelocity = velocity;
         }
 
+        private void HandleMovement()
+        {
+
+            // Set the Base Direction Vectors
+            var forward = _rb.Transform.Forward;
+            var right = _rb.Transform.Right;
+
+            forward.Y = 0;
+            right.Y = 0;
+
+            if (forward.LengthSquared() > 0f)
+                forward.Normalize();
+            else
+                forward = Vector3.Forward;
+
+            if (right.LengthSquared() > 0f)
+                right.Normalize();
+            else
+                right = Vector3.Right;
+
+            _keyboardState = Keyboard.GetState();
+
+            var moveDir = Vector3.Zero;
+
+            // Apply Direction based on the input
+            if (_keyboardState.IsKeyDown(_forwardKey))
+                moveDir += forward;
+            if (_keyboardState.IsKeyDown(_backKey))
+                moveDir -= forward;
+            if (_keyboardState.IsKeyDown(_rightKey))
+                moveDir += right;
+            if (_keyboardState.IsKeyDown(_leftKey))
+                moveDir -= right;
+
+            var speed = _moveSpeed;
+
+            // Move the players rigid body
+            Move(moveDir, speed);
+        }
+        #endregion
+
+        #region Game Loop
+        protected override void Update(float deltaTime)
+        {
+            HandleMovement();
+        }
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Handle the players collision with objects in the world
+        /// </summary>
+        /// <param name="collision">Collision Event</param>
         public void HandlePlayerCollision(CollisionEvent collision)
         {
             // Early Exit if the Collsiion doesnt match the player layer mask
@@ -75,49 +161,9 @@ namespace GDGame.Scripts.Player
                     Debug.WriteLine("Game Won");
                     break;
                 default:
-                    Debug.WriteLine("Collison not Set Up");
+                    // Debug.WriteLine("Collison not Set Up");
                     break;
             }
-        }
-        private void Move(Vector3 direction, float speed)
-        {
-            if (_rb.Transform == null)
-                return;
-
-            direction.Normalize();
-
-            Vector3 delta = direction * (speed * Time.DeltaTimeSecs);
-            // Debug.WriteLine($"{delta.ToString()}");
-
-            _rb.AddForce(delta);
-        }
-        public void HandleMovement(int dir)
-        {
-            var forward = _playerParent.Transform.Forward;
-            var right = _playerParent.Transform.Right;
-
-            forward.Y = 0;
-            right.Y = 0;
-
-            var moveDir = Vector3.Zero;
-
-            if (dir == AppData.FORWARD_MOVE_NUM)
-                moveDir += forward;
-
-            if(dir == AppData.BACKWARD_MOVE_NUM)
-                moveDir -= forward;
-
-            if (dir == AppData.LEFT_MOVE_NUM)
-                moveDir -= right;
-
-            if(dir == AppData.RIGHT_MOVE_NUM)
-                moveDir += right;
-
-            if(moveDir.LengthSquared() == 0) return;
-
-            //Debug.WriteLine($"{moveDir.ToString()}");
-
-            Move(moveDir, _moveSpeed);
         }
         #endregion
     }

@@ -25,6 +25,7 @@ namespace GDGame.Scripts.UI
         private SpriteFont _hudFont;
         private Color _hudTextColour = Color.White;
         private List<UIText> _textObjects;
+        private bool _isVisible;
         private readonly Dictionary<string, Vector2> _hudPositions = new()
         {
             ["top_left"] = new Vector2(200, 100),
@@ -43,6 +44,7 @@ namespace GDGame.Scripts.UI
             _hudFont = hudFont;
             _playerStats = stats;
             _textObjects = new();
+            _isVisible = false;
 
         }
         #endregion
@@ -119,16 +121,9 @@ namespace GDGame.Scripts.UI
             CreateText(AppData.LANG_ORB_KEY, startPos += vertIncrement);
             CreateOrbStat(startPos + horIncrement);
         }
-
-        private void HandlePause()
-        {
-            foreach (var text in _textObjects)
-                text.Enabled = !text.Enabled;
-        }
         public void Initialise()
         {
             InitHUDText();
-            EventChannelManager.Instance.InputEvents.OnPauseToggle.Subscribe(HandlePause);
         }
         #endregion
     }

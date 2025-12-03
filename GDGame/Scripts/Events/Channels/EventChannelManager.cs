@@ -16,12 +16,14 @@ namespace GDGame.Scripts.Events.Channels
         private readonly InputEventChannel _inputEvents;
         private readonly PlayerEventChannel _playerEvents;
         private readonly AudioEventChannel _audioEvents;
+        private readonly GameEventChannel _gameEvents;
 
         public EventChannelManager() 
         {
             _inputEvents = new InputEventChannel();
             _playerEvents = new PlayerEventChannel();
             _audioEvents = new AudioEventChannel();
+            _gameEvents = new GameEventChannel();
         }
 
         #region Accessors
@@ -38,6 +40,7 @@ namespace GDGame.Scripts.Events.Channels
         public InputEventChannel InputEvents => _inputEvents;
         public PlayerEventChannel PlayerEvents => _playerEvents;
         public AudioEventChannel AudioEvents => _audioEvents;
+        public GameEventChannel GameEvents => _gameEvents;
         #endregion
 
         #region Methods
@@ -53,6 +56,7 @@ namespace GDGame.Scripts.Events.Channels
             _inputEvents.ClearEventChannel();
             _playerEvents.ClearEventChannel();
             _audioEvents.ClearEventChannel();
+            _gameEvents.ClearEventChannel();
         }
 
         #endregion

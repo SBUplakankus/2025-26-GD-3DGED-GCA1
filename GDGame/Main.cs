@@ -31,9 +31,11 @@ namespace GDGame
         #region Fields
 
         // Core
-        private GraphicsDeviceManager _graphics;
+        private readonly GraphicsDeviceManager _graphics;
         private ContentDictionary<Model> _modelDictionary;
         private ContentDictionary<Effect> _effectsDictionary;
+        private PhysicsSystem _physicsSystem;
+        private PhysicsDebugSystem _physicsDebugRenderer;
         private Scene _scene;
         private bool _disposed = false;
         private Vector2 _screenCentre;
@@ -46,7 +48,7 @@ namespace GDGame
         private ModelGenerator _modelGenerator;
         private MaterialGenerator _materialGenerator;
         private InputManager _inputManager;
-        private TrapManager _trapManager;
+        private readonly TrapManager _trapManager;
         private TimeController _timeController;
         private CinematicCamController _cineCamController;
         private GameStateManager _gameStateManager;
@@ -98,7 +100,7 @@ namespace GDGame
         private void InitializeMouse()
         {
             Mouse.SetPosition((int)_screenCentre.X, (int) _screenCentre.Y);
-            IsMouseVisible = false;
+            IsMouseVisible = true;
         }
 
         private void InitializeContext()
@@ -106,7 +108,7 @@ namespace GDGame
             EngineContext.Initialize(GraphicsDevice, Content);
         }
 
-        private void InitLocalisation()
+        private static void InitLocalisation()
         {
             LocalisationController.Initialise();
         }
@@ -115,7 +117,6 @@ namespace GDGame
         {
             _materialGenerator = new MaterialGenerator(_graphics);
         }
-
         private void InitScene()
         {
             _sceneController = new SceneController(this);
@@ -129,6 +130,8 @@ namespace GDGame
             EventChannelManager.Initialise();
             _inputEventChannel = EventChannelManager.Instance.InputEvents;
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
+
+            // _inputEventChannel.OnPauseToggle.Subscribe(HandlePauseToggle);
 
             SceneController.AddToCurrentScene(new EventSystem(EngineContext.Instance.Events));
         }
@@ -161,7 +164,7 @@ namespace GDGame
             }
 
             _audioController = new AudioController(sounds);
-            _uiController = new UserInterfaceController(EngineContext.Instance.SpriteBatch ,fonts, textures, _screenCentre);
+            _uiController = new UserInterfaceController(EngineContext.Instance.SpriteBatch ,fonts, textures, _screenCentre, this);
             _sceneGenerator = new SceneGenerator(textures, _materialGenerator.MatBasicLit, _materialGenerator.MatBasicUnlit,
                 _materialGenerator.MatBasicUnlitGround, _graphics);
             _modelGenerator = new ModelGenerator(textures, models, _materialGenerator.MatBasicUnlit, _graphics);
@@ -169,19 +172,27 @@ namespace GDGame
 
         private void InitPhysicsSystem()
         {
-            var physicsSystem = _scene.AddSystem(new PhysicsSystem());
-            physicsSystem.Gravity = AppData.GRAVITY;
+            _physicsSystem = new PhysicsSystem()
+            {
+                Gravity = AppData.GRAVITY
+            };
+
+            InitPhysicsDebugSystem(true);
+
+            _scene.AddSystem(_physicsDebugRenderer);
+            _scene.AddSystem(_physicsSystem);
         }
 
         private void InitPhysicsDebugSystem(bool isEnabled)
         {
-            var physicsDebugRenderer = _scene.AddSystem(new PhysicsDebugSystem());
-            physicsDebugRenderer.Enabled = isEnabled;
-
-            physicsDebugRenderer.StaticColor = Color.Green;
-            physicsDebugRenderer.KinematicColor = Color.Blue;
-            physicsDebugRenderer.DynamicColor = Color.Yellow;
-            physicsDebugRenderer.TriggerColor = Color.Red;
+            _physicsDebugRenderer = new PhysicsDebugSystem()
+            {
+                Enabled = isEnabled,
+                StaticColor = Color.Green,
+                KinematicColor = Color.Blue,
+                DynamicColor = Color.Yellow,
+                TriggerColor = Color.Red
+            };
         }
 
         private void InitCameraAndRenderSystems()
@@ -201,8 +212,8 @@ namespace GDGame
             InitializeMouse();
             GenerateMaterials();
             InitScene();
+            InitEvents();
             InitPhysicsSystem();
-            InitPhysicsDebugSystem(true);
             InitCameraAndRenderSystems();
         }
 
@@ -219,7 +230,6 @@ namespace GDGame
             _inputManager.Initialise();
             _inputEventChannel.OnFullscreenToggle.Subscribe(HandleFullscreenToggle);
             _inputEventChannel.OnApplicationExit.Subscribe(HandleGameExit);
-            _inputEventChannel.OnPauseToggle.Subscribe(HandlePause);
         }
 
         private void GenerateBaseScene()
@@ -229,6 +239,7 @@ namespace GDGame
 
         private void InitializeUI()
         {
+            SceneController.AddToCurrentScene(new UIEventSystem());
             _uiController.Initialise(_playerController.Stats);
         }
         private void InitPlayer()
@@ -237,17 +248,17 @@ namespace GDGame
             _playerController = new PlayerController(aspectRatio, _audioController);
         }
 
-        private void InitTraps()
+        private static void InitTraps()
         {
             //_trapManager = new TrapManager();
             var trapManagerGO = new GameObject("TrapManagerGO");
-            var trapManager = trapManagerGO.AddComponent<TrapManager>();
+            trapManagerGO.AddComponent<TrapManager>();
             SceneController.AddToCurrentScene(trapManagerGO);
         }
 
         private void InitTime()
         {
-            _timeController = new TimeController();
+            _timeController = new TimeController(_physicsDebugRenderer, _physicsSystem);
         }
 
         private void InitCineCam()
@@ -261,15 +272,14 @@ namespace GDGame
         {
             _gameStateManager = new GameStateManager();
         }
-
         private void InitDemoGameEvents()
         {
             _gameOver = new GameOverObject();
             _gameWon = new GameWonObject();
         }
+
         private void InitGameSystems()
         {
-            InitEvents();
             GenerateBaseScene();
             InitInputSystem();
             InitLocalisation();
@@ -281,7 +291,6 @@ namespace GDGame
             InitTime();
             InitGameStateManager();
             DemoLoadFromJSON();
-            TestObjectLoad();
             InitDemoGameEvents();
         }
 
@@ -306,7 +315,7 @@ namespace GDGame
 
         private void HandleFullscreenToggle() => _graphics.ToggleFullScreen();
         private void HandleGameExit() => Application.Exit();
-        private void HandlePause() => IsMouseVisible = !IsMouseVisible;
+        private void HandlePauseToggle() => IsMouseVisible = !IsMouseVisible;
 
         #endregion
 
@@ -323,16 +332,6 @@ namespace GDGame
                 _scene.Add(_modelGenerator.GenerateModel(
                     d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName));
         }
-
-        private void TestObjectLoad()
-        {
-            GameObject player = _modelGenerator.GenerateModel(
-                new Vector3(0, 5, 10),
-                new Vector3(0, 0, 0),
-                new Vector3(0.1f, 0.1f, 0.1f),
-                "colormap", "ghost", "test");
-        }
-
         #endregion
 
         #region Disposal
@@ -340,7 +339,7 @@ namespace GDGame
         /// <summary>
         /// Clear all of the event channels
         /// </summary>
-        private void UnscubscribeFromEvents()
+        private static void UnsubscribeFromEvents()
         {
             EventChannelManager.Instance.ClearEventChannels();
         }
@@ -373,7 +372,7 @@ namespace GDGame
                 System.Diagnostics.Debug.WriteLine("Main disposal complete");
             }
 
-            UnscubscribeFromEvents();
+            UnsubscribeFromEvents();
             _disposed = true;
 
             base.Dispose(disposing);
