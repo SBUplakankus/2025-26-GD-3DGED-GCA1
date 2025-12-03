@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using GDEngine.Core.Collections;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Enums;
@@ -14,7 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GDGame.Scripts.UI
 {
-    public class UserInterfaceController : SystemBase
+    public class UserInterfaceController : SystemBase, IDisposable
     {
         #region Fields
 
@@ -28,6 +29,7 @@ namespace GDGame.Scripts.UI
         private PauseMenu _pauseMenu;
         private Vector2 _screenCentre;
         private Game _game;
+        private bool disposedValue;
 
         // Event Channels
         private GameEventChannel _gameEvents;
@@ -121,6 +123,43 @@ namespace GDGame.Scripts.UI
         {
             _spriteBatch.Begin();
             _spriteBatch.End();
+        }
+
+        private void Clear()
+        {
+            _menuController?.Dispose();
+            _menuController = null;
+
+            _cursorController?.Dispose();
+            _cursorController = null;
+
+            _spriteBatch?.Dispose();
+            _spriteBatch = null;
+
+            _playerHUD?.Dispose();
+            _playerHUD = null;
+
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposedValue) return;
+
+            if (disposing)
+                Clear();
+
+            disposedValue = true;
+        }
+
+        ~UserInterfaceController()
+        {
+             Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

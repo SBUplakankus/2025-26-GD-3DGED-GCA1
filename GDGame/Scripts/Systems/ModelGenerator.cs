@@ -11,7 +11,7 @@ namespace GDGame.Scripts.Systems
     /// <summary>
     /// Creates Models off of given data
     /// </summary>
-    public class ModelGenerator
+    public class ModelGenerator : IDisposable
     {
         #region Fields
         private static ModelGenerator _instance;
@@ -19,6 +19,7 @@ namespace GDGame.Scripts.Systems
         private ContentDictionary<Model> _models;
         private Material _material;
         private GraphicsDeviceManager _graphics;
+        private bool disposedValue;
         #endregion
 
         #region Constructors
@@ -119,6 +120,41 @@ namespace GDGame.Scripts.Systems
             meshRenderer.Overrides.MainTexture = texture;
 
             return gameObject;
+        }
+
+        private void Clear()
+        {
+            _textures?.Dispose();
+            _textures = null;
+
+            _models?.Dispose();
+            _models = null;
+
+            _material?.Dispose();
+            _material = null;
+
+            _graphics?.Dispose();
+            _graphics = null;
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposedValue) return;
+
+            if (disposing)
+                Clear();
+
+            disposedValue = true;
+        }
+
+        ~ModelGenerator()
+        {
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

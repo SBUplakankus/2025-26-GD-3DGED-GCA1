@@ -18,7 +18,7 @@ namespace GDGame.Scripts.UI
     /// Controls the Player HUD which displays stats and messages on the screen.
     /// Created in <see cref="UserInterfaceController"/>.
     /// </summary>
-    public class PlayerHUD
+    public class PlayerHUD : IDisposable
     {
         #region Fields
         private PlayerStats _playerStats;
@@ -26,6 +26,7 @@ namespace GDGame.Scripts.UI
         private Color _hudTextColour = Color.White;
         private List<UIText> _textObjects;
         private bool _isVisible;
+        private bool disposedValue;
         private readonly Dictionary<string, Vector2> _hudPositions = new()
         {
             ["top_left"] = new Vector2(200, 100),
@@ -124,6 +125,35 @@ namespace GDGame.Scripts.UI
         public void Initialise()
         {
             InitHUDText();
+        }
+
+        private void Clear()
+        {
+            _playerStats = null;
+            _textObjects = null;
+            _hudFont = null;
+                
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposedValue) return;
+
+            if (disposing)
+                Clear();
+
+            disposedValue = true;
+        }
+
+        ~PlayerHUD()
+        {
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

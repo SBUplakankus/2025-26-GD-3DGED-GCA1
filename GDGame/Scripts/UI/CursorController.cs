@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Rendering;
 using GDEngine.Core.Rendering.UI;
@@ -12,13 +13,14 @@ namespace GDGame.Scripts.UI
     /// Controls the cursor reticle in the centre of the screen.
     /// Created in <see cref="UserInterfaceController"/>.
     /// </summary>
-    public class CursorController
+    public class CursorController : IDisposable
     {
         #region Fields
         private GameObject _reticleGO;
         private UIReticle _reticleRenderer;
         private Vector2 _reticleScale = new (0.1f, 0.1f);
         private bool _reticleVisible = false;
+        private bool disposedValue;
         #endregion
 
         #region Constructors
@@ -38,6 +40,34 @@ namespace GDGame.Scripts.UI
 
         #region Accessors
         public GameObject Reticle => _reticleGO;
+
+        private void Clear()
+        {
+            _reticleRenderer = null;
+            _reticleGO = null;
+
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposedValue) return;
+
+            if (disposing)
+                Clear();
+
+            disposedValue = true;
+        }
+
+        ~CursorController()
+        {
+             Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
         #endregion
     }
 }

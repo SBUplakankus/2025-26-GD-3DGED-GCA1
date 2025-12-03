@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using GDEngine.Core.Audio;
@@ -16,7 +17,7 @@ namespace GDGame.Scripts.Audio
     /// <summary>
     /// Controls all Audio in the game and stores the Sound files
     /// </summary>
-    public class AudioController : Component
+    public class AudioController : Component, IDisposable
     {
 
         #region Fields
@@ -28,6 +29,7 @@ namespace GDGame.Scripts.Audio
         private float _sfxVolume = 0.8f;
         private float _musicFade = 0;
         private bool _musicLooped = true;
+        private bool disposedValue;
         #endregion
 
         #region Constructors
@@ -112,6 +114,36 @@ namespace GDGame.Scripts.Audio
             Generate3DAudio();
             Add3DAudioToScene();
             InitEventHandlers();
+        }
+
+        private void Clear()
+        {
+            _audioSystem?.Dispose();
+            _audioSystem = null;
+
+            _sounds?.Dispose();
+            _sounds = null;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposedValue) return;
+
+            if (disposing)
+                Clear();
+
+            disposedValue = true;
+        }
+
+        ~AudioController()
+        {
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
         #endregion
 

@@ -32,13 +32,11 @@ namespace GDGame
 
         // Core
         private readonly GraphicsDeviceManager _graphics;
-        private ContentDictionary<Model> _modelDictionary;
-        private ContentDictionary<Effect> _effectsDictionary;
         private PhysicsSystem _physicsSystem;
         private PhysicsDebugSystem _physicsDebugRenderer;
         private Scene _scene;
-        private bool _disposed = false;
         private Vector2 _screenCentre;
+        private bool _disposed = false;
 
         // Game Systems
         private AudioController _audioController;
@@ -146,7 +144,6 @@ namespace GDGame
             var textures = new ContentDictionary<Texture2D>();
             var models = new ContentDictionary<Model>();
             var fonts = new ContentDictionary<SpriteFont>();
-            _effectsDictionary = new ContentDictionary<Effect>();
             var sounds = new ContentDictionary<SoundEffect>();
 
             var manifests = JSONSerializationUtility.LoadData<AssetManifest>(Content, relativeFilePathAndName);
@@ -159,7 +156,6 @@ namespace GDGame
                     textures.LoadFromManifest(m.Textures, e => e.Name, e => e.ContentPath, overwrite: true);
                     fonts.LoadFromManifest(m.Fonts, e => e.Name, e => e.ContentPath, overwrite: true);
                     sounds.LoadFromManifest(m.Sounds, e => e.Name, e => e.ContentPath, overwrite: true);
-                    _effectsDictionary.LoadFromManifest(m.Effects, e => e.Name, e => e.ContentPath, overwrite: true);
                 }
             }
 
@@ -356,15 +352,38 @@ namespace GDGame
             {
                 System.Diagnostics.Debug.WriteLine("Disposing Main...");
 
+                System.Diagnostics.Debug.WriteLine("Disposing UI");
+                _uiController?.Dispose();
+                _uiController = null;
+
                 System.Diagnostics.Debug.WriteLine("Disposing Scene");
+                _sceneController?.Dispose();
+                _sceneController = null;
+
                 _scene?.Dispose();
                 _scene = null;
 
-                System.Diagnostics.Debug.WriteLine("Clearing MeshFilter Registry");
+                System.Diagnostics.Debug.WriteLine("Disposing Graphics");
                 MeshFilterFactory.ClearRegistry();
+                
+                _modelGenerator?.Dispose();
+                _modelGenerator = null;
 
-                _modelDictionary?.Dispose();
-                _modelDictionary = null;
+                _materialGenerator?.Dispose();
+                _materialGenerator = null;
+
+                _sceneGenerator?.Dispose();
+                _sceneGenerator = null;
+
+                System.Diagnostics.Debug.WriteLine("Disposing Physics");
+                _physicsSystem?.Dispose();
+                _physicsSystem = null;
+
+                _physicsDebugRenderer = null;
+
+                System.Diagnostics.Debug.WriteLine("Disposing Audio");
+                _audioController?.Dispose();
+                _audioController = null;
 
                 System.Diagnostics.Debug.WriteLine("Disposing EngineContext");
                 EngineContext.Instance?.Dispose();

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GDEngine.Core.Collections;
 using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
@@ -13,7 +14,7 @@ namespace GDGame.Scripts.Systems
     /// <summary>
     /// Generates the base skybox and ground for the main scene
     /// </summary>
-    public class SceneGenerator
+    public class SceneGenerator : IDisposable
     {
         #region Fields
         private ContentDictionary<Texture2D> _textures;
@@ -24,7 +25,7 @@ namespace GDGame.Scripts.Systems
         private const int SKY_SCALE = 500;
         private const int GROUND_SCALE = 500;
         private Vector3 _skyScaleVector = new(SKY_SCALE, SKY_SCALE, 1);
-
+        private bool disposedValue;
         private readonly Dictionary<string, Vector3> _skyPositions =
             new()
             {
@@ -157,6 +158,46 @@ namespace GDGame.Scripts.Systems
             gameObject.IsStatic = true;
 
             currentScene.Add(gameObject);
+        }
+
+        private void Clear()
+        {
+            _textures?.Dispose();
+            _textures = null;
+
+            _matBasicLit?.Dispose();
+            _matBasicLit = null;
+
+            _matBasicUnlit?.Dispose();
+            _matBasicUnlit = null;
+
+            _matBasicUnlitGround?.Dispose();
+            _matBasicUnlitGround = null;
+
+            _graphics?.Dispose();
+            _graphics = null;
+
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposedValue) return;
+
+            if (disposing)
+                Clear();
+
+            disposedValue = true;
+        }
+
+        ~SceneGenerator()
+        {
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }
