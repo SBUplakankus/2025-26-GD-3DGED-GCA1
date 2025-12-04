@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using GDEngine.Core;
 using GDEngine.Core.Collections;
 using GDEngine.Core.Entities;
@@ -11,8 +10,9 @@ using GDEngine.Core.Systems;
 using GDEngine.Core.Timing;
 using GDEngine.Core.Utilities;
 using GDGame.Scripts.Audio;
-using GDGame.Scripts.Events.Channels;
+using GDGame.Scripts.Demo_Game;
 using GDGame.Scripts.DemoGame;
+using GDGame.Scripts.Events.Channels;
 using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
 using GDGame.Scripts.Traps;
@@ -22,7 +22,6 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
-using GDGame.Scripts.Demo_Game;
 
 namespace GDGame
 {
@@ -34,18 +33,18 @@ namespace GDGame
         private readonly GraphicsDeviceManager _graphics;
         private PhysicsSystem _physicsSystem;
         private PhysicsDebugSystem _physicsDebugRenderer;
-        private Scene _scene;
         private Vector2 _screenCentre;
         private bool _disposed = false;
 
-        // Game Systems
-        private AudioController _audioController;
-        private SceneController _sceneController;
-        private UserInterfaceController _uiController;
+        // Graphics 
         private SceneGenerator _sceneGenerator;
         private ModelGenerator _modelGenerator;
         private MaterialGenerator _materialGenerator;
-        private InputManager _inputManager;
+
+        // Game
+        private AudioController _audioController;
+        private SceneController _sceneController;
+        private UserInterfaceController _uiController;
         private readonly TrapManager _trapManager;
         private TimeController _timeController;
         private CinematicCamController _cineCamController;
@@ -55,10 +54,10 @@ namespace GDGame
 
         // Player
         private PlayerController _playerController;
+        private InputManager _inputManager;
 
         // Events
         private InputEventChannel _inputEventChannel;
-        private PlayerEventChannel _playerEventChannel;
 
         #endregion
 
@@ -78,16 +77,19 @@ namespace GDGame
         {
             Window.Title = AppData.GAME_WINDOW_TITLE;
 
-            InitializeGraphics(ScreenResolution.R_FHD_16_9_1920x1080);
-            InitializeContext();
-            InitializeSystems();
-            LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
+            InitCoreSystems();
             InitGameSystems();
 
             base.Initialize();
         }
 
-        private void InitializeGraphics(Integer2 resolution)
+        #region Core Systems
+
+        /// <summary>
+        /// Init the Games Graphics such as DPI and Resolutions
+        /// </summary>
+        /// <param name="resolution"></param>
+        private void InitGraphics(Integer2 resolution)
         {
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             ScreenResolution.SetResolution(_graphics, resolution);
@@ -95,41 +97,58 @@ namespace GDGame
             _screenCentre = new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
         }
 
-        private void InitializeMouse()
+        /// <summary>
+        /// Init the Mouse for the Game on launch
+        /// </summary>
+        private void InitMouse()
         {
             Mouse.SetPosition((int)_screenCentre.X, (int) _screenCentre.Y);
             IsMouseVisible = true;
         }
 
-        private void InitializeContext()
+        /// <summary>
+        /// Init the Engines Core Context which stores important systems
+        /// </summary>
+        private void InitContext()
         {
             EngineContext.Initialize(GraphicsDevice, Content);
         }
 
+        /// <summary>
+        /// Init the Localisation Controller which stores Keys for each language
+        /// That can be accessed globally through its Instance
+        /// </summary>
         private static void InitLocalisation()
         {
             LocalisationController.Initialise();
         }
 
+
+        /// <summary>
+        /// Generate the materials used on models and textures
+        /// </summary>
         private void GenerateMaterials()
         {
             _materialGenerator = new MaterialGenerator(_graphics);
         }
+
+        /// <summary>
+        /// Init the Games base scene
+        /// </summary>
         private void InitScene()
         {
             _sceneController = new SceneController(this);
             _sceneController.Initialise();
-            _scene = _sceneController.CurrentScene;
             Components.Add(_sceneController);
         }
 
+        /// <summary>
+        /// Init the Event Channel Manager and add the Event Bus to the scene
+        /// </summary>
         private void InitEvents()
         {
             EventChannelManager.Initialise();
             _inputEventChannel = EventChannelManager.Instance.InputEvents;
-            _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
-
-            // _inputEventChannel.OnPauseToggle.Subscribe(HandlePauseToggle);
 
             SceneController.AddToCurrentScene(new EventSystem(EngineContext.Instance.Events));
         }
@@ -166,6 +185,9 @@ namespace GDGame
             _modelGenerator = new ModelGenerator(textures, models, _materialGenerator.MatBasicUnlit, _graphics);
         }
 
+        /// <summary>
+        /// Init the Physics System in the current Scene
+        /// </summary>
         private void InitPhysicsSystem()
         {
             _physicsSystem = new PhysicsSystem()
@@ -175,10 +197,14 @@ namespace GDGame
 
             InitPhysicsDebugSystem(true);
 
-            _scene.AddSystem(_physicsDebugRenderer);
-            _scene.AddSystem(_physicsSystem);
+            SceneController.GetCurrentScene.AddSystem(_physicsDebugRenderer);
+            SceneController.GetCurrentScene.AddSystem(_physicsSystem);
         }
 
+        /// <summary>
+        /// Init the Physics Debug System which shows the boundaries for colliders in game
+        /// </summary>
+        /// <param name="isEnabled">Show Debug</param>
         private void InitPhysicsDebugSystem(bool isEnabled)
         {
             _physicsDebugRenderer = new PhysicsDebugSystem()
@@ -191,35 +217,63 @@ namespace GDGame
             };
         }
 
+        /// <summary>
+        /// Init the Camera and Rendering Systems then add them to the current scene
+        /// </summary>
         private void InitCameraAndRenderSystems()
         {
             var cameraSystem = new CameraSystem(_graphics.GraphicsDevice, -AppData.RENDER_ORDER);
-            _scene.Add(cameraSystem);
+            SceneController.GetCurrentScene.Add(cameraSystem);
 
             var renderSystem = new RenderSystem(-AppData.RENDER_ORDER);
-            _scene.Add(renderSystem);
+            SceneController.GetCurrentScene.Add(renderSystem);
 
             var uiRenderSystem = new UIRenderSystem(AppData.RENDER_ORDER);
-            _scene.Add(uiRenderSystem);
+            SceneController.GetCurrentScene.Add(uiRenderSystem);
         }
 
-        private void InitializeSystems()
+        /// <summary>
+        /// Load the objects from the single model and multi model spawn JSON files
+        /// </summary>
+        private void LoadModelsFromJSON()
         {
-            InitializeMouse();
+            foreach (var d in JSONSerializationUtility.LoadData<ModelSpawnData>(Content, AppData.MULTI_MODEL_SPAWN_PATH))
+                SceneController.GetCurrentScene.Add(_modelGenerator.GenerateModel(
+                    d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName));
+        }
+
+        /// <summary>
+        /// Init the Core Systems of the Game Engine
+        /// </summary>
+        private void InitCoreSystems()
+        {
+            InitGraphics(ScreenResolution.R_FHD_16_9_1920x1080);
+            InitContext();
+            InitMouse();
             GenerateMaterials();
             InitScene();
             InitEvents();
             InitPhysicsSystem();
             InitCameraAndRenderSystems();
+            LoadAssetsFromJSON(AppData.ASSET_MANIFEST_PATH);
         }
 
         #endregion
 
         #region Game Systems
+
+        /// <summary>
+        /// Init the Audio System in the game which controls Music, Ambience and SFX
+        /// </summary>
         private void InitAudioSystem()
         {
             _audioController.Initialise();
         }
+
+        /// <summary>
+        /// Init the Input System which stores all Key Variables and
+        /// Passes events through the Input Event Channel when called
+        /// </summary>
         private void InitInputSystem()
         {
             _inputManager = new InputManager();
@@ -228,22 +282,36 @@ namespace GDGame
             _inputEventChannel.OnApplicationExit.Subscribe(HandleGameExit);
         }
 
+        /// <summary>
+        /// Generate the base skybox and floor through the Scene Generator
+        /// </summary>
         private void GenerateBaseScene()
         {
-            _sceneGenerator.GenerateScene(_scene);
+            _sceneGenerator.GenerateScene(SceneController.GetCurrentScene);
         }
 
-        private void InitializeUI()
+        /// <summary>
+        /// Init the games User Interface
+        /// </summary>
+        private void InitUI()
         {
             SceneController.AddToCurrentScene(new UIEventSystem());
             _uiController.Initialise(_playerController.Stats);
         }
+
+        /// <summary>
+        /// Init the Player Controller which contains the movement, camera and stats scripts
+        /// </summary>
         private void InitPlayer()
         {
             var aspectRatio = (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight;
             _playerController = new PlayerController(aspectRatio, _audioController);
         }
 
+        /// <summary>
+        /// Init the Trap Manager which controls the creation and updating of
+        /// Traps and Obstacles in the scene
+        /// </summary>
         private static void InitTraps()
         {
             //_trapManager = new TrapManager();
@@ -252,11 +320,18 @@ namespace GDGame
             SceneController.AddToCurrentScene(trapManagerGO);
         }
 
+        /// <summary>
+        /// Init the Time Controller which controls game time
+        /// </summary>
         private void InitTime()
         {
             _timeController = new TimeController(_physicsDebugRenderer, _physicsSystem);
         }
 
+        /// <summary>
+        /// Initiate the Cinematic Camera Controller that creates the moving Camera intro
+        /// that the player sees at the start of the game.
+        /// </summary>
         private void InitCineCam()
         {
             var aspectRatio = (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight;
@@ -264,35 +339,49 @@ namespace GDGame
             _cineCamController.Initialise();
         }
 
+
+        /// <summary>
+        /// Initiate the Game State Manager
+        /// </summary>
         private void InitGameStateManager()
         {
             _gameStateManager = new GameStateManager();
         }
+
+        /// <summary>
+        /// Create the Two Demo Objects in the scene that control Game Over and Game Won requirements
+        /// </summary>
         private void InitDemoGameEvents()
         {
             _gameOver = new GameOverObject();
             _gameWon = new GameWonObject();
         }
 
+        /// <summary>
+        /// Init the Game Specific systems in the Engine
+        /// </summary>
         private void InitGameSystems()
         {
             GenerateBaseScene();
             InitInputSystem();
             InitLocalisation();
             InitPlayer();
-            InitializeUI();
+            InitUI();
             InitAudioSystem();
             InitCineCam();
             InitTraps();
             InitTime();
             InitGameStateManager();
-            DemoLoadFromJSON();
+            LoadModelsFromJSON();
             InitDemoGameEvents();
         }
 
         #endregion
 
+        #endregion
+
         #region Game Loop
+
         protected override void Update(GameTime gameTime)
         {
             Time.Update(gameTime);
@@ -311,23 +400,7 @@ namespace GDGame
 
         private void HandleFullscreenToggle() => _graphics.ToggleFullScreen();
         private void HandleGameExit() => Application.Exit();
-        private void HandlePauseToggle() => IsMouseVisible = !IsMouseVisible;
 
-        #endregion
-
-        #region Demo Methods
-
-        /// <summary>
-        /// Load the objects from the single model and multi model spawn JSON files
-        /// </summary>
-        private void DemoLoadFromJSON()
-        {
-            List<ModelSpawnData> mList = JSONSerializationUtility.LoadData<ModelSpawnData>(Content, AppData.SINGLE_MODEL_SPAWN_PATH);
-
-            foreach (var d in JSONSerializationUtility.LoadData<ModelSpawnData>(Content, AppData.MULTI_MODEL_SPAWN_PATH))
-                _scene.Add(_modelGenerator.GenerateModel(
-                    d.Position, d.RotationDegrees, d.Scale, d.TextureName, d.ModelName, d.ObjectName));
-        }
         #endregion
 
         #region Disposal
@@ -340,6 +413,10 @@ namespace GDGame
             EventChannelManager.Instance.ClearEventChannels();
         }
 
+        /// <summary>
+        /// Main Game Disposal
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (_disposed)
@@ -359,9 +436,6 @@ namespace GDGame
                 System.Diagnostics.Debug.WriteLine("Disposing Scene");
                 _sceneController?.Dispose();
                 _sceneController = null;
-
-                _scene?.Dispose();
-                _scene = null;
 
                 System.Diagnostics.Debug.WriteLine("Disposing Graphics");
                 MeshFilterFactory.ClearRegistry();
