@@ -47,13 +47,18 @@ namespace GDGame.Scripts.Audio
 
         #region Methods
         /// <summary>
-        /// Play the games default base music
+        /// Set the Games main music based off of a given key
         /// </summary>
+        /// /// <param name="key">Audio File Key</param>
         private void PlayMusic(string key)
         {
             _audioSystem.PlayMusic(key, _musicVolume, _musicFade, _musicLooped);
         }
 
+        /// <summary>
+        /// Play a sound effect in the game off of a given key
+        /// </summary>
+        /// <param name="key">Audio File Key</param>
         private void PlaySFX(string key)
         {
             _audioSystem.PlayOneShot(key, _sfxVolume);
@@ -74,12 +79,21 @@ namespace GDGame.Scripts.Audio
             _3DsoundsList.Add(obj3);
         }
 
+        /// <summary>
+        /// Add the 3D Audio Objects to the scene
+        /// </summary>
         private void Add3DAudioToScene()
         {
             foreach(var obj in _3DsoundsList)
                 SceneController.AddToCurrentScene(obj);
         }
 
+        /// <summary>
+        /// Generate a 3D Audio object off of the audio name and position in world
+        /// </summary>
+        /// <param name="name">Audio File key</param>
+        /// <param name="position">Position in world</param>
+        /// <returns>GameObject with 3D Audio attached</returns>
         private GameObject Generate3DAudioObject(string name, Vector3 position)
         {
             var soundGO = new GameObject(name);
@@ -89,17 +103,30 @@ namespace GDGame.Scripts.Audio
             return soundGO;
         }
 
+        /// <summary>
+        /// Change the volume of the music
+        /// </summary>
+        /// <param name="volume">New Music Volume</param>
         private void HandleMusicVolumeChange(float volume)
         {
             _musicVolume = volume;
             _audioSystem.Mixer.SetVolume(AudioChannel.Music, _musicVolume);
             _audioSystem.CurrentMusic.Volume = _musicVolume;
         }
+
+        /// <summary>
+        /// Change the volume of the SFX
+        /// </summary>
+        /// <param name="volume">New SFX Volume</param>
         private void HandleSFXVolumeChange(float volume)
         {
             _sfxVolume = volume;
             _audioSystem.SetChannelVolume(AudioChannel.Sfx, _sfxVolume);
         }
+
+        /// <summary>
+        /// Initialise the Audio Events to be called in other scripts
+        /// </summary>
         private void InitEventHandlers()
         {
             _audioEventChannel.OnMusicRequested.Subscribe(PlayMusic);
@@ -107,6 +134,11 @@ namespace GDGame.Scripts.Audio
             _audioEventChannel.OnSFXRequested.Subscribe(PlaySFX);
             _audioEventChannel.OnSFXVolumeChanged.Subscribe(HandleSFXVolumeChange);
         }
+
+        /// <summary>
+        /// Initialise the Audio Controller.
+        /// Sets the games main music, generates 3D Audio Objects and initialise the audio events
+        /// </summary>
         public void Initialise()
         {
             _audioEventChannel = EventChannelManager.Instance.AudioEvents;

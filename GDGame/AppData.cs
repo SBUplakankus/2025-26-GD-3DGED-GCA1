@@ -103,8 +103,6 @@ namespace GDGame
         public static readonly string UI_CONTROLS_BG = "UI_controls_bg";
         #endregion
 
-
-
         #region Localisation Keys
         public static readonly string LANG_PLAY_KEY = "Play";
         public static readonly string LANG_PAUSE_KEY = "Pause";

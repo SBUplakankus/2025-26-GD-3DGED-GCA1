@@ -59,12 +59,20 @@ namespace GDGame.Scripts.UI
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Create the cursor displayed in the centre of the screen
+        /// </summary>
         private void InitCursor()
         {
             _cursorController = new CursorController(_interfaceTextures.Get(AppData.RETICLE_NAME));
             SceneController.AddToCurrentScene(_cursorController.Reticle);
         }
 
+        /// <summary>
+        /// Create the HUD in the top left of the screen
+        /// </summary>
+        /// <param name="stats">Player Stats to display</param>
         private void InitHUD(PlayerStats stats)
         {
             _playerHUD = new PlayerHUD(_fonts.Get(AppData.FONT_NAME), stats);
@@ -76,6 +84,9 @@ namespace GDGame.Scripts.UI
             _pauseMenu = new PauseMenu(_interfaceTextures, _fonts.Get(AppData.FONT_NAME), _screenCentre);
         }
 
+        /// <summary>
+        /// Create the Menu Controller that is displayed on start and on pause
+        /// </summary>
         private void InitMenuController()
         {
             _menuController = new MenuController(_game);
@@ -117,6 +128,10 @@ namespace GDGame.Scripts.UI
             };
         }
 
+        /// <summary>
+        /// Initialise the Games User Interface
+        /// </summary>
+        /// <param name="stats">Player Stats to display in the HUD</param>
         public void Initialise(PlayerStats stats)
         {
             InitCursor();

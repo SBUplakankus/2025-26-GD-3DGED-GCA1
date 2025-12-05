@@ -14,6 +14,7 @@ namespace GDGame.Scripts.Player
     /// Controls the player physics movement.
     /// Created in <see cref="PlayerController"/>.
     /// Takes parts of code from <see cref="PhysicsWASDController"/>.
+    /// Input keys gotten from <see cref="InputManager"/>
     /// </summary>
     public class PlayerMovement : Component
     {
@@ -40,6 +41,10 @@ namespace GDGame.Scripts.Player
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Set the player movement keys from the Input Manager
+        /// </summary>
         private void InitMovementKeys()
         {
             var keys = InputManager.MoveKeys;
@@ -48,6 +53,10 @@ namespace GDGame.Scripts.Player
             _backKey = keys.back;
             _forwardKey = keys.forward;
         }
+
+        /// <summary>
+        /// Create the Players Rigidbody
+        /// </summary>
         private void InitRB()
         {
             _collider = new BoxCollider
@@ -61,6 +70,11 @@ namespace GDGame.Scripts.Player
             };
         }
         
+        /// <summary>
+        /// Logic To Move the Player modified from PhysicsWASDController
+        /// </summary>
+        /// <param name="moveDir">Direction to move in</param>
+        /// <param name="speed">Speed to move at</param>
         private void Move(Vector3 moveDir, float speed)
         {
             var velocity = _rb.LinearVelocity;
@@ -83,6 +97,9 @@ namespace GDGame.Scripts.Player
             _rb.LinearVelocity = velocity;
         }
 
+        /// <summary>
+        /// Handles the player movement logic
+        /// </summary>
         private void HandleMovement()
         {
 

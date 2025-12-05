@@ -42,6 +42,11 @@ namespace GDGame.Scripts.Systems
             SetCurrentScene(AppData.MAIN_SCENE_NAME);
         }
 
+        /// <summary>
+        /// Create a scene and add it to the dictionary
+        /// </summary>
+        /// <param name="name">Name of the Scene to Create</param>
+        /// <returns>Returns the created Scene</returns>
         private Scene CreateScene(string name)
         {
             if (_scenesDict.TryGetValue(name, out var existing))
@@ -52,6 +57,11 @@ namespace GDGame.Scripts.Systems
             return s;
         }
 
+        /// <summary>
+        /// Set the current scene in the game
+        /// </summary>
+        /// <param name="name">Name of the Scene</param>
+        /// <exception cref="InvalidOperationException">The Scene Doesn't Exist</exception>
         private void SetCurrentScene(string name)
         {
             if (_scenesDict.TryGetValue(name, out var existing))
@@ -84,6 +94,10 @@ namespace GDGame.Scripts.Systems
                 _currentScene?.SetActiveCamera(_camera);
         }
 
+        /// <summary>
+        /// Set the active camera in the current scene
+        /// </summary>
+        /// <param name="camera">Camera to Set</param>
         public static void SetActiveCamera(Camera camera) => _currentScene?.SetActiveCamera(camera);
 
 

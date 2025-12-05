@@ -16,6 +16,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GDGame.Scripts.UI
 {
+    /// <summary>
+    /// Replaced by <see cref="<MenuController"/>. Unused
+    /// </summary>
     public class PauseMenu
     {
         #region Fields

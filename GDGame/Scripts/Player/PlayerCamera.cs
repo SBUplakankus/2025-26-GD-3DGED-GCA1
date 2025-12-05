@@ -64,6 +64,10 @@ namespace GDGame.Scripts.Player
 
         #region Methods
 
+        /// <summary>
+        /// Logic for moving the camera to the mouse position.
+        /// Code taken from MousePitchYawController.
+        /// </summary>
         private void HandleCameraMovement()
         {
             _newMouseState = Mouse.GetState();

@@ -57,7 +57,7 @@ namespace GDGame.Scripts.Systems
         }
 
         /// <summary>
-        /// Generate a GameObject with a textured model
+        /// Generate a GameObject with a textured model attached
         /// </summary>
         /// <param name="position">Spawn Position</param>
         /// <param name="eulerRotationDegrees">Spawn Rotation</param>
@@ -91,7 +91,7 @@ namespace GDGame.Scripts.Systems
         }
 
         /// <summary>
-        /// Generate a GameObject with a textured cube
+        /// Generate a GameObject with a textured cube attached
         /// </summary>
         /// <param name="position">Spawn Position</param>
         /// <param name="eulerRotationDegrees">Spawn Rotation</param>

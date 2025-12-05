@@ -55,6 +55,11 @@ namespace GDGame.Scripts.Systems
             _instance = new LocalisationController();
         }
 
+        /// <summary>
+        /// Creates a dictionary containing a key in English and the corresponding translation
+        /// </summary>
+        /// <param name="filePath">Path to the CSV File to convert</param>
+        /// <returns>Game ready Language Dictionary</returns>
         private static Dictionary<string, string> LoadCSV(string filePath)
         {
             var dict = new Dictionary<string, string>();
@@ -70,6 +75,13 @@ namespace GDGame.Scripts.Systems
             return dict;
         }
 
+        /// <summary>
+        /// Attempt to get a string to display based on the current language setting.
+        /// Uses English as a fallback option.
+        /// Returns "ERROR: {key} NOT FOUND" if null
+        /// </summary>
+        /// <param name="key">Key to Fetch</param>
+        /// <returns>Translated Key</returns>
         public string Get(string key)
         {
             var activeDict = _currentLanguage switch
@@ -89,6 +101,9 @@ namespace GDGame.Scripts.Systems
             return $"ERROR: {key} NOT FOUND";
         }
 
+        /// <summary>
+        /// Cycle through the languages to display when called
+        /// </summary>
         private void HandleLanguageSwap()
         {
             _currentLanguage = _currentLanguage switch
@@ -102,6 +117,10 @@ namespace GDGame.Scripts.Systems
             Debug.WriteLine($"New Language: {_currentLanguage}");
         }
 
+        /// <summary>
+        /// Set the current language of the Localisation Controller
+        /// </summary>
+        /// <param name="language">:anguage to set</param>
         public void SetLanguage(LanguageOption language) => _currentLanguage = language;
         #endregion
     }

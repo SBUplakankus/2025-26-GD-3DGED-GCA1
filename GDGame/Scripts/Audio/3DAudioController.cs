@@ -39,6 +39,10 @@ namespace GDGame.Scripts.Audio
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Initialise the 3D Sound Object
+        /// </summary>
         private void Init3DSound()
         {
             _emitter.Position = _soundTransform.Position;
@@ -53,6 +57,9 @@ namespace GDGame.Scripts.Audio
             _soundInstance.Play();
         }
 
+        /// <summary>
+        /// Turn the 3D Sound Instance on or off
+        /// </summary>
         public void Toggle3DSound()
         {
             if(_active)

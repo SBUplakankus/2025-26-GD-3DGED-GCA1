@@ -120,6 +120,10 @@ namespace GDGame.Scripts.Systems
             return skySegment;
         }
 
+        /// <summary>
+        /// Generates a box ground with a collider in the given scene
+        /// </summary>
+        /// <param name="currentScene">Scene to add it to</param>
         private void GenerateGround(Scene currentScene)
         {
             GameObject gameObject = null;
