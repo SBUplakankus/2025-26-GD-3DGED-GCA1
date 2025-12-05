@@ -22,7 +22,7 @@ namespace GDGame.Scripts.Player
         private readonly PlayerCamera _playerCamera;
         private readonly PlayerStats _playerStats;
         private PlayerEventChannel _playerEventChannel;
-        private Vector3 _startPos = new (0, 10, 0);
+        private Vector3 _startPos = new (-3, 5, 5);
         private Vector3 _startRot = new (0, 0, 0);
         #endregion
 

@@ -169,6 +169,7 @@ namespace GDGame.Scripts.UI
 
 
             _inputEvents = EventChannelManager.Instance.InputEvents;
+            _gameEvents = EventChannelManager.Instance.GameEvents;
             _inputEvents.OnPauseToggle.Subscribe(ToggleMenu);
 
             TryBuildMenus();
@@ -434,6 +435,12 @@ namespace GDGame.Scripts.UI
 
             if (_controlsMenuPanel != null)
                 _controlsMenuPanel.IsVisible = false;
+
+            if (!_gameStarted)
+            {
+                _gameStarted = true;
+                _gameEvents.OnGameStarted.Raise();
+            }
 
         }
 
