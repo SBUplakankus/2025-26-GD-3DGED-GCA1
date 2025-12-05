@@ -9,7 +9,7 @@ A place for nots on any classes created for our game in the engine.
 ### ⛰️ [Scene Controller](../GDGame/Scripts/Systems/SceneController.cs)
 - Created in `Main`
 - Stores the current scene and any new ones created
-- `_scene` in `Main` is gotten from `SceneController.CurrentScene`
+- In `Main` the current scene is gotten from `SceneController.CurrentScene`
 
 ### 🏡 [Scene Generator](../GDGame/Scripts/Systems/SceneGenerator.cs)
 - Created in `Main`
@@ -93,7 +93,7 @@ A place for nots on any classes created for our game in the engine.
 - Creates the pause screen that toggles when called
 - Displays a resume and quit options
 
-### ⏸️ [Menu Controller](../GDGame/Scripts/UI/MenuController.cs)
+### 🥘 [Menu Controller](../GDGame/Scripts/UI/MenuController.cs)
 - Created in `UserInterfaceController`
 - Lightly modified version of `MenuManager`
 - Controls the main menu display
@@ -116,6 +116,10 @@ A place for nots on any classes created for our game in the engine.
 ### 🪓 [Moving Trap](../GDGame/Scripts/Traps/MovingTrap.cs)
 - Inherits from `TrapBase`
 - Holds the logic for a moving trap such as platforms or axes
+
+### 🛞 [Rotating Trap](../GDGame/Scripts/Traps/RotatingTrap.cs)
+- Inherits from `TrapBase`
+- Holds the logic for a rotating trap such as the guillotine
 
 ---
 
@@ -150,6 +154,11 @@ A place for nots on any classes created for our game in the engine.
 - Created in `EventChannelManager`
 - Events created from `EventBase`
 - Controls Game Over and Game Won events
+
+### 📀 [Game Event Channel](../GDGame/Scripts/Events/Channels/GameEventChannl.cs)
+- Created in `EventChannelManager`
+- Events created from `EventBase`
+- Controls Game Specific Events such as the Game Starting for the first time
 
 ### 📻 [Audio Event Channel](../GDGame/Scripts/Events/Channels/AudioEventChannel.cs)
 - Created in `EventChannelManager`
