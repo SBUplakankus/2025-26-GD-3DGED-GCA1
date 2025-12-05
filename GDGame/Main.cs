@@ -297,7 +297,7 @@ namespace GDGame
         /// <summary>
         /// Init the games User Interface
         /// </summary>
-        private void InitUI()
+        private void InitUserInterface()
         {
             SceneController.AddToCurrentScene(new UIEventSystem());
             _uiController.Initialise(_playerController.Stats);
@@ -370,7 +370,7 @@ namespace GDGame
             InitInputSystem();
             InitLocalisation();
             InitPlayer();
-            InitUI();
+            InitUserInterface();
             InitAudioSystem();
             InitCineCam();
             InitTraps();

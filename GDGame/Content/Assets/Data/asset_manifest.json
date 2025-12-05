@@ -60,20 +60,16 @@
             "contentPath": "assets/textures/ui/Free Flat Toggle Thumb Centre Icon"
         },
         {
-            "name": "bg_1",
-            "contentPath": "assets/textures/ui/1"
+            "name": "home",
+            "contentPath": "assets/textures/ui/home_page"
         },
         {
-            "name": "bg_2",
-            "contentPath": "assets/textures/ui/2"
+            "name": "audio",
+            "contentPath": "assets/textures/ui/audio_page"
         },
         {
-            "name": "bg_3",
-            "contentPath": "assets/textures/ui/3"
-        },
-        {
-            "name": "bg_4",
-            "contentPath": "assets/textures/ui/4"
+            "name": "controls",
+            "contentPath": "assets/textures/ui/controls_page"
         },
         {
             "name": "Plane_sand_openPBR_shader1_BaseColor",
