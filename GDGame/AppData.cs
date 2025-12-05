@@ -51,6 +51,10 @@ namespace GDGame
         public static readonly string CAT_AUDIO_NAME = "cat_audio";
         public static readonly string DUNGEON_AUDIO_NAME = "dungeon_audio";
         public static readonly string CINE_CAM_NAME = "cine_cam";
+        public static readonly string MENU_CONTROLLER_NAME = "UI_menu_controller";
+        public static readonly string AUDIO_PANEL_NAME = "UI_audio_panel";
+        public static readonly string CONTROL_PANEL_NAME = "UI_control_panel";
+        public static readonly string MAIN_PANEL_NAME = "UI_main_panel";
         #endregion
 
         #region Game
@@ -82,11 +86,24 @@ namespace GDGame
         public static readonly string OOF_KEY = "oof";
         public static readonly string RATTLE_KEY = "rattle";
         public static readonly string MAIN_THEME_KEY = "main_theme";
-        #endregion
-
-        #region Content
         public static readonly string MAIN_MUSIC = "test-music";
         #endregion
+
+        #region User Interface
+        public static readonly string PLAY_BUTTON_TEXT = "Play";
+        public static readonly string PAUSE_BUTTON_TEXT = "Pause";
+        public static readonly string CONTROLS_BUTTON_TEXT = "Controls";
+        public static readonly string BACK_BUTTON_TEXT = "Back";
+        public static readonly string QUIT_BUTTON_TEXT = "Quit";
+        public static readonly string AUDIO_BUTTON_TEXT = "Audio";
+        public static readonly string MUSIC_SLIDER_TEXT = "Music";
+        public static readonly string SFX_SLIDER_TEXT = "SFX";
+        public static readonly string UI_AUDIO_BG = "UI_audio_bg";
+        public static readonly string UI_MAIN_BG = "UI_main_bg";
+        public static readonly string UI_CONTROLS_BG = "UI_controls_bg";
+        #endregion
+
+
 
         #region Localisation Keys
         public static readonly string LANG_PLAY_KEY = "Play";

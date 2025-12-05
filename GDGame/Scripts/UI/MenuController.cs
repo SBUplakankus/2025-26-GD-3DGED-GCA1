@@ -263,7 +263,7 @@ namespace GDGame.Scripts.UI
             float spacing = 20f;
 
             // Main menu panel
-            GameObject mainRoot = new GameObject("UI_MainMenuPanel");
+            GameObject mainRoot = new GameObject(AppData.MAIN_PANEL_NAME);
             scene.Add(mainRoot);
 
             _mainMenuPanel = mainRoot.AddComponent<UIMenuPanel>();
@@ -274,7 +274,7 @@ namespace GDGame.Scripts.UI
 
             if (_mainPanelBackground != null)
             {
-                GameObject mainBgRoot = new GameObject("UI_MainMenuBackground");
+                GameObject mainBgRoot = new GameObject(AppData.UI_MAIN_BG);
                 scene.Add(mainBgRoot);
                 mainBgRoot.Transform.SetParent(_mainMenuPanel.Transform);
 
@@ -287,25 +287,25 @@ namespace GDGame.Scripts.UI
             }
 
             _playButton = _mainMenuPanel.AddButton(
-                "Play",
+                AppData.PLAY_BUTTON_TEXT,
                 _buttonTexture!,
                 _font!,
                 OnPlayClicked);
 
             _audioButton = _mainMenuPanel.AddButton(
-                "Audio",
+                AppData.AUDIO_BUTTON_TEXT,
                 _buttonTexture!,
                 _font!,
                 OnAudioClicked);
 
             _controlsButton = _mainMenuPanel.AddButton(
-                "Controls",
+                AppData.CONTROLS_BUTTON_TEXT,
                 _buttonTexture!,
                 _font!,
                 OnControlsClicked);
 
             _exitButton = _mainMenuPanel.AddButton(
-        "Exit",
+        AppData.QUIT_BUTTON_TEXT,
         _buttonTexture!,
         _font!,
         OnExitClicked);
@@ -317,7 +317,7 @@ namespace GDGame.Scripts.UI
             // -----------------------------------------------------------------
             // Audio menu panel
             // -----------------------------------------------------------------
-            GameObject audioRoot = new GameObject("UI_AudioMenuPanel");
+            GameObject audioRoot = new GameObject(AppData.AUDIO_PANEL_NAME);
             scene.Add(audioRoot);
 
             _audioMenuPanel = audioRoot.AddComponent<UIMenuPanel>();
@@ -328,7 +328,7 @@ namespace GDGame.Scripts.UI
 
             if (_audioPanelBackground != null)
             {
-                GameObject audioBgRoot = new GameObject("UI_AudioMenuBackground");
+                GameObject audioBgRoot = new GameObject(AppData.UI_AUDIO_BG);
                 scene.Add(audioBgRoot);
                 audioBgRoot.Transform.SetParent(_audioMenuPanel.Transform);
 
@@ -341,7 +341,7 @@ namespace GDGame.Scripts.UI
             }
 
             _musicSlider = _audioMenuPanel.AddSlider(
-                "Music",
+                AppData.MUSIC_SLIDER_TEXT,
                 _sliderTrackTexture!,
                 _sliderHandleTexture!,
                 _font!,
@@ -351,7 +351,7 @@ namespace GDGame.Scripts.UI
                 OnMusicSliderChanged);
 
             _sfxSlider = _audioMenuPanel.AddSlider(
-                "SFX",
+                AppData.SFX_SLIDER_TEXT,
                 _sliderTrackTexture!,
                 _sliderHandleTexture!,
                 _font!,
@@ -361,7 +361,7 @@ namespace GDGame.Scripts.UI
                 OnSfxSliderChanged);
 
             _audioBackButton = _audioMenuPanel.AddButton(
-                "Back",
+                AppData.BACK_BUTTON_TEXT,
                 _buttonTexture!,
                 _font!,
                 OnBackToMainFromAudio);
@@ -372,7 +372,7 @@ namespace GDGame.Scripts.UI
             // -----------------------------------------------------------------
             // Controls menu panel
             // -----------------------------------------------------------------
-            GameObject controlsRoot = new GameObject("UI_ControlsMenuPanel");
+            GameObject controlsRoot = new GameObject(AppData.CONTROL_PANEL_NAME);
             scene.Add(controlsRoot);
 
             _controlsMenuPanel = controlsRoot.AddComponent<UIMenuPanel>();
@@ -383,7 +383,7 @@ namespace GDGame.Scripts.UI
 
             if (_controlsPanelBackground != null)
             {
-                GameObject controlsBgRoot = new GameObject("UI_ControlsMenuBackground");
+                GameObject controlsBgRoot = new GameObject(AppData.UI_CONTROLS_BG);
                 scene.Add(controlsBgRoot);
                 controlsBgRoot.Transform.SetParent(_controlsMenuPanel.Transform);
 
@@ -396,7 +396,7 @@ namespace GDGame.Scripts.UI
             }
 
             _controlsBackButton = _controlsMenuPanel.AddButton(
-                "Back",
+                AppData.BACK_BUTTON_TEXT,
                 _buttonTexture!,
                 _font!,
                 OnBackToMainFromControls);
