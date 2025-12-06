@@ -11,7 +11,7 @@
         public EventBase OnApplicationExit = new();
         public EventBase<int> OnMovementInput = new();
         public EventBase OnLanguageSwap = new();
-
+        public EventBase OnIntroSkip = new();
         /// <summary>
         /// Unsubscribe from all events in the Channel
         /// </summary>
@@ -22,6 +22,7 @@
             OnApplicationExit.UnsubscribeAll();
             OnMovementInput.UnsubscribeAll();
             OnLanguageSwap.UnsubscribeAll();
+            OnIntroSkip.UnsubscribeAll();
         }
     }
 }

@@ -29,6 +29,7 @@ namespace GDGame.Scripts.Systems
         #endregion
 
         #region Input Keys
+        private readonly Keys _skipKey = Keys.T;
         private readonly Keys _pauseKey = Keys.Q;
         private readonly Keys _fullscreenKey = Keys.F11;
         private readonly Keys _exitKey = Keys.E;
@@ -40,6 +41,7 @@ namespace GDGame.Scripts.Systems
         private readonly Keys _orbTestKey = Keys.O;
         private readonly Keys _damageTestKey = Keys.P;
         private static MovementKeys _movementKeys;
+
         #endregion
 
         #region Constructors
@@ -100,12 +102,21 @@ namespace GDGame.Scripts.Systems
         /// <summary>
         /// Check to see if the player has pressed the pause key then send out the event
         /// </summary>
+        
         private void CheckForPause()
         {
             bool isPressed = _newKBState.IsKeyDown(_pauseKey) && !_oldKBState.IsKeyDown(_pauseKey);
             if (!isPressed) return;
 
             _inputEventChannel.OnPauseToggle.Raise();    
+        }
+
+        private void CheckForSkip()
+        {
+            bool isPressed = _newKBState.IsKeyDown(_skipKey) && !_oldKBState.IsKeyDown(_skipKey);
+            if (!isPressed) return;
+
+            _inputEventChannel.OnIntroSkip.Raise();
         }
 
         /// <summary>
@@ -174,6 +185,7 @@ namespace GDGame.Scripts.Systems
             CheckForOrbTest();
             CheckForDamageTest();
             CheckForPause();
+            CheckForSkip();
         }
         #endregion
 

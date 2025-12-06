@@ -21,6 +21,7 @@ namespace GDGame.Scripts.Systems
         private AudioEventChannel _audioEventChannel;
         private PlayerEventChannel _playerEventChannel;
         private GameEventChannel _gameEventChannel;
+        private InputEventChannel _inputEventChannel;
         private readonly Camera _camera;
         private Vector3 _startPos = new (-3, 25,-20);
         private Vector3 _endPos = new (-3, 20, 10);
@@ -55,6 +56,10 @@ namespace GDGame.Scripts.Systems
             _gameEventChannel = EventChannelManager.Instance.GameEvents;
 
             _gameEventChannel.OnGameStarted.Subscribe(StartCameraMovement);
+
+            _inputEventChannel = EventChannelManager.Instance.InputEvents;
+            _inputEventChannel.OnIntroSkip.Subscribe(HandleSkip);
+
         }
 
         private void StartCameraMovement()
@@ -77,7 +82,12 @@ namespace GDGame.Scripts.Systems
             SceneController.SetActiveCamera(AppData.PLAYER_NAME);
             _playerEventChannel.OnGameStateChange.Raise(GameState.GameActive);
         }
-
+        private void HandleSkip()
+        {
+            if (!_isActive) return;
+            _counter = _duration;
+           
+        }
         protected override void Update(float deltaTime)
         {
             if (!_isActive) return;
