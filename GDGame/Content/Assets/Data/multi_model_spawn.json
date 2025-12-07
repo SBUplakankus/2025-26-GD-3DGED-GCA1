@@ -25,26 +25,26 @@
             "modelName": "Long_Platform",
             "objectName": "cube_spawn-1"
         },
-        {
-            "position": [
-                -118.5,
-                0.05,
-                4
-            ],
-            "rotationDegrees": [
-                0,
-                0,
-                0
-            ],
-            "scale": [
-                3,
-                3,
-                3
-            ],
-            "textureName": "Guilitinne_openPBR_shader1_BaseColor",
-            "modelName": "Guilitinne_final",
-            "objectName": "Guilitinne_final"
-        },
+        //{
+        //    "position": [
+        //        -118.5,
+        //        0.05,
+        //        4
+        //    ],
+        //    "rotationDegrees": [
+        //        0,
+        //        0,
+        //        0
+        //    ],
+        //    "scale": [
+        //        3,
+        //        3,
+        //        3
+        //    ],
+        //    "textureName": "Guilitinne_openPBR_shader1_BaseColor",
+        //    "modelName": "Guilitinne_final",
+        //    "objectName": "Guilitinne_final"
+        //},
         {
             "position": [
                 0,

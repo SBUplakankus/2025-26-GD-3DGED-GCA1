@@ -10,6 +10,7 @@ namespace GDGame.Scripts.Traps
         {
             #region Fields
             protected GameObject _trapGO;
+            protected GameObject _trapModelGO;
             private int _trapID;
             #endregion
 
