@@ -27,9 +27,9 @@ namespace GDGame
         public static readonly string SKYBOX_RIGHT_TEXTURE_KEY = "skybox_right";
         public static readonly string SKYBOX_FRONT_TEXTURE_KEY = "skybox_front";
         public static readonly string SKYBOX_SKY_TEXTURE_KEY = "skybox_sky";
-        public static readonly string ENGLISH_CSV_PATH = "../../../Localisation/english.csv";
-        public static readonly string CZECH_CSV_PATH = "../../../Localisation/czech.csv";
-        public static readonly string UKRANIAN_CSV_PATH = "../../../Localisation/ukranian.csv";
+        public static readonly string ENGLISH_CSV_PATH = "Localisation/english.csv";
+        public static readonly string CZECH_CSV_PATH = "Localisation/czech.csv";
+        public static readonly string UKRANIAN_CSV_PATH = "Localisation/ukranian.csv";
         #endregion
 
         #region GameObject Names
