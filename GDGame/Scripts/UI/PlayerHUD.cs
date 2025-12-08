@@ -30,6 +30,7 @@ namespace GDGame.Scripts.UI
         private readonly Dictionary<string, Vector2> _hudPositions = new()
         {
             ["top_left"] = new Vector2(200, 100),
+            ["top_right"] = new Vector2(1500, 100),
             ["vert_increment"] = new Vector2(0, 50),
             ["hor_increment"] = new Vector2(285, 0),
             ["health"] = new Vector2(200, 230),
@@ -70,7 +71,7 @@ namespace GDGame.Scripts.UI
                 PositionProvider = () => pos
             };
 
-            textGO.AddComponent(uiText);
+            textGO.AddComponent(uiText);  
             _textObjects.Add(uiText);
             SceneController.AddToCurrentScene(textGO);
         }
@@ -142,8 +143,8 @@ namespace GDGame.Scripts.UI
             var vertIncrement = GetPos("vert_increment");
             var horIncrement = GetPos("hor_increment");
 
-            CreateText(AppData.LANG_TIME_KEY, startPos);
-            CreateText(AppData.LANG_HEALTH_KEY, startPos += vertIncrement);
+            CreateText(AppData.LANG_TIME_KEY, GetPos("top_right"));
+            CreateText(AppData.LANG_HEALTH_KEY, startPos);
             CreateHealthStat(startPos + horIncrement);
             CreateText(AppData.LANG_ORB_KEY, startPos += vertIncrement);
             CreateOrbStat(startPos + horIncrement);
