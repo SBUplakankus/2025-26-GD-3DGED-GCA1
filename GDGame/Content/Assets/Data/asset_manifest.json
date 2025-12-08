@@ -150,6 +150,26 @@
       "name": "Enviroment_Final",
       "contentPath": "assets/models/Enviroment_Final"
     },
+    {
+      "name": "Enterence_Base",
+      "contentPath": "assets/models/Enterence_Base"
+    },
+    {
+      "name": "Floor",
+      "contentPath": "assets/models/Floor"
+    },
+    {
+      "name": "Enterence",
+      "contentPath": "assets/models/Enterence"
+    },
+    {
+      "name": "Stairs_Base",
+      "contentPath": "assets/models/Stairs_Base"
+    },
+    {
+      "name": "Steps",
+      "contentPath": "assets/models/Steps"
+    },
 
     {
       "name": "Guilitinne_final",

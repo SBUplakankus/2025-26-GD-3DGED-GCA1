@@ -347,6 +347,106 @@
       "modelName": "Enviroment_Final",
       "objectName": "Enviroment_Final"
     },
+    {
+      "position": [
+        15,
+        0,
+        -100
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Enviroment_text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        15,
+        0,
+        -100
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Enviroment_text",
+      "modelName": "Stairs_Base",
+      "objectName": "Stairs_Base"
+    },
+    {
+      "position": [
+        15,
+        0,
+        -100
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Enviroment_text",
+      "modelName": "Floor",
+      "objectName": "Floor"
+    },
+    {
+      "position": [
+        15,
+        0,
+        -100
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Enviroment_text",
+      "modelName": "Enterence",
+      "objectName": "Enterence"
+    },
+    {
+      "position": [
+        15,
+        0,
+        -100
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Enviroment_text",
+      "modelName": "Enterence_Base",
+      "objectName": "Enterence_Base"
+    },
 
 
     {
