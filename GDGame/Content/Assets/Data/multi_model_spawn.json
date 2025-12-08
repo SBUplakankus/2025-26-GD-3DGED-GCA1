@@ -349,9 +349,9 @@
     },
     {
       "position": [
+        20,
         0,
-        0,
-        0
+        -35
       ],
       "rotationDegrees": [
         0,
@@ -363,15 +363,15 @@
         2,
         2
       ],
-      "textureName": "Enviroment_text",
+      "textureName": "Steps_Text",
       "modelName": "Steps",
       "objectName": "Steps"
     },
     {
       "position": [
         20,
-        0,
-        -49
+        2,
+        -40
       ],
       "rotationDegrees": [
         0,
@@ -383,7 +383,167 @@
         2,
         2
       ],
-      "textureName": "Enviroment_text",
+      "textureName": "Steps_Text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        20,
+        4,
+        -45
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Steps_Text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        20,
+        6,
+        -48
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Steps_Text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        20,
+        8,
+        -53
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Steps_Text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        20,
+        10,
+        -58
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Steps_Text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        20,
+        12,
+        -63
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Steps_Text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        20,
+        14,
+        -68
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Steps_Text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        20,
+        16,
+        -72
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Steps_Text",
+      "modelName": "Steps",
+      "objectName": "Steps"
+    },
+    {
+      "position": [
+        20,
+        -1,
+        -34
+      ],
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "textureName": "Stairs_Base_Text",
       "modelName": "Stairs_Base",
       "objectName": "Stairs_Base"
     },
@@ -403,15 +563,15 @@
         2,
         2
       ],
-      "textureName": "Enviroment_text",
+      "textureName": "Floor_Text",
       "modelName": "Floor",
       "objectName": "Floor"
     },
     {
       "position": [
-        -35,
-        30,
-        -130
+        13,
+        20,
+        -135
       ],
       "rotationDegrees": [
         0,
@@ -423,7 +583,7 @@
         2,
         2
       ],
-      "textureName": "Enviroment_text",
+      "textureName": "Door_Text",
       "modelName": "Enterence",
       "objectName": "Enterence"
     },
@@ -443,7 +603,7 @@
         2,
         2
       ],
-      "textureName": "Enviroment_text",
+      "textureName": "Enterence_Base_Text",
       "modelName": "Enterence_Base",
       "objectName": "Enterence_Base"
     },
