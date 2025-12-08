@@ -91,6 +91,15 @@ namespace GDGame.Scripts.Player
                 _timeRemaining = 0;
         }
 
+        public void AddTime(float seconds)
+        {
+            _timeRemaining += seconds;
+        }
+
+        public void StopTimer()
+        {
+            _timerStarted = false;
+        }
         #endregion
     }
 }
