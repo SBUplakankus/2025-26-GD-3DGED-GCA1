@@ -3,19 +3,15 @@ using System.Diagnostics;
 
 namespace GDGame.Scripts.Player
 {
-    /// <summary>
-    /// Controls the player stats in the game that are displayed in the Player HUD.
-    /// Created and stored in <see cref="PlayerController"/>.
-    /// </summary>
     public class PlayerStats
     {
         #region Fields
         private readonly int _startHealth = 100;
+        private readonly float _startingTimeInSeconds = 600f;
         private int _currentHealth;
         private int _orbsCollected;
         private float _timeRemaining;
-        private bool _timerStarted = false;
-        private bool _timerEnded = false;
+        private bool _isTimerRunning = false;
         #endregion
 
         #region Accessors
@@ -25,16 +21,16 @@ namespace GDGame.Scripts.Player
         {
             get
             {
-                if (!_timerStarted && _timeRemaining == 0)
-
-                    return "Time Remaining: 10:00";
+                if (!_isTimerRunning && _timeRemaining == _startingTimeInSeconds)
+                    return "Time remaining: 10:00";
 
                 int minutes = (int)(_timeRemaining / 60);
                 int seconds = (int)(_timeRemaining % 60);
-                return $"Time Remaining: {minutes:D2}:{seconds:D2}";
+                return $"Time remaining: {minutes:D2}:{seconds:D2}";
             }
         }
-        public bool IsTimeUp => _timeRemaining <=  0;
+
+        public bool IsTimeUp => _timeRemaining <= 0;
         #endregion
 
         #region Constructors
@@ -50,8 +46,23 @@ namespace GDGame.Scripts.Player
         {
             _currentHealth = _startHealth;
             _orbsCollected = 0;
-            _timeRemaining = 600f; //starts from 10 minutes 
-            _timerStarted = false;
+            _timeRemaining = _startingTimeInSeconds;
+            _isTimerRunning = false;
+        }
+
+        /// <summary>
+        /// Start the timer countdown
+        /// </summary>
+        public void StartTimer()
+        {
+            if (!_isTimerRunning)
+            {
+                
+                if (_timeRemaining <= 0 || _timeRemaining >= _startingTimeInSeconds)
+                    _timeRemaining = _startingTimeInSeconds;
+
+                _isTimerRunning = true;
+            }
         }
 
         /// <summary>
@@ -75,31 +86,32 @@ namespace GDGame.Scripts.Player
             _orbsCollected++;
         }
 
-        public void StartTimer()
-        {
-            _timeRemaining = 600f;  //10 minutes
-            _timerStarted = true;
-        }
-
+        /// <summary>
+        /// Handle the time countdown if timer has been started
+        /// </summary>
         public void HandleTimeCountdown()
         {
-            if (!_timerStarted || _timeRemaining <= 0) 
+            if (!_isTimerRunning || _timeRemaining <= 0)
                 return;
+
             _timeRemaining -= Time.DeltaTimeSecs;
 
             if (_timeRemaining <= 0)
+            {
                 _timeRemaining = 0;
+                _isTimerRunning = false;
+            }
         }
 
+        /// <summary>
+        /// Add extra time to the timer
+        /// </summary>
+        /// <param name="seconds">Seconds to add</param>
         public void AddTime(float seconds)
         {
             _timeRemaining += seconds;
         }
 
-        public void StopTimer()
-        {
-            _timerStarted = false;
-        }
         #endregion
     }
 }
