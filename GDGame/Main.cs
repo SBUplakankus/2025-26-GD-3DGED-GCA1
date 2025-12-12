@@ -249,6 +249,12 @@ namespace GDGame
                         _trapIdCounter, m.Position, m.RotationDegrees, m.Scale,
                         m.TextureName, m.ModelName, m.ObjectName, rotSpeed: 3f);
                 }
+                else if (!string.IsNullOrEmpty(m.ObjectName) && m.ObjectName.Equals("Spike"))
+                {
+                    _trapManager.AddMovingTrap(
+                        _trapIdCounter, m.Position, m.RotationDegrees, m.Scale,
+                        m.TextureName, m.ModelName, m.ObjectName, moveSpeed: 1f);
+                }
 
                 else
                 {

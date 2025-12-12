@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace GDGame.Scripts.Traps
 {
@@ -28,7 +29,15 @@ namespace GDGame.Scripts.Traps
         #region Game Methods
         public void AddTrap(int id, Vector3 position, Vector3 rotation, Vector3 scale, string textureName, string modelName, string objectName, float rotSpeed)
         {
+            
             RotatingTrap trap = new RotatingTrap(id, position, rotation, scale, textureName, modelName, objectName, rotSpeed);
+            _trapList.Add(trap);
+            trap.InitTrap();
+        }
+
+        public void AddMovingTrap(int id, Vector3 position, Vector3 rotation, Vector3 scale, string textureName, string modelName, string objectName, float moveSpeed)
+        {
+            MovingTrap trap = new MovingTrap(id, position,rotation,scale,textureName,modelName,objectName, moveSpeed);
             _trapList.Add(trap);
             trap.InitTrap();
         }
@@ -55,7 +64,7 @@ namespace GDGame.Scripts.Traps
         #region Engine Methods
         protected override void Start()
         {
-            _trapList.Add(new MovingTrap(1, 1f));
+            //_trapList.Add(new MovingTrap(1, 1f));
             //_trapList.Add(new RotatingTrap(2, 5f));
 
             InitTraps();
