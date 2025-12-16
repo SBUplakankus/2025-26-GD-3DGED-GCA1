@@ -14,6 +14,7 @@ Due to time constraint, there is not much game there but more of a demo for the 
 | Control | Key | 
 |--------|------|
 | Movement | `W / A / S / D` |
+| Jump | `Space` |
 | Camera | `Move Mouse` |
 | Swap Language | `L` |
 | Toggle Pause | `Esc` |
