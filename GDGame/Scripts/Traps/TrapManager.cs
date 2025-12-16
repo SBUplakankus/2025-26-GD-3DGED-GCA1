@@ -13,6 +13,7 @@ namespace GDGame.Scripts.Traps
     {
         #region Fields
         private List<TrapBase> _trapList;
+        private static readonly Random _rand = new Random();
         #endregion
 
         #region Constructor
@@ -29,8 +30,9 @@ namespace GDGame.Scripts.Traps
         #region Game Methods
         public void AddTrap(int id, Vector3 position, Vector3 rotation, Vector3 scale, string textureName, string modelName, string objectName, float rotSpeed)
         {
-            
-            RotatingTrap trap = new RotatingTrap(id, position, rotation, scale, textureName, modelName, objectName, rotSpeed);
+            double rotDelay = _rand.NextDouble() * 120f - 60f;
+
+            RotatingTrap trap = new RotatingTrap(id, position, rotation, scale, textureName, modelName, objectName, rotDelay, rotSpeed);
             _trapList.Add(trap);
             trap.InitTrap();
         }
