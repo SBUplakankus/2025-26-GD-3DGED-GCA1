@@ -55,6 +55,7 @@ namespace GDGame
         public static readonly string AUDIO_PANEL_NAME = "UI_audio_panel";
         public static readonly string CONTROL_PANEL_NAME = "UI_control_panel";
         public static readonly string MAIN_PANEL_NAME = "UI_main_panel";
+        public static readonly string FOOTSTEP_AUDIO_NAME = "Walking_Audio";
         #endregion
 
         #region Game
@@ -87,6 +88,7 @@ namespace GDGame
         public static readonly string RATTLE_KEY = "rattle";
         public static readonly string MAIN_THEME_KEY = "main_theme";
         public static readonly string MAIN_MUSIC = "test-music";
+        public const string UI_CLICK_SOUND_KEY = "ui_click";
         #endregion
 
         #region User Interface

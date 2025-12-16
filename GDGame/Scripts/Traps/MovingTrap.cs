@@ -1,7 +1,9 @@
 ﻿using GDEngine.Core.Components;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
+using SharpDX.Direct2D1.Effects;
 using System;
+using System.Security.AccessControl;
 
 namespace GDGame.Scripts.Traps
 {
@@ -16,12 +18,20 @@ namespace GDGame.Scripts.Traps
         #endregion
 
         #region Constructors
-        public MovingTrap(int id, float moveSpeed) : base(id)
+        public MovingTrap(int id, Vector3 position, Vector3 rotation, Vector3 scale, string textureName, string modelName, string objectName, float moveSpeed) : base(id)
         {
-            _trapGO = ModelGenerator.Instance.GenerateCube(new Vector3(10, 10, 10), Vector3.Zero, new Vector3(10, 10, 10), "ground_grass", AppData.TRAP_NAME + id);
+            _startPosition = position;
+            _moveSpeed = moveSpeed;
+
+            _trapGO = ModelGenerator.Instance.GenerateModel(
+                            position,
+                            rotation,
+                            scale,
+                            textureName,
+                            modelName,
+                            objectName + id);
             _trapGO.AddComponent<BoxCollider>();
             SceneController.AddToCurrentScene(_trapGO);
-            _moveSpeed = moveSpeed;
         }
         #endregion
 

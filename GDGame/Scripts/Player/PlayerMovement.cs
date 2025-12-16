@@ -1,12 +1,18 @@
-﻿using System.Diagnostics;
+﻿using GDEngine.Core.Components;
+﻿using BepuPhysics.Constraints;
 using GDEngine.Core.Components;
 using GDEngine.Core.Events;
 using GDEngine.Core.Rendering.Base;
+using GDEngine.Core.Services;
 using GDEngine.Core.Timing;
+using GDGame.Scripts.Events.Channels;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct3D9;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace GDGame.Scripts.Player
 {
@@ -20,12 +26,21 @@ namespace GDGame.Scripts.Player
     {
         #region Fields
         private readonly float _moveSpeed = 15f;
+        private readonly float _jumpForce = 8f;
+        private bool _isGrounded = false;
         private RigidBody _rb;
         private BoxCollider _collider;
         private readonly LayerMask _playerLayerMask = LayerMask.All;
-        private Keys _forwardKey, _rightKey, _backKey, _leftKey;
+        private Keys _forwardKey, _rightKey, _backKey, _leftKey, _jumpKey;
         private KeyboardState _keyboardState;
+        private bool _isGameOver = false;
+        private float _timeOfLastHit = (float)Time.RealtimeSinceStartupSecs;
+
+        private readonly InputEventChannel _inputEventChannel = EventChannelManager.Instance.InputEvents;
         #endregion
+
+        private SoundEffect _footsteps;
+        private SoundEffectInstance _footstepinstance;
 
         #region Accessors
         public RigidBody RB => _rb;
@@ -37,6 +52,7 @@ namespace GDGame.Scripts.Player
         {
             InitMovementKeys();
             InitRB();
+            // InitFootsteps();
         }
         #endregion
 
@@ -52,6 +68,7 @@ namespace GDGame.Scripts.Player
             _leftKey = keys.left;
             _backKey = keys.back;
             _forwardKey = keys.forward;
+            _jumpKey = keys.jump;
         }
 
         /// <summary>
@@ -70,6 +87,13 @@ namespace GDGame.Scripts.Player
             };
         }
         
+        private void InitFootsteps()
+        {
+            _footsteps = EngineContext.Instance.Content.Load<SoundEffect>("Assets/Sounds/Walking");
+            _footstepinstance = _footsteps.CreateInstance();
+            _footstepinstance.IsLooped = true;
+        }
+
         /// <summary>
         /// Logic To Move the Player modified from PhysicsWASDController
         /// </summary>
@@ -97,10 +121,21 @@ namespace GDGame.Scripts.Player
             _rb.LinearVelocity = velocity;
         }
 
+        private void Jump()
+        {
+            if (!_isGrounded)
+                return;
+
+            var velocity = _rb.LinearVelocity;
+            velocity.Y = _jumpForce;
+            _rb.LinearVelocity = velocity;
+            _isGrounded = false;
+        }
+
         /// <summary>
         /// Handles the player movement logic
         /// </summary>
-        private void HandleMovement()
+        private Vector3 HandleMovement()
         {
 
             // Set the Base Direction Vectors
@@ -133,18 +168,52 @@ namespace GDGame.Scripts.Player
                 moveDir += right;
             if (_keyboardState.IsKeyDown(_leftKey))
                 moveDir -= right;
+            if (_keyboardState.IsKeyDown(_jumpKey))
+            {
+                Jump();
+            }
 
             var speed = _moveSpeed;
 
             // Move the players rigid body
             Move(moveDir, speed);
+            if (_isGrounded)
+            {
+                var velocity = _rb.LinearVelocity;
+                velocity.Y = 0;
+                _rb.LinearVelocity = velocity;
+
+            }
+
+            return moveDir;
         }
         #endregion
+
+        private void HandleFootsteps(Vector3 moveDir)
+        {
+            bool isMoving = moveDir.LengthSquared() > 0f;
+
+            if (isMoving)
+            {
+                if (_footstepinstance.State != SoundState.Playing)
+                {
+                    _footstepinstance.Play();
+                }
+            }
+            else
+            {
+                if (_footstepinstance.State == SoundState.Playing)
+                {
+                    _footstepinstance.Stop();
+                }
+            }
+        }
 
         #region Game Loop
         protected override void Update(float deltaTime)
         {
-            HandleMovement();
+            Vector3 moveDir = HandleMovement();
+            // HandleFootsteps(moveDir);
         }
         #endregion
 
@@ -165,20 +234,52 @@ namespace GDGame.Scripts.Player
             if (!collision.Matches(_playerLayerMask)) return;
             if (a != _rb && b != _rb) return;
 
+
             var colName = b.GameObject.Name;
 
-            switch (colName)
+            if (colName!="ground")
             {
-                case "Game_Over":
-                    Debug.WriteLine("Game Over");
-                    break;
-                case "Game_Won":
-                    Debug.WriteLine("Game Won");
-                    break;
-                default:
-                    // Debug.WriteLine("Collison not Set Up");
-                    break;
+                Debug.WriteLine("Player Collision Detected: " + colName);
+
             }
+            if (colName.ToLower().Contains("ground") || colName.ToLower().Contains("base") || colName.ToLower().Contains("platform") || colName.ToLower().Contains("steps"))
+            {
+                _isGrounded = true;
+                return;
+            }
+
+            if (colName.Contains("Spike"))
+            {
+                if (_isGameOver) return;
+                _isGameOver = true;
+
+                Debug.WriteLine("Game Over");
+                //_inputEventChannel.OnPauseToggle.Raise();
+                EventChannelManager.Instance.PlayerEvents.OnPlayerLose.Raise();
+            }
+            else if (colName.Contains("Guilitinne_final"))
+            {
+                if ((float)Time.RealtimeSinceStartupSecs-_timeOfLastHit>0.5f)
+                {
+                    EventChannelManager.Instance.PlayerEvents.OnPlayerDamaged.Raise(10);
+                    _timeOfLastHit = (float)Time.RealtimeSinceStartupSecs;
+                }
+                return;
+            }
+
+
+                switch (colName)
+                {
+                    case "Game_Over":
+                        Debug.WriteLine("Game Over");
+                    break;
+                    case "Game_Won":
+                        Debug.WriteLine("Game Won");
+                        break;
+                    default:
+                        // Debug.WriteLine("Collison not Set Up");
+                        break;
+                }
         }
         #endregion
     }

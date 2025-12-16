@@ -120,6 +120,27 @@ namespace GDGame.Scripts.UI
             SceneController.AddToCurrentScene(textGO);
         }
 
+        // <summary>
+        /// Creates the timer display in the top right of the screen.
+        /// </summary>
+        /// <param name="pos">Position on Screen</param>
+        private void CreateTimerStat(Vector2 pos)
+        {
+            var textGO = new GameObject($"Text Object: Timer");
+            var uiText = new UIText
+            {
+                Color = _hudTextColour,
+                Font = _hudFont,
+                LayerDepth = UILayer.HUD,
+                TextProvider = () => _playerStats.TimeLeft,
+                PositionProvider = () => pos
+            };
+
+            textGO.AddComponent(uiText);
+            _textObjects.Add(uiText);
+            SceneController.AddToCurrentScene(textGO);
+        }
+
         /// <summary>
         /// Get a Vector2 Position from the Positions Dictionary
         /// </summary>
@@ -143,7 +164,7 @@ namespace GDGame.Scripts.UI
             var vertIncrement = GetPos("vert_increment");
             var horIncrement = GetPos("hor_increment");
 
-            CreateText(AppData.LANG_TIME_KEY, GetPos("top_right"));
+            CreateTimerStat(GetPos("top_right"));
             CreateText(AppData.LANG_HEALTH_KEY, startPos);
             CreateHealthStat(startPos + horIncrement);
             CreateText(AppData.LANG_ORB_KEY, startPos += vertIncrement);
