@@ -1,4 +1,5 @@
 ﻿using GDEngine.Core.Timing;
+using GDGame.Scripts.Events.Channels;
 using System.Diagnostics;
 
 namespace GDGame.Scripts.Player
@@ -64,6 +65,7 @@ namespace GDGame.Scripts.Player
 
             if (_currentHealth > 0) return;
 
+            EventChannelManager.Instance.PlayerEvents.OnPlayerLose.Raise();
             Debug.WriteLine("gg");
         }
 

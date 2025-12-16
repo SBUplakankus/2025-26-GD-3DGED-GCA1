@@ -17,9 +17,9 @@
         0
       ],
       "scale": [
+        10,
         3,
-        3,
-        3
+        50
       ],
       "textureName": "Long_Platform_lambert1_BaseColor",
       "modelName": "Long_Platform_Final",
@@ -38,7 +38,7 @@
       ],
       "scale": [
         3,
-        3,
+        6,
         3
       ],
       "textureName": "Guilitinne_openPBR_shader1_BaseColor",
@@ -78,7 +78,7 @@
       ],
       "scale": [
         3,
-        3,
+        6,
         3
       ],
       "textureName": "Guilitinne_openPBR_shader1_BaseColor",
@@ -118,7 +118,7 @@
       ],
       "scale": [
         3,
-        3,
+        6,
         3
       ],
       "textureName": "Guilitinne_openPBR_shader1_BaseColor",
@@ -158,7 +158,7 @@
       ],
       "scale": [
         3,
-        3,
+        6,
         3
       ],
       "textureName": "Guilitinne_openPBR_shader1_BaseColor",
@@ -198,7 +198,7 @@
       ],
       "scale": [
         3,
-        3,
+        6,
         3
       ],
       "textureName": "Guilitinne_openPBR_shader1_BaseColor",
@@ -238,7 +238,7 @@
       ],
       "scale": [
         3,
-        3,
+        6,
         3
       ],
       "textureName": "Guilitinne_openPBR_shader1_BaseColor",
@@ -278,7 +278,7 @@
       ],
       "scale": [
         3,
-        3,
+        6,
         3
       ],
       "textureName": "Guilitinne_openPBR_shader1_BaseColor",
@@ -317,9 +317,9 @@
         0
       ],
       "scale": [
+        5,
         3,
-        3,
-        3
+        5
       ],
       "textureName": "small_platform_text",
       "modelName": "Spike_Platform",
@@ -379,9 +379,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Steps_Text",
       "modelName": "Steps",
@@ -399,9 +399,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Steps_Text",
       "modelName": "Steps",
@@ -419,9 +419,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Steps_Text",
       "modelName": "Steps",
@@ -439,9 +439,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Steps_Text",
       "modelName": "Steps",
@@ -459,9 +459,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Steps_Text",
       "modelName": "Steps",
@@ -479,9 +479,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Steps_Text",
       "modelName": "Steps",
@@ -499,9 +499,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Steps_Text",
       "modelName": "Steps",
@@ -519,9 +519,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Steps_Text",
       "modelName": "Steps",
@@ -539,9 +539,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Stairs_Base_Text",
       "modelName": "Stairs_Base",
@@ -559,9 +559,9 @@
         0
       ],
       "scale": [
+        50,
         2,
-        2,
-        2
+        5
       ],
       "textureName": "Floor_Text",
       "modelName": "Floor",
@@ -621,9 +621,9 @@
         0
       ],
       "scale": [
+        10,
         3,
-        3,
-        3
+        10
       ],
       "textureName": "Spike_lambert1_BaseColor",
       "modelName": "Spike",

@@ -87,11 +87,12 @@ namespace GDGame.Scripts.Systems
 
             meshRenderer.Material = _material;
             meshRenderer.Overrides.MainTexture = texture;
-
+            
             var rb = new RigidBody
             {
                 BodyType = BodyType.Static,
             };
+
             gameObject.AddComponent(rb);
 
             var collider = new BoxCollider
