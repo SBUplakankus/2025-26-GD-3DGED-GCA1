@@ -21,12 +21,9 @@ namespace GDGame.Scripts.Player
         {
             get
             {
-                if (!_isTimerRunning && _timeRemaining == _startingTimeInSeconds)
-                    return "Time remaining: 10:00";
-
                 int minutes = (int)(_timeRemaining / 60);
                 int seconds = (int)(_timeRemaining % 60);
-                return $"Time remaining: {minutes:D2}:{seconds:D2}";
+                return "Time Remaining: " + $"{minutes:D2}:{seconds:D2}"; 
             }
         }
 

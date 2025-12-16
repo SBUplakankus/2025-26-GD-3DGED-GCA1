@@ -60,8 +60,20 @@ namespace GDGame.Scripts.Player
         public PlayerStats Stats => _playerStats;
         #endregion
 
+        #region Methods
+
+        /// <summary>
+        /// Update the player controller each frame
+        /// </summary>
+        public void Update()
+        {
+            _playerStats.HandleTimeCountdown();
+        }
+
+        #endregion
+
         #region Events
-        
+
         private void InitPlayerEvents()
         {
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;

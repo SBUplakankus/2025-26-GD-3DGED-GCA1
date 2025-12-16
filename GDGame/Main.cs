@@ -310,6 +310,7 @@ namespace GDGame
         {
             var aspectRatio = (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight;
             _playerController = new PlayerController(aspectRatio, _audioController);
+            _playerController.Stats.StartTimer();
         }
 
         /// <summary>
@@ -389,6 +390,7 @@ namespace GDGame
         protected override void Update(GameTime gameTime)
         {
             Time.Update(gameTime);
+            _playerController?.Update();
             base.Update(gameTime);
         }
 
