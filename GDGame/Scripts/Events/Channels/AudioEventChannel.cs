@@ -11,6 +11,9 @@
         public EventBase<float> OnMusicVolumeChanged = new();
         public EventBase<float> OnSFXVolumeChanged = new();
 
+        public EventBase OnFootstepsStart = new();
+        public EventBase OnFootstepsStop = new();
+
         /// <summary>
         /// Unsubscribe from all events in the Channel
         /// </summary>
@@ -20,6 +23,8 @@
             OnSFXRequested.UnsubscribeAll();
             OnMusicVolumeChanged.UnsubscribeAll();
             OnSFXVolumeChanged.UnsubscribeAll();
+            OnFootstepsStart.UnsubscribeAll();
+            OnFootstepsStop.UnsubscribeAll();
         }
     }
 }
