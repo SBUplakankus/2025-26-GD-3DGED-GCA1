@@ -52,7 +52,7 @@ namespace GDGame.Scripts.Player
         {
             InitMovementKeys();
             InitRB();
-            InitFootsteps();
+            // InitFootsteps();
         }
         #endregion
 
@@ -184,6 +184,8 @@ namespace GDGame.Scripts.Player
                 _rb.LinearVelocity = velocity;
 
             }
+
+            return moveDir;
         }
         #endregion
 
@@ -211,7 +213,7 @@ namespace GDGame.Scripts.Player
         protected override void Update(float deltaTime)
         {
             Vector3 moveDir = HandleMovement();
-            HandleFootsteps(moveDir);
+            // HandleFootsteps(moveDir);
         }
         #endregion
 
