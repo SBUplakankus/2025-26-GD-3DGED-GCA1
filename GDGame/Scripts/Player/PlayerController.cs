@@ -77,6 +77,7 @@ namespace GDGame.Scripts.Player
         {
             _playerGO.Transform.TranslateTo(_startPos);
             _playerGO.Transform.RotateToWorld(new Quaternion(_startRot,1));
+            EventChannelManager.Instance.InputEvents.OnPauseToggle.Raise();
             _playerStats.Initialise();
         }
         #endregion

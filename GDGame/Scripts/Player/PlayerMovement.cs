@@ -1,4 +1,5 @@
-﻿using GDEngine.Core.Components;
+﻿using BepuPhysics.Constraints;
+using GDEngine.Core.Components;
 using GDEngine.Core.Events;
 using GDEngine.Core.Rendering.Base;
 using GDEngine.Core.Timing;
@@ -161,10 +162,12 @@ namespace GDGame.Scripts.Player
 
             // Move the players rigid body
             Move(moveDir, speed);
-
-            if (_rb.LinearVelocity.Y <= 0.01f)
+            if (_isGrounded)
             {
-                _isGrounded = true;
+                var velocity = _rb.LinearVelocity;
+                velocity.Y = 0;
+                _rb.LinearVelocity = velocity;
+
             }
         }
         #endregion
@@ -201,6 +204,11 @@ namespace GDGame.Scripts.Player
                 Debug.WriteLine("Player Collision Detected: " + colName);
 
             }
+            if (colName.ToLower().Contains("ground") || colName.ToLower().Contains("base") || colName.ToLower().Contains("platform") || colName.ToLower().Contains("steps"))
+            {
+                _isGrounded = true;
+                return;
+            }
 
             if (colName.Contains("Spike"))
             {
@@ -213,7 +221,7 @@ namespace GDGame.Scripts.Player
             }
             else if (colName.Contains("Guilitinne_final"))
             {
-                if ((float)Time.RealtimeSinceStartupSecs-_timeOfLastHit>0.1f)
+                if ((float)Time.RealtimeSinceStartupSecs-_timeOfLastHit>0.5f)
                 {
                     EventChannelManager.Instance.PlayerEvents.OnPlayerDamaged.Raise(10);
                     _timeOfLastHit = (float)Time.RealtimeSinceStartupSecs;

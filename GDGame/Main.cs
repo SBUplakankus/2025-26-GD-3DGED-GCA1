@@ -1,8 +1,9 @@
-﻿using System.Windows.Forms;
-using GDEngine.Core;
+﻿using GDEngine.Core;
 using GDEngine.Core.Collections;
+using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Factories;
+using GDEngine.Core.Rendering;
 using GDEngine.Core.Screen;
 using GDEngine.Core.Serialization;
 using GDEngine.Core.Services;
@@ -21,6 +22,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct3D9;
+using System.Linq;
+using System.Windows.Forms;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDGame
@@ -255,6 +259,17 @@ namespace GDGame
                     _trapManager.AddMovingTrap(
                         _trapIdCounter, m.Position, m.RotationDegrees, m.Scale,
                         m.TextureName, m.ModelName, m.ObjectName, moveSpeed: 1f);
+                }
+                else if (!string.IsNullOrEmpty(m.ObjectName) && m.ObjectName.ToLower().Contains("platform"))
+                {
+                    GameObject modelGO = _modelGenerator.GenerateModel(
+                        m.Position, m.RotationDegrees, m.Scale, m.TextureName, m.ModelName, m.ObjectName);
+                    Vector3 boxSize = new Vector3(-5,m.Position.Y + m.Scale.Y/2f,m.Position.Z +m.Scale.Z/2f);
+                    modelGO.Components.OfType<BoxCollider>().FirstOrDefault().Center= boxSize;
+
+                    SceneController.GetCurrentScene.Add(modelGO);
+
+
                 }
 
                 else

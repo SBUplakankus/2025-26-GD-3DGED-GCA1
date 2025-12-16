@@ -45,7 +45,6 @@ namespace GDGame.Scripts.Traps
                 modelName,
                 objectName + id);
 
-            _trapGO.AddComponent<BoxCollider>();
             SceneController.AddToCurrentScene(_trapGO);
         }
         #endregion
