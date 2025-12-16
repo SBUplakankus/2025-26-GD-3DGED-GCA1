@@ -42,10 +42,16 @@ Individual Logs on what each team member did in the project
 
 ---
 
-## 🐶 Fuhad
+## 🐶 Fuhad - Lead Designer
 
 ### 😃 Main Tasks
-- ...
+- Developed the concept of the game.
+- Developed a timer system that triggers game over once it reaches 0.
+- Created a user evaluation form.
+- Gathered user feedback from the user evaluation form.
+- Created a UI click triggered sound.
+- Designed the layout of the game.
+- Created sounds for player death and a dragon trap.
 
 ---
 
