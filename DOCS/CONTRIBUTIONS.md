@@ -64,5 +64,7 @@ Individual Logs on what each team member did in the project
   -  Created, edited and finalized individual and group audio
   -  Created UI and menus
   -  Research into UI and UX and design principles
+  -  Created player sounds
+  -  Added player footsteps audio
 
 ---
