@@ -28,6 +28,7 @@ The goal is to develop a basic game using the 3D engine we made in class through
 
 | Name | Use |
 |------|-----|
+| [Screencast](https://www.youtube.com/watch?v=L_kBLXX9jqw) | Link to our screencast on YouTube |
 | [Git Guide](DOCS/GIT_GUIDE.md) | Teach the team how to use Git to avoid Merge Conflicts and keep a clean project |
 | [Development Plan](DOCS/DEVELOPMENT_PLAN.md) | Track the features of our game and layout what we want to achieve each week | 
 | [Engine Documentation](DOCS/ENGINE_DOCUMENTATION.md) | Contains tips, how-to's and fixes for problems we find in the engine |
@@ -35,7 +36,7 @@ The goal is to develop a basic game using the 3D engine we made in class through
 | [Game Instructions](DOCS/GAME_INSTRUCTIONS.md) | Contains instructions on how to play the game |
 | [User Testing](DOCS/USER_TESTING.md) | Contains takeaways and notes from our user testing sessions |
 | [Contributions](DOCS/CONTRIBUTIONS.md) | Contains the work each member of the team did and their reflections |
-| [References](DOCS/REFERENCES.md) | Contains references for materials used in our project |
+| [References](DOCS/REFERENCES.md) | Contains references for materials used in our project 
 
 ---
 
