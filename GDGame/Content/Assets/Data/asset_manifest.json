@@ -228,6 +228,10 @@
         {
             "name": "main_theme",
             "contentPath": "assets/sounds/Medieval_Mayhem_OST1.1"
+        },
+        {
+            "name": "ui_click",
+            "contentPath": "assets/sounds/ui_click"
         }
 
     ],
