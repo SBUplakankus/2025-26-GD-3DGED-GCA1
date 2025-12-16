@@ -6,13 +6,16 @@ Individual Logs on what each team member did in the project
 ## 🐱 Tomas - Project Manager / Trap Design
 
 ### 😃 Main Tasks
-  -  Guided teammates workflow
-  -  Tested every idea presented by teammates
-  -  Helped out with design decisions and ensured we don't stray away from our goal
-  -  Designed and documented all of our games objects mainly traps
-  -  Made sample sounds and helped with recording and editing
-  -  Designed, composed, edited and mixed the OST for the game
-  -  Created the code for the Traps
+  -  Created Trap Classes and Trap Manager
+  -  Made the Moving trap for the spikes that moves up and down perpetually
+  -  Creted the Rotating trap for the Guillotine that rotates around an axis
+  -  Upgraded the Rotating Trap code to work universally
+  -  Added offset to each Rotating Trap
+  -  Changed the from JSON loading to look for Traps and load them seperately
+  -  Added Jumping
+  -  Fixed some JSON Box Colliders
+  -  Added collision detection for the Guillotine to be able to damage the player
+  -  Added Game Over when the player touches spikes or when their HP reaches 0 (position reset not working)
 
 ---
 
