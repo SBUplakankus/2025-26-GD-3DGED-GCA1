@@ -88,6 +88,7 @@ namespace GDGame
         public static readonly string RATTLE_KEY = "rattle";
         public static readonly string MAIN_THEME_KEY = "main_theme";
         public static readonly string MAIN_MUSIC = "test-music";
+        public const string UI_CLICK_SOUND_KEY = "ui_click";
         #endregion
 
         #region User Interface

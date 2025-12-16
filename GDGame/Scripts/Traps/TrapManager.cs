@@ -1,6 +1,8 @@
 ﻿using GDEngine.Core.Components;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace GDGame.Scripts.Traps
 {
@@ -11,14 +13,13 @@ namespace GDGame.Scripts.Traps
     {
         #region Fields
         private List<TrapBase> _trapList;
+        private static readonly Random _rand = new Random();
         #endregion
 
         #region Constructor
         public TrapManager() 
         {
             _trapList = new List<TrapBase>();
-            //_trapList.Add(new MovingTrap(1,5));
-            //_trapList.Add(new RotatingTrap(2,3));
         }
         #endregion
 
@@ -27,6 +28,22 @@ namespace GDGame.Scripts.Traps
         #endregion
 
         #region Game Methods
+        public void AddTrap(int id, Vector3 position, Vector3 rotation, Vector3 scale, string textureName, string modelName, string objectName, float rotSpeed)
+        {
+            double rotDelay = _rand.NextDouble() * 120f - 60f;
+
+            RotatingTrap trap = new RotatingTrap(id, position, rotation, scale, textureName, modelName, objectName, rotDelay, rotSpeed);
+            _trapList.Add(trap);
+            trap.InitTrap();
+        }
+
+        public void AddMovingTrap(int id, Vector3 position, Vector3 rotation, Vector3 scale, string textureName, string modelName, string objectName, float moveSpeed)
+        {
+            MovingTrap trap = new MovingTrap(id, position,rotation,scale,textureName,modelName,objectName, moveSpeed);
+            _trapList.Add(trap);
+            trap.InitTrap();
+        }
+
         private void InitTraps()
         {
             if (_trapList.Count == 0) return;
@@ -49,8 +66,8 @@ namespace GDGame.Scripts.Traps
         #region Engine Methods
         protected override void Start()
         {
-            _trapList.Add(new MovingTrap(1, 1f));
-            _trapList.Add(new RotatingTrap(2, 1f));
+            //_trapList.Add(new MovingTrap(1, 1f));
+            //_trapList.Add(new RotatingTrap(2, 5f));
 
             InitTraps();
         }

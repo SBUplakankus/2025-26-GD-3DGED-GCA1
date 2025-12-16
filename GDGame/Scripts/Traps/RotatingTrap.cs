@@ -1,5 +1,7 @@
 ﻿using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
+using GDEngine.Core.Timing;
+using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using System;
@@ -13,96 +15,130 @@ namespace GDGame.Scripts.Traps
     {
         #region Fields
         private float _rotSpeed = 5f;
-        private float _startAngle = -90f;
-        private float _endAngle = 90f;
+        private float _centreAngle = 0f;
+        private float _endAngle = 60f;
         private float _currentAngle = 0f;
+        private double _rotDelay = 0;
         private bool _rotatingClockwise = true;
         #endregion
 
         #region Constructors
-        public RotatingTrap(int id, float rotSpeed) : base(id)
+        public RotatingTrap(
+            int id,
+            Vector3 position,
+            Vector3 rotation,
+            Vector3 scale,
+            string textureName,
+            string modelName,
+            string objectName,
+            double rotDelay,
+            float rotSpeed) : base(id)
         {
-            _trapGO = ModelGenerator.Instance.GenerateCube(
-                new Vector3(-3, 5, 0),
-                Vector3.Zero,
-                new Vector3(0.5f, 0.5f, 0.5f),
-                "ground_grass",
-                AppData.TRAP_NAME + id);
+            _rotDelay = rotDelay;
+            _rotSpeed = rotSpeed;
 
-            _trapModelGO = ModelGenerator.Instance.GenerateModel(
-                Vector3.Zero, Vector3.Zero, new Vector3(3,3,3),
-                "Guilitinne_openPBR_shader1_BaseColor",
-                "Guilitinne_final",
-                AppData.TRAP_NAME + id);
-
-            _trapModelGO.AddComponent<BoxCollider>();
+            _trapGO = ModelGenerator.Instance.GenerateModel(
+                position,
+                rotation,
+                scale,
+                textureName,
+                modelName,
+                objectName + id);
 
             SceneController.AddToCurrentScene(_trapGO);
-            //SceneController.AddToCurrentScene(_trapModelGO);
-
-
-            // Make sure parent has no scale applied
-            _trapGO.Transform.ScaleTo(Vector3.One);
-
-            // Then generate the model with normal scale
-            _trapModelGO.Transform.TranslateTo (new Vector3(1, 1, 1));
-
-            // Then parent it
-            _trapModelGO.Transform.SetParent(_trapGO.Transform);
-
-            // now place the model locally
-            _trapModelGO.Transform.TranslateTo(
-                new Vector3(-118.5f, 0.05f, 4)
-                //new Vector3(0, 10, 0)
-                );
-
-            // Only add the parent to the scene
-
-            _rotSpeed = rotSpeed;
         }
         #endregion
 
         #region Methods
+        //public override void UpdateTrap()
+        //{
+        //    _trapGO.Transform.RotateBy(Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.ToRadians(_rotSpeed)));
+        //    if (_rotatingClockwise)
+        //    {
+        //        _currentAngle++;
+        //    }
+        //    else
+        //    {
+        //        _currentAngle--;
+        //    }
+
+        //    if (_currentAngle >= _endAngle)
+        //    {
+        //        _rotatingClockwise = false;
+        //        flip();
+        //    }
+        //    if (_currentAngle <= _startAngle)
+        //    {
+        //        _rotatingClockwise = true;
+        //        flip();
+        //    }
+
+
+        //}
+
         public override void UpdateTrap()
         {
-            _trapGO.Transform.RotateBy(Quaternion.CreateFromAxisAngle(Vector3.Forward, MathHelper.ToRadians(_rotSpeed)));
-            if (_rotatingClockwise)
-            {
-                _currentAngle++;
-            }
-            else
-            {
-                _currentAngle--;
-            }
+            float baseRad = MathHelper.ToRadians(_rotSpeed);
+
+            //Compute a target angle as a sine wave around 0 with phase offset
+            float t = (float)Time.RealtimeSinceStartupSecs;
+            float targetAngle = MathF.Sin(t * _rotSpeed + (float)_rotDelay) * _endAngle;
+
+            //Compute delta from current angle
+            float degChange = targetAngle - _currentAngle;
+
+            //Apply easing
+            float distFromCenter = MathF.Abs(_currentAngle) / _endAngle;
+            distFromCenter = Math.Clamp(distFromCenter, 0f, 1f);
+
+            float easing = (1f + MathF.Cos(distFromCenter * MathF.PI)) * 0.5f;
+            float easedMul = MathHelper.Lerp(0.2f, 1f, easing);
+
+            degChange *= easedMul;
+
+            //Update current angle and rotation direction
+            _rotatingClockwise = degChange >= 0f;
+            _currentAngle += degChange;
 
             if (_currentAngle >= _endAngle)
             {
-                _rotatingClockwise = false;
+                _currentAngle = _endAngle;
                 flip();
             }
-            if (_currentAngle <= _startAngle)
+            else if (_currentAngle <= -_endAngle)
             {
-                _rotatingClockwise = true;
+                _currentAngle = -_endAngle;
                 flip();
             }
 
-
+            //Apply rotation
+            _trapGO.Transform.RotateBy(
+                Quaternion.CreateFromAxisAngle(
+                    Vector3.Forward,
+                    MathHelper.ToRadians(degChange)
+                )
+            );
         }
 
         public override void InitTrap()
         {
-            
+            _currentAngle = 0f;
+            _rotatingClockwise = true;
         }
+
+
 
         public override void HandlePlayerHit()
         {
             throw new NotImplementedException();
+            
         }
         #endregion
 
         public void flip()
         {
             _rotSpeed = -_rotSpeed;
+            _rotatingClockwise = !_rotatingClockwise;
         }
     }
 }

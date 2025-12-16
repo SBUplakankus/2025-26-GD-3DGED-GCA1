@@ -1,8 +1,9 @@
-﻿using System.Windows.Forms;
-using GDEngine.Core;
+﻿using GDEngine.Core;
 using GDEngine.Core.Collections;
+using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Factories;
+using GDEngine.Core.Rendering;
 using GDEngine.Core.Screen;
 using GDEngine.Core.Serialization;
 using GDEngine.Core.Services;
@@ -21,6 +22,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct3D9;
+using System.Linq;
+using System.Windows.Forms;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDGame
@@ -45,7 +49,8 @@ namespace GDGame
         private AudioController _audioController;
         private SceneController _sceneController;
         private UserInterfaceController _uiController;
-        private readonly TrapManager _trapManager;
+        //private readonly TrapManager _trapManager;
+        private TrapManager _trapManager;
         private TimeController _timeController;
         private CinematicCamController _cineCamController;
         private GameStateManager _gameStateManager;
@@ -232,6 +237,7 @@ namespace GDGame
             SceneController.GetCurrentScene.Add(uiRenderSystem);
         }
 
+        private int _trapIdCounter = 0;
         /// <summary>
         /// Load the objects from the multi model spawn JSON file
         /// </summary>
@@ -239,10 +245,40 @@ namespace GDGame
         {
             foreach (var m in JSONSerializationUtility.LoadData<ModelSpawnData>(Content, AppData.MULTI_MODEL_SPAWN_PATH))
             {
-                var modelGO = _modelGenerator.GenerateModel(
-                    m.Position, m.RotationDegrees, m.Scale, m.TextureName, m.ModelName, m.ObjectName);
+                
+                if (!string.IsNullOrEmpty(m.ObjectName) && m.ObjectName.Contains("Guilitinne_final"))
+                {
+                    _trapIdCounter++;
+                    _trapManager.AddTrap(
+                        _trapIdCounter, m.Position, m.RotationDegrees, m.Scale,
+                        m.TextureName, m.ModelName, m.ObjectName, rotSpeed: 3f);
+                }
+                else if (!string.IsNullOrEmpty(m.ObjectName) && m.ObjectName.Equals("Spike"))
+                {
+                    _trapIdCounter++;
+                    _trapManager.AddMovingTrap(
+                        _trapIdCounter, m.Position, m.RotationDegrees, m.Scale,
+                        m.TextureName, m.ModelName, m.ObjectName, moveSpeed: 1f);
+                }
+                else if (!string.IsNullOrEmpty(m.ObjectName) && m.ObjectName.ToLower().Contains("platform"))
+                {
+                    GameObject modelGO = _modelGenerator.GenerateModel(
+                        m.Position, m.RotationDegrees, m.Scale, m.TextureName, m.ModelName, m.ObjectName);
+                    Vector3 boxSize = new Vector3(-5,m.Position.Y + m.Scale.Y/2f,m.Position.Z +m.Scale.Z/2f);
+                    modelGO.Components.OfType<BoxCollider>().FirstOrDefault().Center= boxSize;
 
-                SceneController.GetCurrentScene.Add(modelGO);
+                    SceneController.GetCurrentScene.Add(modelGO);
+
+
+                }
+
+                else
+                {
+                    var modelGO = _modelGenerator.GenerateModel(
+                        m.Position, m.RotationDegrees, m.Scale, m.TextureName, m.ModelName, m.ObjectName);
+
+                    SceneController.GetCurrentScene.Add(modelGO);
+                }
             }
         }
 
@@ -310,17 +346,19 @@ namespace GDGame
         {
             var aspectRatio = (float)_graphics.PreferredBackBufferWidth / _graphics.PreferredBackBufferHeight;
             _playerController = new PlayerController(aspectRatio, _audioController);
+            _playerController.Stats.StartTimer();
         }
 
         /// <summary>
         /// Init the Trap Manager which controls the creation and updating of
         /// Traps and Obstacles in the scene
         /// </summary>
-        private static void InitTraps()
+        private void InitTraps()
         {
             //_trapManager = new TrapManager();
             var trapManagerGO = new GameObject("TrapManagerGO");
             trapManagerGO.AddComponent<TrapManager>();
+            _trapManager = trapManagerGO.GetComponent<TrapManager>();
             SceneController.AddToCurrentScene(trapManagerGO);
         }
 
@@ -389,6 +427,7 @@ namespace GDGame
         protected override void Update(GameTime gameTime)
         {
             Time.Update(gameTime);
+            _playerController?.Update();
             base.Update(gameTime);
         }
 
