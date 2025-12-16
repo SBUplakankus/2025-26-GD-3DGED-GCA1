@@ -20,10 +20,12 @@ namespace GDGame.Scripts.Player
     {
         #region Fields
         private readonly float _moveSpeed = 15f;
+        private readonly float _jumpForce = 8f;
+        private bool _isGrounded = false;
         private RigidBody _rb;
         private BoxCollider _collider;
         private readonly LayerMask _playerLayerMask = LayerMask.All;
-        private Keys _forwardKey, _rightKey, _backKey, _leftKey;
+        private Keys _forwardKey, _rightKey, _backKey, _leftKey, _jumpKey;
         private KeyboardState _keyboardState;
         #endregion
 
@@ -52,6 +54,7 @@ namespace GDGame.Scripts.Player
             _leftKey = keys.left;
             _backKey = keys.back;
             _forwardKey = keys.forward;
+            _jumpKey = keys.jump;
         }
 
         /// <summary>
@@ -97,6 +100,17 @@ namespace GDGame.Scripts.Player
             _rb.LinearVelocity = velocity;
         }
 
+        private void Jump()
+        {
+            if (!_isGrounded)
+                return;
+
+            var velocity = _rb.LinearVelocity;
+            velocity.Y = _jumpForce;
+            _rb.LinearVelocity = velocity;
+            _isGrounded = false;
+        }
+
         /// <summary>
         /// Handles the player movement logic
         /// </summary>
@@ -133,11 +147,20 @@ namespace GDGame.Scripts.Player
                 moveDir += right;
             if (_keyboardState.IsKeyDown(_leftKey))
                 moveDir -= right;
+            if (_keyboardState.IsKeyDown(_jumpKey))
+            {
+                Jump();
+            }
 
             var speed = _moveSpeed;
 
             // Move the players rigid body
             Move(moveDir, speed);
+
+            if (_rb.LinearVelocity.Y <= 0.01f)
+            {
+                _isGrounded = true;
+            }
         }
         #endregion
 

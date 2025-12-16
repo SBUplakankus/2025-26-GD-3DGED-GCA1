@@ -80,25 +80,26 @@ namespace GDGame.Scripts.Traps
         {
             float baseRad = MathHelper.ToRadians(_rotSpeed);
 
-            // **Compute a target angle as a sine wave around 0 with phase offset**
+            //Compute a target angle as a sine wave around 0 with phase offset
             float t = (float)Time.RealtimeSinceStartupSecs;
             float targetAngle = MathF.Sin(t * _rotSpeed + (float)_rotDelay) * _endAngle;
 
-            // Compute delta from current angle
-            float deltaAngle = targetAngle - _currentAngle;
+            //Compute delta from current angle
+            float degChange = targetAngle - _currentAngle;
 
-            // Apply easing like in your original code
+            //Apply easing
             float distFromCenter = MathF.Abs(_currentAngle) / _endAngle;
             distFromCenter = Math.Clamp(distFromCenter, 0f, 1f);
+
             float easing = (1f + MathF.Cos(distFromCenter * MathF.PI)) * 0.5f;
             float easedMul = MathHelper.Lerp(0.2f, 1f, easing);
-            deltaAngle *= easedMul;
 
-            // Update current angle and rotation direction
-            _rotatingClockwise = deltaAngle >= 0f;
-            _currentAngle += deltaAngle;
+            degChange *= easedMul;
 
-            // Flip logic (optional, still works)
+            //Update current angle and rotation direction
+            _rotatingClockwise = degChange >= 0f;
+            _currentAngle += degChange;
+
             if (_currentAngle >= _endAngle)
             {
                 _currentAngle = _endAngle;
@@ -110,18 +111,17 @@ namespace GDGame.Scripts.Traps
                 flip();
             }
 
-            // Apply rotation
+            //Apply rotation
             _trapGO.Transform.RotateBy(
                 Quaternion.CreateFromAxisAngle(
                     Vector3.Forward,
-                    MathHelper.ToRadians(deltaAngle)
+                    MathHelper.ToRadians(degChange)
                 )
             );
         }
 
         public override void InitTrap()
         {
-            // **Start at 0**; no offsets here because sine in UpdateTrap handles phase
             _currentAngle = 0f;
             _rotatingClockwise = true;
         }

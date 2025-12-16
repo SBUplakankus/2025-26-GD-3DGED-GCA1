@@ -20,6 +20,9 @@ namespace GDGame.Scripts.Traps
         #region Constructors
         public MovingTrap(int id, Vector3 position, Vector3 rotation, Vector3 scale, string textureName, string modelName, string objectName, float moveSpeed) : base(id)
         {
+            _startPosition = position;
+            _moveSpeed = moveSpeed;
+
             _trapGO = ModelGenerator.Instance.GenerateModel(
                             position,
                             rotation,
@@ -29,7 +32,6 @@ namespace GDGame.Scripts.Traps
                             objectName + id);
             _trapGO.AddComponent<BoxCollider>();
             SceneController.AddToCurrentScene(_trapGO);
-            _moveSpeed = moveSpeed;
         }
         #endregion
 

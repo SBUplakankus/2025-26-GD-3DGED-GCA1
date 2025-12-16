@@ -40,6 +40,8 @@ namespace GDGame.Scripts.Systems
         private readonly Keys _languageSwitchKey = Keys.L;
         private readonly Keys _orbTestKey = Keys.O;
         private readonly Keys _damageTestKey = Keys.P;
+        private readonly Keys _jumpKey = Keys.Space;
+
         private static MovementKeys _movementKeys;
 
         #endregion
@@ -89,7 +91,8 @@ namespace GDGame.Scripts.Systems
                 right = _rightKey,
                 forward = _forwardKey,
                 left = _leftKey,
-                back = _backwardKey
+                back = _backwardKey,
+                jump = _jumpKey
             };
 
             SceneController.AddToCurrentScene(_inputGO);
@@ -203,6 +206,6 @@ namespace GDGame.Scripts.Systems
 
     public struct MovementKeys 
     { 
-        public Keys forward, right, back, left; 
+        public Keys forward, right, back, left, jump; 
     }
 }
