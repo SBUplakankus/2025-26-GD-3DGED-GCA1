@@ -1,14 +1,15 @@
-﻿using System.Diagnostics;
-using System.Drawing;
-using GDEngine.Core.Components;
+﻿using GDEngine.Core.Components;
 using GDEngine.Core.Events;
 using GDEngine.Core.Rendering.Base;
+using GDEngine.Core.Services;
 using GDEngine.Core.Timing;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct3D9;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace GDGame.Scripts.Player
 {
@@ -30,7 +31,7 @@ namespace GDGame.Scripts.Player
         #endregion
 
         private SoundEffect _footsteps;
-        private InstanceSoundEffect _footstepinstance;
+        private SoundEffectInstance _footstepinstance;
 
         #region Accessors
         public RigidBody RB => _rb;
@@ -42,6 +43,7 @@ namespace GDGame.Scripts.Player
         {
             InitMovementKeys();
             InitRB();
+            InitFootsteps();
         }
         #endregion
 
@@ -77,7 +79,7 @@ namespace GDGame.Scripts.Player
         
         private void InitFootsteps()
         {
-            _footsteps = ContentLoader.Load<SoundEffect>("Audio/footsteps");
+            _footsteps = EngineContext.Instance.Content.Load<SoundEffect>("Assets/Sounds/Walking");
             _footstepinstance = _footsteps.CreateInstance();
             _footstepinstance.IsLooped = true;
         }
@@ -112,7 +114,7 @@ namespace GDGame.Scripts.Player
         /// <summary>
         /// Handles the player movement logic
         /// </summary>
-        private void HandleMovement()
+        private Vector3 HandleMovement()
         {
 
             // Set the Base Direction Vectors
@@ -150,6 +152,7 @@ namespace GDGame.Scripts.Player
 
             // Move the players rigid body
             Move(moveDir, speed);
+            return moveDir;
         }
         #endregion
 
@@ -157,16 +160,27 @@ namespace GDGame.Scripts.Player
         {
             bool isMoving = moveDir.LengthSquared() > 0f;
 
-            if(isMoving)
+            if (isMoving)
             {
-                _footstepinstance.Play();
+                if (_footstepinstance.State != SoundState.Playing)
+                {
+                    _footstepinstance.Play();
+                }
+            }
+            else
+            {
+                if (_footstepinstance.State == SoundState.Playing)
+                {
+                    _footstepinstance.Stop();
+                }
             }
         }
 
         #region Game Loop
         protected override void Update(float deltaTime)
         {
-            HandleMovement();
+            Vector3 moveDir = HandleMovement();
+            HandleFootsteps(moveDir);
         }
         #endregion
 

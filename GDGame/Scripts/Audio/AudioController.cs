@@ -30,6 +30,7 @@ namespace GDGame.Scripts.Audio
         private float _musicFade = 0;
         private bool _musicLooped = true;
         private bool disposedValue;
+        private SoundEffectInstance _footsteps;
         #endregion
 
         #region Constructors
@@ -64,6 +65,25 @@ namespace GDGame.Scripts.Audio
             _audioSystem.PlayOneShot(key, _sfxVolume);
         }
 
+        private void StartFootsteps()
+        {
+            if (_footsteps == null)
+            {
+                _footsteps = _sounds.Get(AppData.FOOTSTEP_AUDIO_NAME).CreateInstance();
+                _footsteps.IsLooped = true;
+                _footsteps.Volume = _sfxVolume;
+            }
+
+            if (_footsteps.State != SoundState.Playing)
+                _footsteps.Play();
+        }
+
+        private void StopFootsteps()
+        {
+            if (_footsteps?.State == SoundState.Playing)
+                _footsteps.Stop();
+        }
+
         /// <summary>
         /// Generate the 3D Audio Objects for the scene
         /// </summary>
@@ -77,6 +97,7 @@ namespace GDGame.Scripts.Audio
 
             var obj3 = Generate3DAudioObject(AppData.DUNGEON_AUDIO_NAME, new Vector3(1, 1, 1));
             _3DsoundsList.Add(obj3);
+
         }
 
         /// <summary>
@@ -133,6 +154,8 @@ namespace GDGame.Scripts.Audio
             _audioEventChannel.OnMusicVolumeChanged.Subscribe(HandleMusicVolumeChange);
             _audioEventChannel.OnSFXRequested.Subscribe(PlaySFX);
             _audioEventChannel.OnSFXVolumeChanged.Subscribe(HandleSFXVolumeChange);
+            _audioEventChannel.OnFootstepsStart.Subscribe(StartFootsteps);
+            _audioEventChannel.OnFootstepsStop.Subscribe(StopFootsteps);
         }
 
         /// <summary>

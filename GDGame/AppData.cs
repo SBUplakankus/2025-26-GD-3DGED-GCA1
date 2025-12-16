@@ -55,6 +55,7 @@ namespace GDGame
         public static readonly string AUDIO_PANEL_NAME = "UI_audio_panel";
         public static readonly string CONTROL_PANEL_NAME = "UI_control_panel";
         public static readonly string MAIN_PANEL_NAME = "UI_main_panel";
+        public static readonly string FOOTSTEP_AUDIO_NAME = "Walking_Audio";
         #endregion
 
         #region Game
