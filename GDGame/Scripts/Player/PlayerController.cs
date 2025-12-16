@@ -24,6 +24,7 @@ namespace GDGame.Scripts.Player
         private PlayerEventChannel _playerEventChannel;
         private Vector3 _startPos = new (-3, 5, 5);
         private Vector3 _startRot = new (0, 0, 0);
+        private bool _timeUpTriggered = false;
         #endregion
 
         #region Constructors
@@ -60,8 +61,26 @@ namespace GDGame.Scripts.Player
         public PlayerStats Stats => _playerStats;
         #endregion
 
+        #region Methods
+
+        /// <summary>
+        /// Update the player controller each frame
+        /// </summary>
+        public void Update()
+        {
+            _playerStats.HandleTimeCountdown();
+
+            if (_playerStats.IsTimeUp && !_timeUpTriggered)
+            {
+                _timeUpTriggered = true;
+                _playerEventChannel.OnPlayerLose.Raise();
+            }
+        }
+
+        #endregion
+
         #region Events
-        
+
         private void InitPlayerEvents()
         {
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
