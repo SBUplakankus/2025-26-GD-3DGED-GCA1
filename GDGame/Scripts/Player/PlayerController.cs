@@ -67,7 +67,17 @@ namespace GDGame.Scripts.Player
             _playerEventChannel = EventChannelManager.Instance.PlayerEvents;
             _playerEventChannel.OnOrbCollected.Subscribe(_playerStats.HandleOrbCollection);
             _playerEventChannel.OnPlayerDamaged.Subscribe(_playerStats.TakeDamage);
+
+            _playerEventChannel.OnPlayerLose.Subscribe(playerReset);
+
             EngineContext.Instance.Events.Subscribe<CollisionEvent>(_playerMovement.HandlePlayerCollision);
+        }
+
+        private void playerReset()
+        {
+            _playerGO.Transform.TranslateTo(_startPos);
+            _playerGO.Transform.RotateToWorld(new Quaternion(_startRot,1));
+            _playerStats.Initialise();
         }
         #endregion
     }

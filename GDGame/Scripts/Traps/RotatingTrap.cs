@@ -1,6 +1,7 @@
 ﻿using GDEngine.Core.Components;
 using GDEngine.Core.Entities;
 using GDEngine.Core.Timing;
+using GDGame.Scripts.Player;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using System;
@@ -131,6 +132,7 @@ namespace GDGame.Scripts.Traps
         public override void HandlePlayerHit()
         {
             throw new NotImplementedException();
+            
         }
         #endregion
 

@@ -1,12 +1,13 @@
-﻿using System.Diagnostics;
-using GDEngine.Core.Components;
+﻿using GDEngine.Core.Components;
 using GDEngine.Core.Events;
 using GDEngine.Core.Rendering.Base;
 using GDEngine.Core.Timing;
+using GDGame.Scripts.Events.Channels;
 using GDGame.Scripts.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct3D9;
+using System.Diagnostics;
 
 namespace GDGame.Scripts.Player
 {
@@ -27,6 +28,10 @@ namespace GDGame.Scripts.Player
         private readonly LayerMask _playerLayerMask = LayerMask.All;
         private Keys _forwardKey, _rightKey, _backKey, _leftKey, _jumpKey;
         private KeyboardState _keyboardState;
+        private bool _isGameOver = false;
+        private float _timeOfLastHit = (float)Time.RealtimeSinceStartupSecs;
+
+        private readonly InputEventChannel _inputEventChannel = EventChannelManager.Instance.InputEvents;
         #endregion
 
         #region Accessors
@@ -188,20 +193,47 @@ namespace GDGame.Scripts.Player
             if (!collision.Matches(_playerLayerMask)) return;
             if (a != _rb && b != _rb) return;
 
+
             var colName = b.GameObject.Name;
 
-            switch (colName)
+            if (colName!="ground")
             {
-                case "Game_Over":
-                    Debug.WriteLine("Game Over");
-                    break;
-                case "Game_Won":
-                    Debug.WriteLine("Game Won");
-                    break;
-                default:
-                    // Debug.WriteLine("Collison not Set Up");
-                    break;
+                Debug.WriteLine("Player Collision Detected: " + colName);
+
             }
+
+            if (colName.Contains("Spike"))
+            {
+                if (_isGameOver) return;
+                _isGameOver = true;
+
+                Debug.WriteLine("Game Over");
+                //_inputEventChannel.OnPauseToggle.Raise();
+                EventChannelManager.Instance.PlayerEvents.OnPlayerLose.Raise();
+            }
+            else if (colName.Contains("Guilitinne_final"))
+            {
+                if ((float)Time.RealtimeSinceStartupSecs-_timeOfLastHit>0.1f)
+                {
+                    EventChannelManager.Instance.PlayerEvents.OnPlayerDamaged.Raise(10);
+                    _timeOfLastHit = (float)Time.RealtimeSinceStartupSecs;
+                }
+                return;
+            }
+
+
+                switch (colName)
+                {
+                    case "Game_Over":
+                        Debug.WriteLine("Game Over");
+                    break;
+                    case "Game_Won":
+                        Debug.WriteLine("Game Won");
+                        break;
+                    default:
+                        // Debug.WriteLine("Collison not Set Up");
+                        break;
+                }
         }
         #endregion
     }
