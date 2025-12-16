@@ -454,31 +454,37 @@ namespace GDGame.Scripts.UI
         }
         private void OnPlayClicked()
         {
+            PlayClickSound();
             PlayRequested?.Invoke();
         }
 
         private void OnAudioClicked()
         {
+            PlayClickSound();
             ShowAudioMenu();
         }
 
         private void OnControlsClicked()
         {
+            PlayClickSound();
             ShowControlsMenu();
         }
 
         private void OnExitClicked()
         {
+            PlayClickSound();
             ExitRequested?.Invoke();
         }
 
         private void OnBackToMainFromAudio()
         {
+            PlayClickSound();
             ShowMainMenu();
         }
 
         private void OnBackToMainFromControls()
         {
+            PlayClickSound();
             ShowMainMenu();
         }
 
@@ -490,6 +496,16 @@ namespace GDGame.Scripts.UI
         private void OnSfxSliderChanged(float value)
         {
             SfxVolumeChanged?.Invoke(value);
+        }
+
+        /// <summary>
+        /// Play UI click sound
+        /// </summary>
+        private void PlayClickSound()
+        {
+            // Get the audio event channel and trigger a UI click sound
+            var audioEvents = EventChannelManager.Instance.AudioEvents;
+            audioEvents.OnSFXRequested.Raise(AppData.UI_CLICK_SOUND_KEY);
         }
         #endregion
 
